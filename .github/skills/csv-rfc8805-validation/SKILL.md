@@ -5,4 +5,4 @@ description: Checks the CSV structure
 
 # Skill Instructions
 
-A valid IP geolocation feed file in RFC8805 format is a valid CSV file, with optional comments and rows of comma-delimited columnar data. 
+This skills insures the IP geolocation CSV feed valid is (a) in fact a valid CSV file, and (b) is formatted according to the minimum requirements of the [RFC 8805 internet standard - A Format for Self-Published IP Geolocation Feeds](https://www.rfc-editor.org/rfc/rfc8805.txt)
