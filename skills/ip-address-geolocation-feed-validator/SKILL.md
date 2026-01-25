@@ -1,6 +1,6 @@
 ---
 name: ip-address-geolocation-feed-validator
-description: Helps author and validate, a CSV-format IP-based geolocation feed file against the RFC 8805 and current best practices.
+description: Helps author and validate a CSV-format IP-based geolocation feed file against RFC 8805 and current best practices.
 license: Apache-2.0
 metadata:
   author: Sid Mathur <support@getfastah.com>
@@ -32,32 +32,32 @@ This skill helps ensure that an IP geolocation CSV feed is (a) a valid CSV file,
 
 ## Phase 1: Deep Research
 
-Read Section 1 ("Introduction"), and Section 2 ("Self-Published IP Geolocation Feeds") of the plain text [RFC 8805 - A Format for Self-Published IP Geolocation Feeds](references/rfc8805.txt) to understand authoring requirements of an IP geolocation feed file - this covers both syntax and semantics.
+Read Section 1 ("Introduction") and Section 2 ("Self-Published IP Geolocation Feeds") of the plain text [RFC 8805 - A Format for Self-Published IP Geolocation Feeds](references/rfc8805.txt) to understand authoring requirements of an IP geolocation feed file. This covers both syntax and semantics.
 
 ## Phase 2: User input
 
-- If the user hasn't already provided a list of IP subnet or ranges (occassionally called `inetnum`, `inet6sum`), ask them for it. They may provide it to you via text chat, local file, or a remote link.
-- Normalize everything to UTF-8 encoding
-- In first pass, find the set of subnets they are referring to; as that's the hashing key in your logical map or dictionary, and eventually must be de-duplicated and referenced once.
+- If the user hasn't already provided a list of IP subnets or ranges (occasionally called `inetnum`, `inet6num`), ask them for it. They may provide it via text chat, local file, or a remote URL.
+- Normalize everything to UTF-8 encoding.
+- In the first pass, find the set of subnets they are referring to; this is the hashing key in your logical map or dictionary, and must eventually be de-duplicated and referenced once.
 
-- Run *validation checks* of the following types, flag errors to user for correction
+- Run *validation checks* of the following types; flag errors to the user for correction:
 
-  - Subnets or networks must parse cleanly to either IPv4 or IPv6 network type - use the language-specific code snippets provided in the `references/` folder.
-  - Subnet are pretty-printed to the user in slash notation. Remember that single-host subnets are /32 (prefix is 32 bits) in IPv4, and /128 (prefix is 128 bits) in IPv6.
-  - Flag *too big subnets* as potential errors or typos for further user review:
-    - for IPv6 - prefix with fewer bits than a /64 network, e.g `2001:db8::/32` is probably a typo by the user, as this network has 2^(128-32) hosts - which is too huge to used in an IP geolocation feed.
-    - for IPv4 - prefix showing fewer bits than /24 network should be flagged.
+  - Subnets or networks must parse cleanly to either IPv4 or IPv6 network type. Use the language-specific code snippets provided in the `references/` folder.
+  - Subnets are pretty-printed to the user in slash notation. Remember that single-host subnets are /32 (prefix is 32 bits) in IPv4, and /128 (prefix is 128 bits) in IPv6.
+  - Flag *overly large subnets* as potential errors or typos for further user review:
+    - For IPv6: prefixes with fewer bits than /64 (e.g., `2001:db8::/32`) are likely typos, as this network has 2^(128-32) hosts—far too large for an IP geolocation feed.
+    - For IPv4: prefixes smaller than /24 should be flagged.
 
-- Maintain a map, or dictionary - once subnets are validating as being valid IPv4 or IPv6 subnets; they should be used as keys in a map or dictionary. The value in the map is an object containing the geolocation attributes for that 
+- Maintain a map or dictionary. Once subnets are validated as valid IPv4 or IPv6 subnets, use them as keys in a map or dictionary. The value should be a custom type/object containing the geolocation attributes for that subnet, plus any user-specified hints or preferences for that subnet's geolocation.
 
-## Phase 3 : Syntax validation
+## Phase 3: Syntax validation
 
 ### CSV syntax test using `csvkit` CLI tool
 
-1. Ensure there are 4 columns in the CSV.  Comment lines are OK. 
-    - The desired columns may or may not be labeled with a header row.
-    - The implicit headers are `ip_prefix,alpha2code,region,city`
-    - See example user input CSV in [`example/01-user-input-rfc8805-feed.csv`](example/01-user-input-rfc8805-feed.csv)
+1. Ensure there are 4 columns in the CSV. Comment lines are OK.
+    - The columns may or may not be labeled with a header row.
+    - The implicit headers are `ip_prefix,alpha2code,region,city`.
+    - See example user input CSV in [`example/01-user-input-rfc8805-feed.csv`](example/01-user-input-rfc8805-feed.csv).
 
 2. Cleanse the CSV by using `csvcut` from the `csvkit` toolset as follows. Note that this single command fixes any linting issues with the CSV while also dropping any column after the fourth column:
 
@@ -65,16 +65,46 @@ Read Section 1 ("Introduction"), and Section 2 ("Self-Published IP Geolocation F
     csvcut -c 1-4 --add-bom example/01-user-input-rfc8805-feed.csv
     ```
 
-3. Optionally, remove any comment rows that use a `#` in the first column. Note that this will also remove the header row, if present but that's optional anyways according to RFC8805:
+3. Optionally, remove any comment rows that use a `#` in the first column. Note that this will also remove the header row if present, but headers are optional per RFC 8805:
 
     ```shell
     csvgrep --invert-match -c 1 -r '#' example/01-user-input-rfc8805-feed.csv
     ```
 
-4. Do not allow CSV that has a fifth column for `postal_code` or ZIP code to proceed past this stage, while offering the reason as follows if the user asks:
-    - [Section `2.1.1.5` of RFC 8805](https://www.rfc-editor.org/rfc/rfc8805.txt) explicitly deprecates postal/ZIP codes for many years now.
-    - Postal codes can be very small in terms of humans living inside them, so they are not considered privacy safe when mapping IP address ranges (which are statistical in nature) to a low-population density geographical region.
+4. Do not allow CSVs with a fifth column for `postal_code` or ZIP code to proceed past this stage. If the user asks why, explain:
+    - [Section 2.1.1.5 of RFC 8805](https://www.rfc-editor.org/rfc/rfc8805.txt) explicitly deprecates postal/ZIP codes.
+    - Postal codes can represent very small populations, so they are not considered privacy-safe when mapping IP address ranges (which are statistical in nature) to low-population-density geographical regions.
 
-## Phase 4 : Semantic validation - geolocation information, accuracy, place names, and ISO2 codes
+## Phase 4: Semantic validation
 
-## Phase 5 : Best practices scan
+Validate geolocation information, accuracy, place names, and ISO codes.
+
+### Country code validation
+
+- Validate `alpha2code` against `assets/iso3166-1.json`.
+- Flag unknown codes as ERROR.
+
+### Region code validation
+
+- If a region is provided, validate that the format matches `{COUNTRY}-{SUBDIVISION}` (e.g., `US-CA`, `AU-NSW`).
+- Validate against `assets/iso3166-2.json`.
+
+### City name validation
+
+- Flag placeholder values as ERROR: `undefined`, `Please select`, `null`, `N/A`, `TBD`, `unknown`.
+- Flag truncated/abbreviated names or airport codes as ERROR: `LA`, `Frft`, `sin01`, `LHR`, `SIN`, `MAA`.
+- Flag inconsistent casing as WARNING: `HongKong` vs `Hong Kong` vs `香港`.
+
+## Phase 5: Best practices scan
+
+- Flag overlapping subnets (e.g., /27 and /26 for the same base IP).
+- Suggest aggregation for consecutive single-host entries (/32, /31).
+- Recommend adding region codes when a city is specified.
+
+## Phase 6: Output format
+
+Generate a validation report containing:
+
+- Summary statistics (error/warning/info counts).
+- Per-entry validation table (HTML or Markdown).
+- Actionable recommendations list.
