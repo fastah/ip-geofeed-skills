@@ -10,6 +10,25 @@ Self-help resources from Siddharth "Sid" Mathur's talk at [NANOG 96](https://nan
 
 ## Quick guide
 
+### Amp
+
+Install the skill directly from GitHub:
+
+```shell
+amp install github.com/fastah/ip-geofeed-skills/validator
+```
+
+Then invoke it with:
+
+```
+/skill validator
+```
+
+Or simply ask Amp to validate a geofeed and it will auto-select the skill.
+
+### VS Code / GitHub Copilot
+
+Clone this repository into your workspace, and the skill will be discovered automatically from the `skills/` directory.
 
 ## What are Agent Skills
 

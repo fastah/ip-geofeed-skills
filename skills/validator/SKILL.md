@@ -1,5 +1,5 @@
 ---
-name: ip-address-geolocation-feed-validator
+name: validator
 description: Helps author and validate a CSV-format IP-based geolocation feed file against RFC 8805 and current best practices.
 license: Apache-2.0
 metadata:

@@ -1,7 +1,7 @@
 <available_skills>
     <skill>
-        <name>ip-address-geolocation-feed-validator</name>
-        <description>Helps author and validate, a CSV-format IP-based geolocation feed file against the RFC 8805 and current best practices.</description>
-        <location>.github/skills/ip-address-geolocation-feed-validator/SKILL.md</location>
+        <name>validator</name>
+        <description>Helps author and validate a CSV-format IP-based geolocation feed file against RFC 8805 and current best practices.</description>
+        <location>skills/validator/SKILL.md</location>
     </skill>
 </available_skills>
