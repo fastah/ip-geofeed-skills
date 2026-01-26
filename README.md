@@ -1,7 +1,6 @@
 # AI skills for IP Geolocation feeds - authoring, validating, and publication
 
-![GitHub Downloads (all assets, latest release)](https://img.shields.io/github/downloads-pre/fastah/ip-geofeed-skills/latest/total)
-
+[![Download latest ZIP package](https://img.shields.io/badge/Latest%20release%20ZIP-8A2BE2)](https://github.com/fastah/ip-geofeed-skills/releases/latest/)
 
 This package has self-help resources from Siddharth "Sid" Mathur's talk at [NANOG 96](https://nanog.org/events/nanog-96/) San Francisco - [High-quality IP Geofeeds using AI Coding Assistants and MCP](https://nanog.org/events/nanog-96/content/5683/).
 
