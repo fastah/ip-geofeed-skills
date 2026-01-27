@@ -15,7 +15,7 @@ AI coding agents should be asked to read IP geolocation feed validation guidance
 
 - If using [ChatGPT Codex](https://marketplace.visualstudio.com/items?itemName=openai.chatgpt), enable [Skills](https://developers.openai.com/codex/skills/) with the `[[skills.config]]` flag.
 
-- Tools on Windows: Use the Microsoft Store for self-updating [VS Code](https://apps.microsoft.com/detail/xp9khm4bk9fz7q?hl=en-US&gl=US), [Python](https://apps.microsoft.com/detail/9mz1snwt0n5d?hl=en-US&gl=US), and [PowerShell](https://apps.microsoft.com/detail/9mz1snwt0n5d?hl=en-US&gl=US).
+- Tools on Windows: Use the Microsoft Store for self-updating [VS Code](https://apps.microsoft.com/detail/xp9khm4bk9fz7q?hl=en-US&gl=US), [Python](https://apps.microsoft.com/detail/9pnrbtzxmb4z?hl=en-US&gl=US), and [PowerShell](https://apps.microsoft.com/detail/9mz1snwt0n5d?hl=en-US&gl=US).
 
 ## Quick guide
 
