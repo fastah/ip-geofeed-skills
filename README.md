@@ -9,13 +9,13 @@ AI coding agents should be asked to read IP geolocation feed validation guidance
 ## Pre-requisites
 
 - IDE - [Visual Studio Code](https://code.visualstudio.com).
-- If using [GitHub Copilot](https://marketplace.visualstudio.com/items?itemName=GitHub.copilot-chat), enable the experimental [`chat.useAgentSkills`](vscode://settings/chat.useAgentSkills) feature, see [Agent Skills help](https://code.visualstudio.com/docs/copilot/customization/agent-skills). Related [VS Code config file](.vscode/settings.json).
+- For [GitHub Copilot](https://marketplace.visualstudio.com/items?itemName=GitHub.copilot-chat), enable the experimental [`chat.useAgentSkills`](vscode://settings/chat.useAgentSkills) feature, see [Agent Skills help](https://code.visualstudio.com/docs/copilot/customization/agent-skills). Related [VS Code config file](.vscode/settings.json).
 
-- If using [Claude](https://marketplace.visualstudio.com/items?itemName=anthropic.claude-code) - turn on [Skills in Settings -> Capabilities](https://support.claude.com/en/articles/12512180-using-skills-in-claude). Enterprise users must also enable `Code execution and file creation`. Claude Code supports Skills in beta.
+- For [Claude Code](https://marketplace.visualstudio.com/items?itemName=anthropic.claude-code) - enable [Skills in Settings -> Capabilities](https://support.claude.com/en/articles/12512180-using-skills-in-claude). Then make a `validator.zip` ZIP file from the [`skills/validator`](skills/validator) folder, and upload it as an Agent Skill. Enterprise users must also enable `Code execution and file creation`.
 
-- If using [ChatGPT Codex](https://marketplace.visualstudio.com/items?itemName=openai.chatgpt), enable [Skills](https://developers.openai.com/codex/skills/) with the `[[skills.config]]` flag.
+- For [ChatGPT Codex](https://marketplace.visualstudio.com/items?itemName=openai.chatgpt), enable [Skills](https://developers.openai.com/codex/skills/) with the `[[skills.config]]` flag.
 
-- Tools on Windows: Use the Microsoft Store for self-updating [VS Code](https://apps.microsoft.com/detail/xp9khm4bk9fz7q?hl=en-US&gl=US), [Python](https://apps.microsoft.com/detail/9pnrbtzxmb4z?hl=en-US&gl=US), and [PowerShell](https://apps.microsoft.com/detail/9mz1snwt0n5d?hl=en-US&gl=US).
+- *Windows only*: Use the Microsoft Store for self-updating [VS Code](https://apps.microsoft.com/detail/xp9khm4bk9fz7q?hl=en-US&gl=US), [Python](https://apps.microsoft.com/detail/9pnrbtzxmb4z?hl=en-US&gl=US), and [PowerShell](https://apps.microsoft.com/detail/9mz1snwt0n5d?hl=en-US&gl=US).
 
 ## Quick guide
 
