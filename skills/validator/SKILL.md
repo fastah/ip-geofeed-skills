@@ -142,6 +142,11 @@ The goal is to ensure the file can be parsed reliably and normalized into a **co
     - Flag **overly large subnets** as potential errors or typos for user review:
       - **IPv6**: Prefixes shorter than `/64` (for example, `2001:db8::/32`) should be flagged, as they represent an unrealistically large address space for an IP geolocation feed.
       - **IPv4**: Prefixes shorter than `/24` should be flagged.
+    - Flag **non-public IP address ranges** that are accidentally or intentionally included in the subnet list.
+    - Treat any subnet identified as **private, loopback, link-local, multicast, or otherwise non-public** as invalid for an RFC 8805 feed.
+    - In Python, use the built-in `is_private` (and related address properties) as shown in the code snippets provided in the `references/` folder.
+    - Report detected non-public subnets to the user as **ERRORS** and require correction before continuing.
+
 
   - **Subnet Storage**
     - Once validated, store each subnet as a **key** in a map or dictionary.
