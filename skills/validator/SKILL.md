@@ -58,7 +58,7 @@ This skill validates an IP geolocation feed provided in CSV format by ensuring t
 
 - **Validation Script Generation**
   - Generate a **single validation script** that incorporates **all steps from Phases 2–6**.
-  - Store the generated script in the `./scripts` directory.
+  - Store the generated script in the `./run/scripts` directory.
   - The script must include:
     - Load CSV input — download if a URL is provided, otherwise use local (**Phase 2**).
     - CSV and IP syntax checks (**Phase 3**).
@@ -90,7 +90,7 @@ This research phase establishes the conceptual foundation needed before performi
   - A local CSV file
   - A remote URL pointing to a CSV file
 
-- If the input is a **remote URL**, download the CSV file into the `./input` directory before processing.
+- If the input is a **remote URL**, download the CSV file into the `./run/data` directory before processing.
 - If the input is a **local file**, continue processing it directly without downloading.
 - Normalize all input data to **UTF-8** encoding.
 
@@ -220,7 +220,9 @@ Semantic validation must run only after **syntax validation** completes successf
 ### Phase 6: HTML Report Generation
 
 Generate a **deterministic, self-contained HTML validation report** using **HTML5** and **inline CSS only** (no external assets).  
-If inline rendering is supported by the UI, render directly; otherwise write `validation-report.html` to the working directory and open it using the system default browser.
+If inline rendering is supported by the UI, render the report directly.
+Otherwise, write the HTML report to `./run/report/`, using the **input CSV filename** (with a `.html` extension), and open it with the system default browser.
+
 
 
 #### Summary Section
