@@ -1,7 +1,6 @@
 {
     "recommendations": [
         "ms-python.python",
-        "golang.go",
         "mechatroner.rainbow-csv",
         "ms-vscode.PowerShell",
     ]

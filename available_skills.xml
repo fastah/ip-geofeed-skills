@@ -1,7 +1,7 @@
 <available_skills>
     <skill>
-        <name>validator</name>
+        <name>geofeed-tuner</name>
         <description>Helps author and validate a CSV-format IP-based geolocation feed file against RFC 8805 and current best practices.</description>
-        <location>skills/validator/SKILL.md</location>
+        <location>skills/geofeed-tuner/SKILL.md</location>
     </skill>
 </available_skills>

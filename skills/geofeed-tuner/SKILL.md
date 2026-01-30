@@ -1,5 +1,5 @@
 ---
-name: validator
+name: geofeed-tuner
 description: Helps author and validate a CSV-format IP-based geolocation feed file against RFC 8805 and current best practices.
 license: Apache-2.0
 metadata:
@@ -57,16 +57,17 @@ This skill validates an IP geolocation feed provided in CSV format by ensuring t
     Generate a **HTML report** summarizing validation results, errors, and warnings.
 
 - **Validation Script Generation**
-  - Generate a **single validation script** that incorporates **all steps from Phases 3–6**.
-  - Store the generated script in the `./scripts` directory.
+  - Generate a **single validation script** that incorporates **all steps from Phases 2–6**.
+  - Store the generated script in the `./run/scripts` directory.
   - The script must include:
-    - CSV and IP syntax checks (Phase 3).
-    - Semantic validations including country, region, city, and postal code checks (Phase 4).
-    - Best practices warnings and recommendations (Phase 5).
-    - HTML report generation summarizing validation results (Phase 6).
+    - Load CSV input — download if a URL is provided, otherwise use local (**Phase 2**).
+    - CSV and IP syntax checks (**Phase 3**).
+    - Semantic validations including country, region, city, and postal code checks (**Phase 4**).
+    - Best practices warnings and recommendations (**Phase 5**).
+    - HTML report generation summarizing validation results (**Phase 6**).
 
 - Users or automation agents should **not skip phases**, as each phase provides critical checks or data transformations required for the next stage.
-- Logging or reporting at each phase is recommended to **track progress and flag any corrections needed** before continuing.
+
 
 
 ### Phase 1: Deep Research
@@ -89,7 +90,7 @@ This research phase establishes the conceptual foundation needed before performi
   - A local CSV file
   - A remote URL pointing to a CSV file
 
-- If the input is a **remote URL**, download the CSV file into the `./input` directory before processing.
+- If the input is a **remote URL**, download the CSV file into the `./run/data` directory before processing.
 - If the input is a **local file**, continue processing it directly without downloading.
 - Normalize all input data to **UTF-8** encoding.
 
@@ -142,6 +143,11 @@ The goal is to ensure the file can be parsed reliably and normalized into a **co
     - Flag **overly large subnets** as potential errors or typos for user review:
       - **IPv6**: Prefixes shorter than `/64` (for example, `2001:db8::/32`) should be flagged, as they represent an unrealistically large address space for an IP geolocation feed.
       - **IPv4**: Prefixes shorter than `/24` should be flagged.
+    - Flag **non-public IP address ranges** that are accidentally or intentionally included in the subnet list.
+    - Treat any subnet identified as **private, loopback, link-local, multicast, or otherwise non-public** as invalid for an RFC 8805 feed.
+    - In Python, use the built-in `is_private` (and related address properties) as shown in the code snippets provided in the `references/` folder.
+    - Report detected non-public subnets to the user as **ERRORS** and require correction before continuing.
+
 
   - **Subnet Storage**
     - Once validated, store each subnet as a **key** in a map or dictionary.
@@ -213,50 +219,170 @@ Semantic validation must run only after **syntax validation** completes successf
 
 ### Phase 6: HTML Report Generation
 
-Generate an HTML validation report with the following structure. Use modern web standards (HTML5, and W3C Web APIs) with inline CSS to create minimal file clutter. OK to generate inline HTML report if the UI supports it; otherwise write out the .html to the working directory or open it for the user using the default open-with-browser system action.
+- Generate a **deterministic, self-contained HTML validation report** using **HTML5** and **inline CSS only** (no external assets).  
+- If inline rendering is supported by the UI, render the report directly. Otherwise, write the HTML report to `./run/report/`, using the **input CSV filename** (with a `.html` extension), and open it with the system default browser.
+- Where applicable, use **Bootstrap (v5.3.x)** classes and components to style the report for readability and consistency.
+  - Prefer layout, tables, badges, alerts, and collapsible UI elements from Bootstrap.
+  - Do not require a build step; use CDN-compatible Bootstrap assets only.
+  - Reference: [Bootstrap documentation](https://raw.githubusercontent.com/twbs/bootstrap/refs/tags/v5.3.8/site/src/content/docs/getting-started/introduction.mdx)
 
-#### 1. Summary header
 
-Display rolled-up statistics at the top:
 
-- Total entries processed
-- Counts by severity: ERROR, WARNING, INFO (valid entries)
-- Feed metadata: filename, timestamp, IPv4/IPv6 entry counts
-- Geographical accuracy stats - subnets with city-level accuracy, with state-only accuracy, with country-level accurarcy, and "do not geolocate" signalling.
+#### Summary Section
 
-#### 2. Results table
+Render a **fixed metrics panel** at the top of the report, consisting of **four separate tables stacked vertically (top-down)**.
+Each table must appear **one after the other**, never side-by-side.
 
-Render a table with one row per CSV entry. Columns:
+##### Table layout and styling requirements
 
-| Column | Description |
-|--------|-------------|
-| Line | Original CSV line number |
-| IP Prefix | The subnet in CIDR notation |
-| Country | `alpha2code` with flag emoji if valid |
-| Region | `region` code |
-| City | City name |
-| Status | ERROR / WARNING / INFO |
-| Messages | Validation messages for this entry. Inferred geographical accuracy. |
+- Use `./templates/report_header.html` as the **visual and structural reference** for the metrics panel.
+- **Style the template and all summary tables using Bootstrap (v5.3.x)** for layout, spacing, and typography.
+  - Use Bootstrap table utilities (`.table`, `.table-bordered`, `.table-sm`, etc.) where appropriate.
+  - Use Bootstrap spacing and container classes to enforce margins and alignment.
+- All tables must have a **consistent width** across the report.
+- Table width must **fit within the page viewport** and respect horizontal margins.
+- Apply equal **left and right margins** so tables are visually centered.
+- Use a **clean, readable report style**:
+  - Clear table borders
+  - Bold header row
+  - Adequate cell padding
+- Do not allow tables to overflow horizontally.
+- Tables must scale cleanly for typical desktop screen widths and printing.
 
-#### 3. Row grouping and styling
+Each table must use a **two-column key–value layout**:
+- **Left column**: metric label
+- **Right column**: computed value only
 
-Group rows by severity for user triage:
 
-- **ERROR** (red): Invalid entries requiring fixes before publication
-- **WARNING** (yellow): Entries that may need review
-- **INFO** (green): Valid entries with optional suggestions
+###### Feed Metadata
 
-Use collapsible sections so users can hide INFO rows and focus on problems.
+- Input file: display the source as a URL if provided; otherwise show the local file path and resolved filename.
+- Timestamp must be UTC, ISO-8601.
 
-#### 4. Actionable recommendations
+| Metric               | Value |
+|----------------------|-------|
+| Input file           |       |
+| Validation timestamp |       |
 
-End with a numbered list of specific fixes, e.g.:
 
-1. "Line 42: Replace country code `UK` with `GB`"
-2. Any other observations and comments.
+###### Entries
 
----
+| Metric                     | Value |
+|----------------------------|-------|
+| Total entries              |       |
+| IPv4 entries               |       |
+| IPv6 entries               |       |
 
-**TODO: Clarify the following before implementation:**
 
-- TODO: Add "Copy to clipboard" button for exporting valid 4-column CSV data
+###### Validation Results
+
+| Metric        | Value |
+|---------------|-------|
+| ERROR count   |       |
+| WARNING count |       |
+| INFO count    |       |
+
+
+###### Geographical Accuracy Classification
+
+| Metric                     | Value |
+|----------------------------|-------|
+| City-level accuracy        |       |
+| Region-level accuracy      |       |
+| Country-level accuracy     |       |
+| Do-not-geolocate entries   |       |
+
+
+#### Results Table
+
+Render a **single, stable, sortable HTML table** with **one row per input CSV entry**.
+- Preserve the **original CSV row order** by default.
+- Use `./templates/report_table.html` as the **visual and structural reference** for table.
+
+Columns **must appear in this exact order**:
+
+| Column    | Description                                               |
+|-----------|-----------------------------------------------------------|
+| Line      | 1-based CSV line number                                   |
+| IP Prefix | Normalized CIDR notation                                  |
+| Country   | `alpha2code` with the corresponding country flag emoji    |
+| Region    | Region code or empty                                      |
+| City      | City name or empty                                        |
+| Severity  | ERROR, WARNING, BEST_PRACTICE, or INFO                    |
+| Messages  | Ordered list of validation messages and inferred accuracy |
+
+##### Column Definitions
+
+- **Line**  
+  - The **1-based line number** from the original input CSV file.  
+  - This value must refer to the physical line in the source file after comment handling.
+
+- **IP Prefix**  
+  - The IP subnet expressed in **normalized CIDR notation**.  
+
+- **Country**  
+  The two-letter ISO 3166-1 `alpha2code` associated with the subnet.  
+  - Always display the **country flag emoji** alongside the code in the HTML report.
+  - If the country code is invalid, display the raw value with the emoji omitted or replaced according to validation rules.
+
+- **Region**  
+
+The **ISO 3166-2 subdivision code** (for example, `US-CA`).
+
+  - UI Behavior
+    - Render the **Region** field as a **dropdown menu**.
+    - The **default selected value** MUST be the value provided in the CSV.
+    - If the CSV value is present and valid, **skip any lookup** and proceed to the next step.
+
+  - Auto-suggestion (Fallback)
+    - If the CSV value is **empty or missing**:
+      - Invoke the [Blackbox](https://mcp.mapbox.com/mcp) MCP server **reverse-geocode** tool using the **City** field.
+      - Populate the dropdown with **at least three suggested region codes**.
+      - Suggestions SHOULD be ordered by **confidence or relevance**, when available.
+      - Leave the field empty if no region is specified or applicable.
+      - The user MAY override the suggested value by selecting a different option from the dropdown.
+
+- **City**  
+  The city name associated with the subnet.  
+  - Leave empty if no city is provided.
+
+- **Severity**  
+  - The **highest severity level** assigned to the row after all validation phases complete.  
+  - Severity order: `ERROR` > `WARNING` > `BEST_PRACTICE` > `INFO`
+
+
+- **Messages**  
+  An **ordered list** of validation messages for the row.  
+  - Includes  **ERROR**, **WARNING** and  **OBSERVATION**.
+
+##### Filtering and Visual Encoding
+
+- Apply **row-level visual styling** based on severity:
+  - **ERROR**: light red background
+  - **WARNING**: light yellow background
+  - **BEST_PRACTICE**: light blue or neutral background
+  - **INFO**: light green background
+
+- Provide a **severity filter dropdown** positioned **above the table**, aligned with the table title.
+  - Options:
+    - ERROR
+    - WARNING
+    - BEST_PRACTICE
+    - INFO
+    - All (default)
+
+- Filtering must:
+  - Operate on the **single table**
+  - Preserve original row order
+  - Toggle visibility only (do not remove rows from the DOM)
+
+
+#### Output Guarantees
+
+- Report must be readable in any modern browser without JavaScript dependencies.
+- No network access is permitted during report generation.
+- All values must be derived **only from validation output**, not recomputed heuristically.
+
+### Phase 7: Final Consistency and Completeness Check
+
+Perform a final pass over the validated data and generated outputs to ensure nothing was missed or left inconsistent.

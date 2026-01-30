@@ -4,14 +4,14 @@
 
 This package has self-help resources from Siddharth "Sid" Mathur's talk at [NANOG 96](https://nanog.org/events/nanog-96/) San Francisco - [High-quality IP Geofeeds using AI Coding Assistants and MCP](https://nanog.org/events/nanog-96/content/5683/).
 
-AI coding agents should be asked to read IP geolocation feed validation guidance in [SKILL.md](skills/validator/SKILL.md).
+AI coding agents should be asked to read IP geolocation feed validation guidance in [SKILL.md](skills/geofeed-tuner/SKILL.md).
 
 ## Pre-requisites
 
 - IDE - [Visual Studio Code](https://code.visualstudio.com).
 - For [GitHub Copilot](https://marketplace.visualstudio.com/items?itemName=GitHub.copilot-chat), enable the experimental [`chat.useAgentSkills`](vscode://settings/chat.useAgentSkills) feature, see [Agent Skills help](https://code.visualstudio.com/docs/copilot/customization/agent-skills). Related [VS Code config file](.vscode/settings.json).
 
-- For [Claude Code](https://marketplace.visualstudio.com/items?itemName=anthropic.claude-code) - enable [Skills in Settings -> Capabilities](https://support.claude.com/en/articles/12512180-using-skills-in-claude). Then make a `validator.zip` ZIP file from the [`skills/validator`](skills/validator) folder, and upload it as an Agent Skill. Enterprise users must also enable `Code execution and file creation`.
+- For [Claude Code](https://marketplace.visualstudio.com/items?itemName=anthropic.claude-code) - enable [Skills in Settings -> Capabilities](https://support.claude.com/en/articles/12512180-using-skills-in-claude). Then make a `geofeed-tuner.zip` ZIP file from the [`skills/geofeed-tuner`](skills/geofeed-tuner) folder, and upload it as an Agent Skill. Enterprise users must also enable `Code execution and file creation`.
 
 - For [ChatGPT Codex](https://marketplace.visualstudio.com/items?itemName=openai.chatgpt), enable [Skills](https://developers.openai.com/codex/skills/) with the `[[skills.config]]` flag.
 
@@ -24,13 +24,13 @@ AI coding agents should be asked to read IP geolocation feed validation guidance
 Install the skill directly from GitHub:
 
 ```shell
-amp install github.com/fastah/ip-geofeed-skills/validator
+amp install github.com/fastah/ip-geofeed-skills/geofeed-tuner
 ```
 
 Then invoke it with:
 
 ```
-/skill validator
+/skill geofeed-tuner
 ```
 
 Or simply ask Amp to validate a geofeed and it will auto-select the skill.
