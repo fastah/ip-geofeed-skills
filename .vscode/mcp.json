@@ -1,0 +1,9 @@
+{
+  "servers": {
+    "mapbox-mcp": {
+      "type": "http",
+      "url": "https://mcp.mapbox.com/mcp"
+    }
+  },
+  
+}
