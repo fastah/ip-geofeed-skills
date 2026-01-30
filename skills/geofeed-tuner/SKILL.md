@@ -1,5 +1,5 @@
 ---
-name: validator
+name: geofeed-tuner
 description: Helps author and validate a CSV-format IP-based geolocation feed file against RFC 8805 and current best practices.
 license: Apache-2.0
 metadata:
@@ -219,9 +219,12 @@ Semantic validation must run only after **syntax validation** completes successf
 
 ### Phase 6: HTML Report Generation
 
-Generate a **deterministic, self-contained HTML validation report** using **HTML5** and **inline CSS only** (no external assets).  
-If inline rendering is supported by the UI, render the report directly.
-Otherwise, write the HTML report to `./run/report/`, using the **input CSV filename** (with a `.html` extension), and open it with the system default browser.
+- Generate a **deterministic, self-contained HTML validation report** using **HTML5** and **inline CSS only** (no external assets).  
+- If inline rendering is supported by the UI, render the report directly. Otherwise, write the HTML report to `./run/report/`, using the **input CSV filename** (with a `.html` extension), and open it with the system default browser.
+- Where applicable, use **Bootstrap (v5.3.x)** classes and components to style the report for readability and consistency.
+  - Prefer layout, tables, badges, alerts, and collapsible UI elements from Bootstrap.
+  - Do not require a build step; use CDN-compatible Bootstrap assets only.
+  - Reference: [Bootstrap documentation](https://raw.githubusercontent.com/twbs/bootstrap/refs/tags/v5.3.8/site/src/content/docs/getting-started/introduction.mdx)
 
 
 
@@ -232,11 +235,14 @@ Each table must appear **one after the other**, never side-by-side.
 
 ##### Table layout and styling requirements
 
--Use `./templates/report_header.html` as the **visual and structural reference** for the metrics panel.
+- Use `./templates/report_header.html` as the **visual and structural reference** for the metrics panel.
+- **Style the template and all summary tables using Bootstrap (v5.3.x)** for layout, spacing, and typography.
+  - Use Bootstrap table utilities (`.table`, `.table-bordered`, `.table-sm`, etc.) where appropriate.
+  - Use Bootstrap spacing and container classes to enforce margins and alignment.
 - All tables must have a **consistent width** across the report.
 - Table width must **fit within the page viewport** and respect horizontal margins.
 - Apply equal **left and right margins** so tables are visually centered.
-- Use a **clean, readable style** suitable for reports:
+- Use a **clean, readable report style**:
   - Clear table borders
   - Bold header row
   - Adequate cell padding
@@ -291,6 +297,7 @@ Each table must use a **two-column key–value layout**:
 
 Render a **single, stable, sortable HTML table** with **one row per input CSV entry**.
 - Preserve the **original CSV row order** by default.
+- Use `./templates/report_table.html` as the **visual and structural reference** for table.
 
 Columns **must appear in this exact order**:
 
@@ -304,9 +311,49 @@ Columns **must appear in this exact order**:
 | Severity  | ERROR, WARNING, BEST_PRACTICE, or INFO                    |
 | Messages  | Ordered list of validation messages and inferred accuracy |
 
-- Multiple messages must be rendered as a **bullet list within the cell**.
-- The **Severity** value must reflect the **highest level** raised for that row.
+##### Column Definitions
+
+- **Line**  
+  - The **1-based line number** from the original input CSV file.  
+  - This value must refer to the physical line in the source file after comment handling.
+
+- **IP Prefix**  
+  - The IP subnet expressed in **normalized CIDR notation**.  
+
+- **Country**  
+  The two-letter ISO 3166-1 `alpha2code` associated with the subnet.  
+  - Always display the **country flag emoji** alongside the code in the HTML report.
+  - If the country code is invalid, display the raw value with the emoji omitted or replaced according to validation rules.
+
+- **Region**  
+
+The **ISO 3166-2 subdivision code** (for example, `US-CA`).
+
+  - UI Behavior
+    - Render the **Region** field as a **dropdown menu**.
+    - The **default selected value** MUST be the value provided in the CSV.
+    - If the CSV value is present and valid, **skip any lookup** and proceed to the next step.
+
+  - Auto-suggestion (Fallback)
+    - If the CSV value is **empty or missing**:
+      - Invoke the [Blackbox](https://mcp.mapbox.com/mcp) MCP server **reverse-geocode** tool using the **City** field.
+      - Populate the dropdown with **at least three suggested region codes**.
+      - Suggestions SHOULD be ordered by **confidence or relevance**, when available.
+      - Leave the field empty if no region is specified or applicable.
+      - The user MAY override the suggested value by selecting a different option from the dropdown.
+
+- **City**  
+  The city name associated with the subnet.  
+  - Leave empty if no city is provided.
+
+- **Severity**  
+  - The **highest severity level** assigned to the row after all validation phases complete.  
   - Severity order: `ERROR` > `WARNING` > `BEST_PRACTICE` > `INFO`
+
+
+- **Messages**  
+  An **ordered list** of validation messages for the row.  
+  - Includes  **ERROR**, **WARNING** and  **OBSERVATION**.
 
 ##### Filtering and Visual Encoding
 
@@ -316,11 +363,13 @@ Columns **must appear in this exact order**:
   - **BEST_PRACTICE**: light blue or neutral background
   - **INFO**: light green background
 
-- Provide **interactive filters** above the table to show or hide rows by severity:
-  - ERROR
-  - WARNING
-  - BEST_PRACTICE
-  - INFO
+- Provide a **severity filter dropdown** positioned **above the table**, aligned with the table title.
+  - Options:
+    - ERROR
+    - WARNING
+    - BEST_PRACTICE
+    - INFO
+    - All (default)
 
 - Filtering must:
   - Operate on the **single table**
@@ -334,3 +383,6 @@ Columns **must appear in this exact order**:
 - No network access is permitted during report generation.
 - All values must be derived **only from validation output**, not recomputed heuristically.
 
+### Phase 7: Final Consistency and Completeness Check
+
+Perform a final pass over the validated data and generated outputs to ensure nothing was missed or left inconsistent.
