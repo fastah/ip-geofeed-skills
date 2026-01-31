@@ -50,7 +50,7 @@ All generated, temporary, and output files must be written to these directories:
 
 | Directory       | Purpose                                              |
 |-----------------|------------------------------------------------------|
-| `run/`      | Agent-generated or user-managed validation scripts (Python)                |
+| `run/`          | Working directory for all agent-generated content    |
 | `run/data/`     | Downloaded CSV files from remote URLs                |
 | `run/report/`   | Generated HTML validation reports                    |
 
@@ -61,6 +61,7 @@ All generated, temporary, and output files must be written to these directories:
 3. **All generated HTML reports** must be saved to `./run/report/`.
 4. **All generated Python scripts** must be saved to `./run/`.
 5. The `run/` directory may be cleared between sessions; do not store permanent data there.
+
 ## Processing Pipeline: Sequential Phase Execution
 
 - All phases of the skill must be executed **in order**, from Phase 1 through Phase 7.
@@ -92,7 +93,7 @@ All generated, temporary, and output files must be written to these directories:
 
 - **Validation Script Generation**
   - Generate a **single validation script** that incorporates **all steps from Phases 2–6**.
-  - Store the generated script in the `./scripts/` directory.
+  - Store the generated script in the `./run/` directory.
   - The script must include:
     - Load CSV input — download if a URL is provided, otherwise use local (**Phase 2**).
     - CSV and IP syntax checks (**Phase 3**).
@@ -269,7 +270,7 @@ Each table must appear **one after the other**, never side-by-side.
 
 ##### Table layout and styling requirements
 
-- Use `./templates/report_header.html` as the **visual and structural reference** for the metrics panel.
+- Use `./scripts/templates/report_header.html` as the **visual and structural reference** for the metrics panel.
 - **Style the template and all summary tables using Bootstrap (v5.3.x)** for layout, spacing, and typography.
   - Use Bootstrap table utilities (`.table`, `.table-bordered`, `.table-sm`, etc.) where appropriate.
   - Use Bootstrap spacing and container classes to enforce margins and alignment.
@@ -331,7 +332,7 @@ Each table must use a **two-column key–value layout**:
 
 Render a **single, stable, sortable HTML table** with **one row per input CSV entry**.
 - Preserve the **original CSV row order** by default.
-- Use `./templates/report_table.html` as the **visual and structural reference** for the table.
+- Use `./scripts/templates/report_table.html` as the **visual and structural reference** for the table.
 
 Columns **must appear in this exact order**:
 
