@@ -1,10 +1,12 @@
-# AI skills for IP Geolocation feeds - authoring, validating, and publication
+# Geofeed Tuner – AI Skills for Better IP Geolocation Feeds
 
 [![Download ZIP](https://img.shields.io/badge/Download%20ZIP-8A2BE2)](https://github.com/fastah/ip-geofeed-skills/archive/refs/heads/main.zip)
 
 This package has self-help resources from Siddharth "Sid" Mathur's talk at [NANOG 96](https://nanog.org/events/nanog-96/) San Francisco - [High-quality IP Geofeeds using AI Coding Assistants and MCP](https://nanog.org/events/nanog-96/content/5683/).
 
-AI coding agents should be asked to read IP geolocation feed validation guidance in [SKILL.md](skills/geofeed-tuner/SKILL.md).
+**Geofeed Tuner** helps you create, refine, and improve IP geolocation feeds. It goes beyond simple RFC 8805 compliance checking to offer opinionated recommendations based on real-world deployment experience.
+
+AI coding agents should be asked to read the tuning guidance in [SKILL.md](skills/geofeed-tuner/SKILL.md).
 
 ## Pre-requisites
 
@@ -33,7 +35,7 @@ Then invoke it with:
 /skill geofeed-tuner
 ```
 
-Or simply ask Amp to validate a geofeed and it will auto-select the skill.
+Or simply ask Amp to tune a geofeed and it will auto-select the skill.
 
 ### VS Code / GitHub Copilot
 
@@ -41,7 +43,7 @@ Clone this repository into your workspace, and the skill will be discovered auto
 
 ## What are (AI) Agent Skills
 
-AI [Agent Skills](https://agentskills.io/home) is an open standard that works across multiple AI tools to make domain-specific knowledge easier to share - which in this repository's case is IP Geolocation feed validation. 
+AI [Agent Skills](https://agentskills.io/home) is an open standard that works across multiple AI tools to make domain-specific knowledge easier to share - which in this repository's case is IP Geolocation feed tuning and improvement. 
 
 Partial list of AI tools that support Agent Skills:
 
