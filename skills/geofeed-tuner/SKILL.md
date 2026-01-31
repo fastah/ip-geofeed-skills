@@ -1,25 +1,25 @@
 ---
 name: geofeed-tuner
-description: Helps author and validate a CSV-format IP-based geolocation feed file against RFC 8805 and current best practices.
+description: Helps create, refine, and improve CSV-format IP geolocation feeds with opinionated recommendations beyond RFC 8805 compliance.
 license: Apache-2.0
 metadata:
   author: Sid Mathur <support@getfastah.com>
-  version: "0.2"
+  version: "0.3"
 compatibility: Requires Python 3
 ---
 
-# Validator for RFC 8805 IP Geolocation CSV Feeds
+# Geofeed Tuner – Create Better IP Geolocation Feeds
 
-This skill validates an IP geolocation feed provided in CSV format by ensuring that it:
-- Is a valid CSV file
-- Conforms to the syntax and semantics defined in  
-  [RFC 8805 – A Format for Self-Published IP Geolocation Feeds](references/rfc8805.txt)
-- Follows current best practices for publishing self-managed IP geolocation data
+This skill helps you create and improve IP geolocation feeds in CSV format by:
+- Ensuring your CSV is well-formed and consistent
+- Checking alignment with [RFC 8805](references/rfc8805.txt) (the industry standard)
+- Applying **opinionated best practices** learned from real-world deployments
+- Suggesting improvements for accuracy, completeness, and privacy
 
 ## When to Use This Skill
 
-- Use this skill when a user asks for help **authoring, validating, or publishing** an IP geolocation feed file in CSV format.
-- Use it to **troubleshoot RFC 8805–compliant CSV geolocation feeds**, including both syntax and semantic validation errors.
+- Use this skill when a user asks for help **creating, improving, or publishing** an IP geolocation feed file in CSV format.
+- Use it to **tune and troubleshoot CSV geolocation feeds** — catching errors, suggesting improvements, and ensuring real-world usability beyond just RFC compliance.
 - **Intended audience**:
   - Network operators, administrators, and engineers responsible for publicly routable IP address space
   - Organizations such as ISPs, mobile carriers, cloud providers, hosting and colocation companies, Internet Exchange operators, and satellite internet providers
@@ -42,7 +42,7 @@ The following directories contain static distribution assets. **Do not create, m
 |----------------|------------------------------------------------------------|
 | `assets/`      | Static data files (ISO codes, Bootstrap CSS/JS, examples)  |
 | `references/`  | RFC specifications and code snippets for reference         |
-| `scripts/`   | Contains executable code that agents can run and HTML template files used as visual references for reports  |
+| `scripts/`     | Contains executable code that agents can run and HTML template files used as visual references for reports  |
 
 ### Working Directories (Generated Content)
 
@@ -52,7 +52,7 @@ All generated, temporary, and output files must be written to these directories:
 |-----------------|------------------------------------------------------|
 | `run/`          | Working directory for all agent-generated content    |
 | `run/data/`     | Downloaded CSV files from remote URLs                |
-| `run/report/`   | Generated HTML validation reports                    |
+| `run/report/`   | Generated HTML tuning reports                        |
 
 ### File Management Rules
 
@@ -66,59 +66,59 @@ All generated, temporary, and output files must be written to these directories:
 
 - All phases of the skill must be executed **in order**, from Phase 1 through Phase 7.
 - Each phase depends on the successful completion of the previous phase.  
-  - For example, **syntax and input validation** must complete before **semantic validation** can run.
+  - For example, **structure checks** must complete before **quality analysis** can run.
 
 - The phases are:
 
-  - **Phase 1: Deep Research**  
-    Understand RFC 8805 requirements for self-published IP geolocation feeds.
+  - **Phase 1: Understand the Standard**  
+    Learn RFC 8805 requirements for self-published IP geolocation feeds.
 
-  - **Phase 2: User Input**  
+  - **Phase 2: Gather Input**  
     Collect IP subnet data from local files or remote URLs.
 
-  - **Phase 3: Syntax Validation**  
-    Validate CSV format, structure, and IP subnet correctness.
+  - **Phase 3: Structure & Format Check**  
+    Verify CSV format, structure, and IP subnet correctness.
 
-  - **Phase 4: Semantic Validation**  
-    Validate country codes, region codes, city names, and postal code rules.
+  - **Phase 4: Geolocation Quality Check**  
+    Analyze country codes, region codes, city names, and deprecated fields.
 
-  - **Phase 5: Best Practices Scan**  
-    Recommend missing region codes, confirm user intent for unspecified subnets, and enforce best practices.
+  - **Phase 5: Tuning & Recommendations**  
+    Apply opinionated best practices and suggest improvements.
 
-  - **Phase 6: HTML Report Generation**  
-    Generate an HTML report summarizing validation results, errors, and warnings.
+  - **Phase 6: Generate Tuning Report**  
+    Create an HTML report summarizing the analysis, issues, and suggestions.
 
-  - **Phase 7: Final Consistency Check**
-    Perform a final pass to ensure nothing was missed or left inconsistent.
+  - **Phase 7: Final Review**  
+    Perform a final pass to ensure consistency and completeness.
 
-- **Validation Script Generation**
-  - Generate a **single validation script** that incorporates **all steps from Phases 2–6**.
+- **Tuning Script Generation**
+  - Generate a **single Python script** that incorporates **all steps from Phases 2–6**.
   - Store the generated script in the `./run/` directory.
   - The script must include:
     - Load CSV input — download if a URL is provided, otherwise use local (**Phase 2**).
-    - CSV and IP syntax checks (**Phase 3**).
-    - Semantic validations including country, region, city, and postal code checks (**Phase 4**).
-    - Best practices warnings and recommendations (**Phase 5**).
-    - HTML report generation summarizing validation results (**Phase 6**).
+    - CSV and IP structure checks (**Phase 3**).
+    - Geolocation quality analysis including country, region, city, and postal code checks (**Phase 4**).
+    - Best practices and improvement suggestions (**Phase 5**).
+    - HTML report generation summarizing results (**Phase 6**).
 
 - Users or automation agents should **not skip phases**, as each phase provides critical checks or data transformations required for the next stage.
 
 
 
-### Phase 1: Deep Research
+### Phase 1: Understand the Standard
 
 Read Section 1 (**Introduction**) and Section 2 (**Self-Published IP Geolocation Feeds**) of the plain-text  
 [RFC 8805 – A Format for Self-Published IP Geolocation Feeds](references/rfc8805.txt).
 
-The goal of this phase is to understand the **authoring requirements** for an IP geolocation feed file, including:
+The goal of this phase is to understand the **foundation** for IP geolocation feeds, including:
 - The overall purpose and scope of RFC 8805
 - The required and optional data elements
-- The expected syntax and semantics of a compliant feed
+- The expected syntax and semantics
 
-This research phase establishes the conceptual foundation needed before performing any input handling, validation, or processing in later phases.
+This research phase establishes the conceptual foundation needed before performing any input handling or analysis in later phases.
 
 
-### Phase 2: User Input
+### Phase 2: Gather Input
 
 - If the user has not already provided a list of IP subnets or ranges (sometimes referred to as `inetnum` or `inet6num`), prompt them to supply it. The input may be provided via:
   - Text pasted into the chat
@@ -131,16 +131,16 @@ This research phase establishes the conceptual foundation needed before performi
 
 
 
-### Phase 3: Syntax Validation
+### Phase 3: Structure & Format Check
 
-Syntax validation verifies the **input format and structure** before any geolocation-specific checks. **Critical syntax errors** must halt further processing.
+This phase verifies that your feed is well-formed and parseable. **Critical structural errors** must be resolved before the tuner can analyze geolocation quality.
 
-#### CSV Validation
+#### CSV Structure
 
-This subsection defines validation rules specific to **CSV-formatted input files** used for RFC 8805 IP geolocation feeds.
+This subsection defines rules for **CSV-formatted input files** used for IP geolocation feeds.
 The goal is to ensure the file can be parsed reliably and normalized into a **consistent internal representation**.
 
-- **CSV Structure Validation**
+- **CSV Structure Checks**
   - If `pandas` is available, use it for CSV parsing.
   - Otherwise, fall back to Python's built-in `csv` module.
 
@@ -165,74 +165,74 @@ The goal is to ensure the file can be parsed reliably and normalized into a **co
   - Both implementation paths (`pandas` and built-in `csv`) must write output using
     the `utf-8-sig` encoding to ensure a **UTF-8 BOM** is present.
 
-#### IP Validation
+#### IP Prefix Analysis
   - Extract and identify the full set of **IP subnets** referenced in the input.
   - These subnets act as **hashing keys** in an internal map or dictionary.
   - All subnets must be **de-duplicated** so each subnet is referenced only once.
 
-  - **Validation Checks**
+  - **Checks**
     - Each subnet must parse cleanly as either an **IPv4 or IPv6 network** using the language-specific code snippets in the `references/` folder.
     - Subnets must be normalized and displayed in **CIDR slash notation**.
       - Single-host IPv4 subnets must be represented as **`/32`**
       - Single-host IPv6 subnets must be represented as **`/128`**
     - Flag **overly large subnets** as potential errors or typos for user review:
-      - **IPv6**: Prefixes shorter than `/64` (for example, `2001:db8::/32`) should be flagged, as they represent an unrealistically large address space for an IP geolocation feed.
+      - **IPv6**: Prefixes shorter than `/64` (for example, `2001:db8::/32`) should be flagged, as they represent an unrealistically large address space for a geolocation feed.
       - **IPv4**: Prefixes shorter than `/24` should be flagged.
     - Flag **non-public IP address ranges** that are accidentally or intentionally included in the subnet list.
-    - Treat any subnet identified as **private, loopback, link-local, multicast, or otherwise non-public** as invalid for an RFC 8805 feed.
+    - Treat any subnet identified as **private, loopback, link-local, multicast, or otherwise non-public** as invalid for a geofeed.
     - In Python, use the built-in `is_private` (and related address properties) as shown in the code snippets provided in the `references/` folder.
     - Report detected non-public subnets to the user as **ERRORS** and require correction before continuing.
 
 
   - **Subnet Storage**
-    - Once validated, store each subnet as a **key** in a map or dictionary.
+    - Once checked, store each subnet as a **key** in a map or dictionary.
     - The corresponding value must be a **custom object** containing:
       - Geolocation attributes for the subnet
       - Any user-provided hints or preferences related to that subnet's geolocation.
 
-### Phase 4: Semantic Validation
+### Phase 4: Geolocation Quality Check
 
-Validate **geolocation information**, **accuracy**, **place names**, and **ISO codes**.
-Semantic validation must run only after **syntax validation** completes successfully.
+Analyze the **accuracy and consistency** of geolocation data — country codes, region codes, city names, and deprecated fields.
+This phase runs after structural checks pass.
 
-#### Country Code Validation
-  - Use the locally available data table [`assets/iso3166-1.json`](assets/iso3166-1.json) for validation.
+#### Country Code Analysis
+  - Use the locally available data table [`assets/iso3166-1.json`](assets/iso3166-1.json) for checking.
     - JSON array of countries and territories with ISO codes
     - Each object includes:
       - `alpha_2`: two-letter country code
       - `name`: short country name
       - `flag`: flag emoji
     - This file represents the **superset of valid `alpha2code` values** for an RFC 8805 CSV
-  - Validate `alpha2code` (RFC 8805 Section 2.1.1.2) against the `alpha_2` attribute.
-  - Sample validation code is available in
+  - Check `alpha2code` (RFC 8805 Section 2.1.1.2) against the `alpha_2` attribute.
+  - Sample code is available in
     [`references/snippets-python3.md`](references/snippets-python3.md).
   - Flag an `alpha2code` not present in the `alpha_2` set as **ERROR**.
   - Flag an empty `alpha2code` as **WARNING**.
     - RFC 8805 allows empty values when geolocation should not be attempted
       (for example, infrastructure devices such as routers).
 
-#### Region Code Validation
-  - Use the locally available data table [`assets/iso3166-2.json`](assets/iso3166-2.json) for validation.
+#### Region Code Analysis
+  - Use the locally available data table [`assets/iso3166-2.json`](assets/iso3166-2.json) for checking.
     - JSON array of country subdivisions with ISO-assigned codes
     - Each object includes:
       - `code`: subdivision code prefixed with country code (for example, `US-CA`)
       - `name`: short subdivision name
     - This file represents the **superset of valid `region` values** for an RFC 8805 CSV
   - If a `region` value is provided (RFC 8805 Section 2.1.1.3):
-    - Validate that the format matches `{COUNTRY}-{SUBDIVISION}`
+    - Check that the format matches `{COUNTRY}-{SUBDIVISION}`
       (for example, `US-CA`, `AU-NSW`).
-    - Validate the value against the `code` attribute (already prefixed with the country code).
+    - Check the value against the `code` attribute (already prefixed with the country code).
 
-#### City Name Validation
+#### City Name Analysis
   - Flag placeholder values as **ERROR**:
     - `undefined`, `Please select`, `null`, `N/A`, `TBD`, `unknown`
   - Flag truncated names, abbreviations, or airport codes as **ERROR**:
     - `LA`, `Frft`, `sin01`, `LHR`, `SIN`, `MAA`
   - Flag inconsistent casing or formatting as **WARNING**:
     - `HongKong` vs `Hong Kong` vs `香港`
-  - There is currently **no authoritative dataset** available for validating city names.
+  - There is currently **no authoritative dataset** available for city name verification.
 
-#### Postal Code Validation
+#### Postal Code Check
   - RFC 8805 Section 2.1.1.5 explicitly **deprecates postal or ZIP codes**.
   - Postal codes can represent very small populations and are **not considered privacy-safe**
     for mapping IP address ranges, which are statistical in nature.
@@ -240,7 +240,9 @@ Semantic validation must run only after **syntax validation** completes successf
     - Produce an **ERROR** indicating that postal codes are deprecated.
     - Indicate that the field should be **removed for privacy reasons**.
 
-### Phase 5: Best Practices Scan
+### Phase 5: Tuning & Recommendations
+
+This phase applies **opinionated recommendations** beyond RFC 8805 — suggestions learned from real-world geofeed deployments that improve accuracy and usability.
 
 - **Region Code Recommendations**
   - Recommend **adding region codes** whenever a city is specified.
@@ -252,9 +254,9 @@ Semantic validation must run only after **syntax validation** completes successf
       or whether they **forgot to specify** the country, state, or city for it.
 
 
-### Phase 6: HTML Report Generation
+### Phase 6: Generate Tuning Report
 
-- Generate a **deterministic, self-contained HTML validation report**.
+- Generate a **self-contained HTML report** summarizing the analysis, issues, and improvement suggestions.
 - The report must use **local Bootstrap 5.3.8 assets** bundled in [`assets/bootstrap-5.3.8-dist/`](assets/bootstrap-5.3.8-dist/) for styling.
   - Reference the local CSS file: `assets/bootstrap-5.3.8-dist/css/bootstrap.min.css`
   - Reference the local JS file (if needed): `assets/bootstrap-5.3.8-dist/js/bootstrap.bundle.min.js`
@@ -297,7 +299,7 @@ Each table must use a **two-column key–value layout**:
 | Metric               | Value |
 |----------------------|-------|
 | Input file           |       |
-| Validation timestamp |       |
+| Tuning timestamp     |       |
 
 
 ###### Entries
@@ -309,13 +311,13 @@ Each table must use a **two-column key–value layout**:
 | IPv6 entries               |       |
 
 
-###### Validation Results
+###### Analysis Summary
 
 | Metric        | Value |
 |---------------|-------|
 | ERROR count   |       |
 | WARNING count |       |
-| INFO count    |       |
+| OK count      |       |
 
 
 ###### Geographical Accuracy Classification
@@ -343,8 +345,8 @@ Columns **must appear in this exact order**:
 | Country   | `alpha2code` with the corresponding country flag emoji    |
 | Region    | Region code or empty                                      |
 | City      | City name or empty                                        |
-| Severity  | ERROR, WARNING, BEST_PRACTICE, or INFO                    |
-| Messages  | Ordered list of validation messages and inferred accuracy |
+| Status    | ERROR, WARNING, SUGGESTION, or OK                         |
+| Messages  | Ordered list of issues and suggestions                    |
 
 ##### Column Definitions
 
@@ -358,7 +360,7 @@ Columns **must appear in this exact order**:
 - **Country**  
   The two-letter ISO 3166-1 `alpha2code` associated with the subnet.  
   - Always display the **country flag emoji** alongside the code in the HTML report.
-  - If the country code is invalid, display the raw value with the emoji omitted or replaced according to validation rules.
+  - If the country code is invalid, display the raw value with the emoji omitted or replaced according to the rules.
 
 - **Region**  
 
@@ -381,29 +383,29 @@ The **ISO 3166-2 subdivision code** (for example, `US-CA`).
   The city name associated with the subnet.  
   - Leave empty if no city is provided.
 
-- **Severity**  
-  - The **highest severity level** assigned to the row after all validation phases complete.  
-  - Severity order: `ERROR` > `WARNING` > `BEST_PRACTICE` > `INFO`
+- **Status**  
+  - The **highest severity level** assigned to the row after all phases complete.  
+  - Severity order: `ERROR` > `WARNING` > `SUGGESTION` > `OK`
 
 
 - **Messages**  
-  An **ordered list** of validation messages for the row.  
-  - Includes  **ERROR**, **WARNING** and  **OBSERVATION**.
+  An **ordered list** of issues and suggestions for the row.  
+  - Includes **ERROR**, **WARNING**, **SUGGESTION**, and **OBSERVATION** messages.
 
 ##### Filtering and Visual Encoding
 
-- Apply **row-level visual styling** based on severity:
+- Apply **row-level visual styling** based on status:
   - **ERROR**: light red background
   - **WARNING**: light yellow background
-  - **BEST_PRACTICE**: light blue or neutral background
-  - **INFO**: light green background
+  - **SUGGESTION**: light blue or neutral background
+  - **OK**: light green background
 
-- Provide a **severity filter dropdown** positioned **above the table**, aligned with the table title.
+- Provide a **status filter dropdown** positioned **above the table**, aligned with the table title.
   - Options:
     - ERROR
     - WARNING
-    - BEST_PRACTICE
-    - INFO
+    - SUGGESTION
+    - OK
     - All (default)
 
 - Filtering must:
@@ -416,13 +418,13 @@ The **ISO 3166-2 subdivision code** (for example, `US-CA`).
 
 - Report must be readable in any modern browser without external network dependencies.
 - All Bootstrap CSS/JS must be referenced from local `assets/bootstrap-5.3.8-dist/` files.
-- All values must be derived **only from validation output**, not recomputed heuristically.
+- All values must be derived **only from analysis output**, not recomputed heuristically.
 
-### Phase 7: Final Consistency and Completeness Check
+### Phase 7: Final Review
 
-Perform a final pass over the validated data and generated outputs to ensure nothing was missed or left inconsistent.
+Perform a final pass over the analyzed data and generated outputs to ensure nothing was missed or left inconsistent.
 
 - Verify that all CSV rows have been processed and appear in the report.
-- Confirm that error/warning/info counts in the summary match the actual row severities.
+- Confirm that error/warning/ok counts in the summary match the actual row statuses.
 - Ensure no duplicate entries exist in the results table.
 - Validate that all file paths and references in the report are correct.

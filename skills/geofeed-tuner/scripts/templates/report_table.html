@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>RFC 8805 Validation Results</title>
+  <title>Geofeed Tuner – Entry Details</title>
 
   <!-- Local Bootstrap 5.3.8 CSS -->
   <link href="../../assets/bootstrap-5.3.8-dist/css/bootstrap.min.css" rel="stylesheet">
@@ -55,21 +55,21 @@
       background-color: #e4e6f0;
     }
 
-    /* Severity row styling */
-    .severity-error td {
+    /* Status row styling */
+    .status-error td {
       background-color: #ffcccc !important;
     }
-    .severity-warning td {
+    .status-warning td {
       background-color: #ffffcc !important;
     }
-    .severity-best-practice td {
+    .status-suggestion td {
       background-color: #cce5ff !important;
     }
-    .severity-info td {
+    .status-ok td {
       background-color: #ccffcc !important;
     }
 
-    /* Severity badge styling */
+    /* Status badge styling */
     .badge-error {
       background-color: #dc3545;
       color: white;
@@ -78,11 +78,11 @@
       background-color: #ffc107;
       color: black;
     }
-    .badge-best-practice {
+    .badge-suggestion {
       background-color: #17a2b8;
       color: white;
     }
-    .badge-info {
+    .badge-ok {
       background-color: #28a745;
       color: white;
     }
@@ -112,15 +112,15 @@
 <body>
 
   <div class="table-wrapper">
-    <!-- Severity Filter -->
+    <!-- Status Filter -->
     <div class="filter-controls p-3 bg-light border-bottom">
-      <label for="severityFilter" class="form-label fw-bold">Filter by Severity:</label>
-      <select id="severityFilter" class="form-select form-select-sm w-auto d-inline-block">
+      <label for="statusFilter" class="form-label fw-bold">Filter by Status:</label>
+      <select id="statusFilter" class="form-select form-select-sm w-auto d-inline-block">
         <option value="all" selected>All</option>
         <option value="error">ERROR</option>
         <option value="warning">WARNING</option>
-        <option value="best-practice">BEST_PRACTICE</option>
-        <option value="info">INFO</option>
+        <option value="suggestion">SUGGESTION</option>
+        <option value="ok">OK</option>
       </select>
     </div>
 
@@ -132,14 +132,14 @@
           <th>Country</th>
           <th>Region</th>
           <th>City</th>
-          <th>Severity</th>
+          <th>Status</th>
           <th>Messages</th>
         </tr>
       </thead>
 
       <tbody>
         <!-- Example: ERROR row -->
-        <tr class="severity-error" data-severity="error">
+        <tr class="status-error" data-status="error">
           <td>1</td>
           <td class="ip-prefix">192.168.1.0/24</td>
           <td><span class="country-flag">🇺🇸</span> US</td>
@@ -154,13 +154,13 @@
           <td><span class="badge badge-error">ERROR</span></td>
           <td>
             <ul class="messages-list">
-              <li>Private IP range not allowed in RFC 8805 feed</li>
+              <li>Private IP range — not suitable for public geofeeds</li>
             </ul>
           </td>
         </tr>
 
         <!-- Example: WARNING row -->
-        <tr class="severity-warning" data-severity="warning">
+        <tr class="status-warning" data-status="warning">
           <td>2</td>
           <td class="ip-prefix">203.0.113.0/24</td>
           <td><span class="country-flag">🇯🇵</span> JP</td>
@@ -175,13 +175,13 @@
           <td><span class="badge badge-warning">WARNING</span></td>
           <td>
             <ul class="messages-list">
-              <li>Region code recommended when city is specified</li>
+              <li>Missing region code — consider adding for better accuracy</li>
             </ul>
           </td>
         </tr>
 
-        <!-- Example: BEST_PRACTICE row -->
-        <tr class="severity-best-practice" data-severity="best-practice">
+        <!-- Example: SUGGESTION row -->
+        <tr class="status-suggestion" data-status="suggestion">
           <td>3</td>
           <td class="ip-prefix">2001:db8::/32</td>
           <td><span class="country-flag">🇩🇪</span> DE</td>
@@ -191,7 +191,7 @@
             </select>
           </td>
           <td>Berlin</td>
-          <td><span class="badge badge-best-practice">BEST_PRACTICE</span></td>
+          <td><span class="badge badge-suggestion">SUGGESTION</span></td>
           <td>
             <ul class="messages-list">
               <li>Large IPv6 prefix (/32) — verify this is intentional</li>
@@ -199,8 +199,8 @@
           </td>
         </tr>
 
-        <!-- Example: INFO row -->
-        <tr class="severity-info" data-severity="info">
+        <!-- Example: OK row -->
+        <tr class="status-ok" data-status="ok">
           <td>4</td>
           <td class="ip-prefix">198.51.100.0/24</td>
           <td><span class="country-flag">🇸🇬</span> SG</td>
@@ -210,10 +210,10 @@
             </select>
           </td>
           <td>Singapore</td>
-          <td><span class="badge badge-info">INFO</span></td>
+          <td><span class="badge badge-ok">OK</span></td>
           <td>
             <ul class="messages-list">
-              <li>Valid entry — city-level accuracy</li>
+              <li>Looks good — city-level accuracy</li>
             </ul>
           </td>
         </tr>
@@ -222,16 +222,16 @@
   </div>
 
   <!-- Local Bootstrap JS (optional, for interactive components) -->
-  <script src="../assets/bootstrap-5.3.8-dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../../assets/bootstrap-5.3.8-dist/js/bootstrap.bundle.min.js"></script>
   
   <script>
-    // Simple severity filter functionality
-    document.getElementById('severityFilter').addEventListener('change', function() {
+    // Simple status filter functionality
+    document.getElementById('statusFilter').addEventListener('change', function() {
       const filterValue = this.value;
-      const rows = document.querySelectorAll('tbody tr[data-severity]');
+      const rows = document.querySelectorAll('tbody tr[data-status]');
       
       rows.forEach(row => {
-        if (filterValue === 'all' || row.dataset.severity === filterValue) {
+        if (filterValue === 'all' || row.dataset.status === filterValue) {
           row.style.display = '';
         } else {
           row.style.display = 'none';
