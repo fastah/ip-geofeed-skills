@@ -86,7 +86,7 @@ All generated, temporary, and output files must be written to these directories:
     Apply opinionated best practices and suggest improvements.
 
   - **Phase 6: Generate Tuning Report**  
-    Generate a **HTML report** summarizing validation results, **ERROR**, **WARNING** and **RECOMMENDATION**.
+    Create an HTML report summarizing the analysis, issues, and suggestions.
 
   - **Phase 7: Final Review**  
     Perform a final pass to ensure consistency and completeness.
@@ -175,34 +175,13 @@ The goal is to ensure the file can be parsed reliably and normalized into a **co
     - Subnets must be normalized and displayed in **CIDR slash notation**.
       - Single-host IPv4 subnets must be represented as **`/32`**
       - Single-host IPv6 subnets must be represented as **`/128`**
-      
-  - **ERROR** 
-    - Report the following conditions as **ERROR** and require correction before continuing:
-
-    - **Invalid subnet syntax**
-      - Message: `Invalid IP prefix: unable to parse as IPv4 or IPv6 network`
-
-    - **Non-public address space**
-      - Applies to subnets that are **private, loopback, link-local, multicast, or otherwise non-public**
-        - In Python, detect non-public ranges using `is_private` and related address properties as shown in `./references`.
-      - Message: `Non-public IP range is not allowed in an RFC 8805 feed`
-
-    - **RFC 8805–incompatible subnet**
-      - Any subnet failing mandatory RFC 8805 constraints
-      - Message: `Subnet is not valid for publication in an RFC 8805 geofeed`
-
-
-
-   - **WARNING**
-      - Flag the following conditions for **user review**, without blocking execution:
-
-      - **Overly large IPv6 subnets**
-        - Prefixes shorter than `/64`
-        - Message: `IPv6 prefix is unusually large and may indicate a typo`
-
-      - **Overly large IPv4 subnets**
-        - Prefixes shorter than `/24`
-        - Message: `IPv4 prefix is unusually large and may indicate a typo`
+    - Flag **overly large subnets** as potential errors or typos for user review:
+      - **IPv6**: Prefixes shorter than `/64` (for example, `2001:db8::/32`) should be flagged, as they represent an unrealistically large address space for a geolocation feed.
+      - **IPv4**: Prefixes shorter than `/24` should be flagged.
+    - Flag **non-public IP address ranges** that are accidentally or intentionally included in the subnet list.
+    - Treat any subnet identified as **private, loopback, link-local, multicast, or otherwise non-public** as invalid for a geofeed.
+    - In Python, use the built-in `is_private` (and related address properties) as shown in the code snippets provided in the `references/` folder.
+    - Report detected non-public subnets to the user as **ERRORS** and require correction before continuing.
 
 
   - **Subnet Storage**
@@ -217,7 +196,7 @@ Analyze the **accuracy and consistency** of geolocation data — country codes, 
 This phase runs after structural checks pass.
 
 #### Country Code Analysis
-  - Use the locally available data table [`ISO3166-1`](assets/iso3166-1.json) for checking.
+  - Use the locally available data table [`assets/iso3166-1.json`](assets/iso3166-1.json) for checking.
     - JSON array of countries and territories with ISO codes
     - Each object includes:
       - `alpha_2`: two-letter country code
@@ -226,16 +205,14 @@ This phase runs after structural checks pass.
     - This file represents the **superset of valid `alpha2code` values** for an RFC 8805 CSV
   - Check `alpha2code` (RFC 8805 Section 2.1.1.2) against the `alpha_2` attribute.
   - Sample code is available in
-    [`references`](references/snippets-*.md).
-
-  - **ERROR** 
-    - **Invalid country code**
-      - Condition: `alpha2code` is present but not found in the `alpha_2` set
-      - Message: `Invalid country code: not a valid ISO 3166-1 alpha-2 value`
-
+    [`references/snippets-python3.md`](references/snippets-python3.md).
+  - Flag an `alpha2code` not present in the `alpha_2` set as **ERROR**.
+  - Flag an empty `alpha2code` as **WARNING**.
+    - RFC 8805 allows empty values when geolocation should not be attempted
+      (for example, infrastructure devices such as routers).
 
 #### Region Code Analysis
-  - Use the locally available data table [`ISO3166-2`](assets/iso3166-2.json) for checking.
+  - Use the locally available data table [`assets/iso3166-2.json`](assets/iso3166-2.json) for checking.
     - JSON array of country subdivisions with ISO-assigned codes
     - Each object includes:
       - `code`: subdivision code prefixed with country code (for example, `US-CA`)
@@ -246,89 +223,44 @@ This phase runs after structural checks pass.
       (for example, `US-CA`, `AU-NSW`).
     - Check the value against the `code` attribute (already prefixed with the country code).
 
-  - **ERROR** 
-    - **Invalid region format**
-      - Condition: `region` does not match `{COUNTRY}-{SUBDIVISION}`
-      - Message: `Invalid region format; expected COUNTRY-SUBDIVISION (e.g., US-CA)`
-    - **Unknown region code**
-      - Condition: `region` value is not found in the `code` set
-      - Message: `Invalid region code: not a valid ISO 3166-2 subdivision`
-    - **Country–region mismatch**
-      - Condition: Country portion of `region` does not match `alpha2code`
-      - Message: `Region code does not match the specified country code`
-
-
 #### City Name Analysis
-
-  City names are validated using **heuristic checks only**.  
-  There is currently **no authoritative dataset** available for validating city names.
-
-  - **ERROR**
-    - **Placeholder or non-meaningful values**
-      - Condition: Placeholder or non-meaningful values including but not limited to:
-        - `undefined`
-        - `Please select`
-        - `null`
-        - `N/A`
-        - `TBD`
-        - `unknown` 
-      - Message: `Invalid city name: placeholder value is not allowed`
-
-    - **Truncated names, abbreviations, or airport codes**  
-      - Condition: Truncated names, abbreviations, or airport codes that do not represent valid city names:
-        - `LA`
-        - `Frft`
-        - `sin01`
-        - `LHR`
-        - `SIN`
-        - `MAA`
-      - Message: `Invalid city name: abbreviated or code-based value detected`
-  
-  - **WARNING**
-    - **Inconsistent casing or formatting**
-      - Condition: City names with inconsistent casing, spacing, or formatting that may reduce data quality, for example:
-        - `HongKong` vs `Hong Kong`
-        - Mixed casing or unexpected script usage
-      - Message: `City name formatting is inconsistent; consider normalizing the value`
+  - Flag placeholder values as **ERROR**:
+    - `undefined`, `Please select`, `null`, `N/A`, `TBD`, `unknown`
+  - Flag truncated names, abbreviations, or airport codes as **ERROR**:
+    - `LA`, `Frft`, `sin01`, `LHR`, `SIN`, `MAA`
+  - Flag inconsistent casing or formatting as **WARNING**:
+    - `HongKong` vs `Hong Kong` vs `香港`
+  - There is currently **no authoritative dataset** available for city name verification.
 
 #### Postal Code Check
   - RFC 8805 Section 2.1.1.5 explicitly **deprecates postal or ZIP codes**.
   - Postal codes can represent very small populations and are **not considered privacy-safe**
     for mapping IP address ranges, which are statistical in nature.
-
-  - **ERROR**
-    - **Postal code present**
-      - Condition: A non-empty value is present in the postal/ZIP code field.
-      - Message: `Postal codes are deprecated by RFC 8805 and must be removed for privacy reasons`
+  - If a postal code is present:
+    - Produce an **ERROR** indicating that postal codes are deprecated.
+    - Indicate that the field should be **removed for privacy reasons**.
 
 ### Phase 5: Tuning & Recommendations
 
 This phase applies **opinionated recommendations** beyond RFC 8805 — suggestions learned from real-world geofeed deployments that improve accuracy and usability.
 
-- **RECOMMENDATION**
+- **Region Code Recommendations**
+  - Recommend **adding region codes** whenever a city is specified.
+  - Ignore the absence of region code when country code matches a **small-sized territory** (by area or population) where state/province usage is uncommon. Load and use the JSON array of 2-letter country codes in [assets/small-territories.json](assets/small-territories.json) for this check.
 
-  - **Missing region code when city is specified**
-    - Condition: A `city` value is present but `region` is empty.
-    - Exception: Skip this check if the `alpha2code` matches a **small-sized territory** (by area or population)
-      where state or province usage is uncommon.
-      - Load and use the country code list from
-        [`Small Territories`](assets/small-territories.json).
-    - Action:
-      - Invoke the [Blackbox MCP Server](https://mcp.mapbox.com/mcp)
-        **reverse-geocode** tool using the **City** field.
-      - Provide **at least three suggested region codes** to the user.
-      - Suggestions SHOULD be ordered by **confidence or relevance**, when available.
-    - Message: `Consider selecting a region code based on city name or suggested options`
-
-  - **Unspecified geolocation for subnet**
-    - Condition: All geographical fields (`alpha2code`, `region`, `city`) are empty for a subnet.
-    - Message: `Confirm whether this subnet is intentionally marked as do-not-geolocate or missing location data`
+- **Subnet Confirmation**
+  - Recommend confirming with the user when a subnet is left **unspecified for all geographical columns**.
+    - Warn the user whether they **intend for the subnet to remain un-geolocated** (literal interpretation of RFC 8805),  
+      or whether they **forgot to specify** the country, state, or city for it.
 
 
+### Phase 6: Generate Tuning Report
 
-### Phase 6: HTML Report Generation
-
-- Generate a **deterministic, self-contained HTML validation report** using **HTML5** and **inline CSS only** (no external assets).  
+- Generate a **self-contained HTML report** summarizing the analysis, issues, and improvement suggestions.
+- The report must use **local Bootstrap 5.3.8 assets** bundled in [`assets/bootstrap-5.3.8-dist/`](assets/bootstrap-5.3.8-dist/) for styling.
+  - Reference the local CSS file: `assets/bootstrap-5.3.8-dist/css/bootstrap.min.css`
+  - Reference the local JS file (if needed): `assets/bootstrap-5.3.8-dist/js/bootstrap.bundle.min.js`
+  - **Do not use CDN links** — the report must work offline without network access.
 - If inline rendering is supported by the UI, render the report directly. Otherwise, write the HTML report to `./run/report/`, using the **input CSV filename** (with a `.html` extension), and open it with the system default browser.
 - Prefer Bootstrap layout classes, tables, badges, alerts, and collapsible UI elements for readability and consistency.
 
@@ -383,7 +315,7 @@ Each table must use a **two-column key–value layout**:
 | Metric        | Value |
 |---------------|-------|
 | ERROR count   |       |
-| **WARNING** count |       |
+| WARNING count |       |
 | OK count      |       |
 
 
@@ -456,29 +388,29 @@ The **ISO 3166-2 subdivision code** (for example, `US-CA`).
   The city name associated with the subnet.  
   - Leave empty if no city is provided.
 
-- **Severity**  
-  - The **highest severity level** assigned to the row after all validation phases complete.  
-  - Severity order: `ERROR` > **WARNING** > `SUGGESTION` > `OK`
+- **Status**  
+  - The **highest severity level** assigned to the row after all phases complete.  
+  - Severity order: `ERROR` > `WARNING` > `SUGGESTION` > `OK`
 
 
 - **Messages**  
-  An **ordered list** of validation messages for the row.  
-  - Includes  **ERROR**, **WARNING** and  **BEST_PRACTICE**.
+  An **ordered list** of issues and suggestions for the row.  
+  - Includes **ERROR**, **WARNING**, **SUGGESTION**, and **OBSERVATION** messages.
 
 ##### Filtering and Visual Encoding
 
-- Apply **row-level visual styling** based on severity:
+- Apply **row-level visual styling** based on status:
   - **ERROR**: light red background
   - **WARNING**: light yellow background
-  - **BEST_PRACTICE**: light blue or neutral background
-  - **INFO**: light green background
+  - **SUGGESTION**: light blue or neutral background
+  - **OK**: light green background
 
-- Provide a **severity filter dropdown** positioned **above the table**, aligned with the table title.
+- Provide a **status filter dropdown** positioned **above the table**, aligned with the table title.
   - Options:
     - ERROR
-    - **WARNING**
-    - BEST_PRACTICE
-    - INFO
+    - WARNING
+    - SUGGESTION
+    - OK
     - All (default)
 
 - Filtering must:
