@@ -21,25 +21,18 @@ AI coding agents should be asked to read the tuning guidance in [SKILL.md](skill
 
 ## Quick guide
 
-### Amp
+[![Download ZIP](https://img.shields.io/badge/Download%20ZIP-8A2BE2)](https://github.com/fastah/ip-geofeed-skills/archive/refs/heads/main.zip)
 
-Install the skill directly from GitHub:
+- Download and unzip this repository.
+- Launch [Visual Studio Code](https://code.visualstudio.com)
+- Within VS Code, open the folder via File menu (top left) -> Open Folder.
+- Install the VS Code extension for your favourite AI coding agent from the Pre-requisites section (above).
+- Click the "Chat" icon on the left navigation bar for GitHub CoPilot (or the alternative agent's chat icon)
+- Type the following prompt to get started
 
-```shell
-amp install github.com/fastah/ip-geofeed-skills/geofeed-tuner
 ```
-
-Then invoke it with:
-
+Hey chat, help me get started with the "Geofeed Tuner" agent skill from the SKILL.md file! :)
 ```
-/skill geofeed-tuner
-```
-
-Or simply ask Amp to tune a geofeed and it will auto-select the skill.
-
-### VS Code / GitHub Copilot
-
-Clone this repository into your workspace, and the skill will be discovered automatically from the `skills/` directory.
 
 ## What are (AI) Agent Skills
 
@@ -68,3 +61,22 @@ These are automatically suggested via the included [extensions hint](.vscode/ext
 | [Go](https://marketplace.visualstudio.com/items?itemName=golang.go) | Go Team at Google | Go (Golang.org) configuration + syntax highlighting |
 | [Rainbow CSV](https://marketplace.visualstudio.com/items?itemName=mechatroner.rainbow-csv) | mechatroner | CSV syntax highlighting |
 | [PowerShell](https://marketplace.visualstudio.com/items?itemName=ms-vscode.PowerShell) | Microsoft | [Windows only] Modern scripting system |
+
+## Advanced usage
+
+### Amp
+
+Install the skill directly from GitHub:
+```shell
+amp install github.com/fastah/ip-geofeed-skills/geofeed-tuner
+```
+Then invoke it with:
+```
+/skill geofeed-tuner
+```
+
+Or simply ask Amp to tune a geofeed and it will auto-select the skill.
+
+### GitHub CoPilot CLI
+
+You can use [CoPilot's CLI mode](https://github.com/features/copilot/cli) to work with [Agent Skills](https://docs.github.com/en/copilot/concepts/agents/about-copilot-cli#customizing-github-copilot-cli). 
