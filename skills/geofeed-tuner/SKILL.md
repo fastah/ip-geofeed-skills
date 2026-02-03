@@ -256,6 +256,14 @@ This phase runs after structural checks pass.
     - **Country–region mismatch**
       - Condition: Country portion of `region` does not match `alpha2code`
       - Message: `Region code does not match the specified country code`
+    - **Region specified for small territory**
+      - Condition:
+        - `alpha2code` is present in the **small territories list**, AND
+        - `region` is non-empty.
+      - Reference:
+        - Small territories identified using
+          [`assets/small-territories.json`](assets/small-territories.json).
+      - Message: `Region must not be specified for small territories`
 
 
 #### City Name Analysis
@@ -307,12 +315,15 @@ This phase applies **opinionated recommendations** beyond RFC 8805 — suggestio
 
 - **SUGGESTION**
 
+  - **City value specified for small territories**
+    - Condition: A `city` value is present and `alpha2code` belongs to a **small-sized territory**
+    - Reference:
+      - Small territories identified using
+        [`assets/small-territories.json`](assets/small-territories.json).
+    - Message: `City-level granularity is usually unnecessary for small territories; consider removing the city value`
+
   - **Missing region code when city is specified**
     - Condition: A `city` value is present but `region` is empty.
-    - Exception: Skip this check if the `alpha2code` matches a **small-sized territory** (by area or population)
-      where state or province usage is uncommon.
-      - Load and use the country code list from
-        [`Small Territories`](assets/small-territories.json).
     - Action:
       - Invoke the [Mapbox MCP Server](https://mcp.mapbox.com/mcp)
         **reverse-geocode** tool using the **City** field.
