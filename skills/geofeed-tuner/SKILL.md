@@ -64,42 +64,10 @@ All generated, temporary, and output files must be written to these directories:
 
 ## Processing Pipeline: Sequential Phase Execution
 
+- **MANDATORY** Read this file completely from start to finish. NEVER set any range limits when reading this file.
 - All phases of the skill must be executed **in order**, from Phase 1 through Phase 7.
 - Each phase depends on the successful completion of the previous phase.  
   - For example, **structure checks** must complete before **quality analysis** can run.
-
-- The phases are:
-
-  - **Phase 1: Understand the Standard**  
-    Learn RFC 8805 requirements for self-published IP geolocation feeds.
-
-  - **Phase 2: Gather Input**  
-    Collect IP subnet data from local files or remote URLs.
-
-  - **Phase 3: Structure & Format Check**  
-    Verify CSV format, structure, and IP subnet correctness.
-
-  - **Phase 4: Geolocation Quality Check**  
-    Analyze country codes, region codes, city names, and deprecated fields.
-
-  - **Phase 5: Tuning & Recommendations**  
-    Apply opinionated best practices and suggest improvements.
-
-  - **Phase 6: Generate Tuning Report**  
-    Create an HTML report summarizing the analysis, issues, and suggestions.
-
-  - **Phase 7: Final Review**  
-    Perform a final pass to ensure consistency and completeness.
-
-- **Tuning Script Generation**
-  - Generate a **single Python script** that incorporates **all steps from Phases 2–6**.
-  - Store the generated script in the `./run/` directory.
-  - The script must include:
-    - Load CSV input — download if a URL is provided, otherwise use local (**Phase 2**).
-    - CSV and IP structure checks (**Phase 3**).
-    - Geolocation quality analysis including country, region, city, and postal code checks (**Phase 4**).
-    - Best practices and improvement suggestions (**Phase 5**).
-    - HTML report generation summarizing results (**Phase 6**).
 
 - Users or automation agents should **not skip phases**, as each phase provides critical checks or data transformations required for the next stage.
 
@@ -309,19 +277,14 @@ This phase runs after structural checks pass.
       - Condition: A non-empty value is present in the postal/ZIP code field.
       - Message: `Postal codes are deprecated by RFC 8805 and must be removed for privacy reasons`
 
-### Phase 5: Tuning & Recommendations
-
-This phase applies **opinionated recommendations** beyond RFC 8805 — suggestions learned from real-world geofeed deployments that improve accuracy and usability.
-
-- **Region Suggestion Batch Lookup**
+### Phase 5: Region Suggestion Batch Lookup**
 
   - **Objective**
-    - Generate region suggestions for rows where a `city` is present but `region` is empty.
+    - Generate region suggestions for rows where a `city` is present but `region` is empty. 
 
   - **Preconditions**
     - Include rows where:
-      - `city` is NOT empty
-      - `city` is NOT empty and has passed **Phase 3: Structure & Format Check**
+      - `city` is NOT empty 
       - `region` is empty
       - `alpha2code` is NOT listed in [`assets/small-territories.json`](assets/small-territories.json)
 
@@ -397,6 +360,10 @@ This phase applies **opinionated recommendations** beyond RFC 8805 — suggestio
     - Do NOT automatically populate the CSV `region` field.
     - Failure to retrieve suggestions must NOT block validation.
 
+### Phase 6: Tuning & Recommendations
+
+This phase applies **opinionated recommendations** beyond RFC 8805 — suggestions learned from real-world geofeed deployments that improve accuracy and usability.
+
 - **SUGGESTION**
 
   - **City value specified for small territories**
@@ -418,7 +385,7 @@ This phase applies **opinionated recommendations** beyond RFC 8805 — suggestio
 
 
 
-### Phase 6: Generate Tuning Report
+### Phase 7: Generate Tuning Report
 
 - Generate a **deterministic, self-contained HTML validation report** using **HTML5** and **inline CSS only** (no external assets).  
 - If inline rendering is supported by the UI, render the report directly. Otherwise, write the HTML report to `./run/report/`, using the **input CSV filename** (with a `.html` extension), and open it with the system default browser.
@@ -584,12 +551,3 @@ The **ISO 3166-2 subdivision code** (for example, `US-CA`).
 - Report must be readable in any modern browser without external network dependencies.
 - All Bootstrap CSS/JS must be referenced from local `assets/bootstrap-5.3.8-dist/` files.
 - All values must be derived **only from analysis output**, not recomputed heuristically.
-
-### Phase 7: Final Review
-
-Perform a final pass over the analyzed data and generated outputs to ensure nothing was missed or left inconsistent.
-
-- Verify that all CSV rows have been processed and appear in the report.
-- Confirm that error/warning/ok counts in the summary match the actual row statuses.
-- Ensure no duplicate entries exist in the results table.
-- Validate that all file paths and references in the report are correct.
