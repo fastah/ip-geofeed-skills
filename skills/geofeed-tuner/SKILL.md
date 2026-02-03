@@ -313,6 +313,90 @@ This phase runs after structural checks pass.
 
 This phase applies **opinionated recommendations** beyond RFC 8805 — suggestions learned from real-world geofeed deployments that improve accuracy and usability.
 
+- **Region Suggestion Batch Lookup**
+
+  - **Objective**
+    - Generate region suggestions for rows where a `city` is present but `region` is empty.
+
+  - **Preconditions**
+    - Include rows where:
+      - `city` is NOT empty
+      - `city` is NOT empty and has passed **Phase 3: Structure & Format Check**
+      - `region` is empty
+      - `alpha2code` is NOT listed in [`assets/small-territories.json`](assets/small-territories.json)
+
+    - Exclude rows where:
+      - `city` is empty
+      - `region` is already populated
+      - `alpha2code` belongs to a small territory
+
+  - **Step 1 — Build Lookup Payload**
+    - Create a JSON array containing only the required lookup fields:
+
+    ```json
+    [
+      {
+        "city": "<city>",
+        "country": "<alpha2code>"
+      }
+    ]
+    ```
+
+    - Do NOT include duplicate city–country pairs.
+
+
+  - **Step 2 — Persist Input**
+    - Store the generated JSON at:
+
+    ```
+    ./run/data/region-lookup-input.json
+    ```
+
+    - Ensure the directory exists before writing.
+
+
+  - **Step 3 — Invoke Mapbox MCP Tool**
+    - Tool: `reverse_geocode`  
+    - Server: `https://mcp.mapbox.com/mcp`
+
+    - Send the JSON array as the request body.
+
+  - **Step 4 — Normalize Results**
+    - For each lookup entry:
+
+      - Deduplicate suggestions by `region_code`
+      - Preserve response order (assumed relevance-ranked)
+      - Keep **at least three** suggestions when available
+      - If fewer than three exist, keep all returned values
+      - If none exist, return an empty suggestion array (do NOT raise an error)
+
+  - **Step 5 — Persist Output**
+    - Store the response at:
+      - [region-lookup-output.json](./run/data/region-lookup-output.json)
+      - Example structure:
+
+      ```json
+      [
+        {
+          "city": "San Jose",
+          "country": "US",
+          "suggestions": [
+            {
+              "region_code": "US-CA",
+              "region_name": "California",
+              "relevance": 0.98
+            }
+          ]
+        }
+      ]
+      ```
+
+
+  - **Operational Rules**
+    - Perform this lookup **once per validation run** (batch mode).
+    - Do NOT automatically populate the CSV `region` field.
+    - Failure to retrieve suggestions must NOT block validation.
+
 - **SUGGESTION**
 
   - **City value specified for small territories**
@@ -324,11 +408,8 @@ This phase applies **opinionated recommendations** beyond RFC 8805 — suggestio
 
   - **Missing region code when city is specified**
     - Condition: A `city` value is present but `region` is empty.
-    - Action:
-      - Invoke the [Mapbox MCP Server](https://mcp.mapbox.com/mcp)
-        **reverse-geocode** tool using the **City** field.
-      - Provide **at least three suggested region codes** to the user.
-      - Suggestions SHOULD be ordered by **confidence or relevance**, when available.
+    - Reference:
+      - [region-lookup-output.json](./run/data/region-lookup-output.json).
     - Message: `Consider selecting a region code based on city name or suggested options: {REGION_CODE} – {Region Name}`
 
   - **Unspecified geolocation for subnet**
