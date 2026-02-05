@@ -149,6 +149,7 @@ The JSON structure below is **IMMUTABLE**.
   "error_count": 0,
   "warning_count": 0,
   "ok_count": 0,
+  "suggestion_count": 0,
 
   "city_level_accuracy": 0,
   "region_level_accuracy": 0,
@@ -176,6 +177,34 @@ The JSON structure below is **IMMUTABLE**.
   ]
 }
 ```
+- `input_file`: The original input source, either a local filename or a remote URL.
+- `tuning_timestamp`: The timestamp when the tuning was performed, in ISO 8601 format.
+- `total_entries`: The total number of entries processed from the input CSV.
+- `ipv4_entries`: The count of entries that are IPv4 subnets.
+- `ipv6_entries`: The count of entries that are IPv6 subnets.
+- `error_count`: The total number of entries flagged with an ERROR status.
+- `warning_count`: The total number of entries flagged with a WARNING status.
+- `ok_count`: The total number of entries flagged with an OK status.
+- `suggestion_count`: The total number of entries flagged with a SUGGESTION status.
+- `city_level_accuracy`: The count of entries with city-level geolocation accuracy.
+- `region_level_accuracy`: The count of entries with region-level geolocation accuracy.
+- `country_level_accuracy`: The count of entries with country-level geolocation accuracy.
+- `do_not_geolocate_entries`: The count of entries that are intentionally marked as do-not-geolocate (no geolocation data provided).
+- `entries`: An array of objects, each representing a single entry from the input CSV, with the following fields:
+  - `line`: The line number in the original CSV file (1-based index).
+  - `ip_prefix`: The normalized IP prefix in CIDR notation.
+  - `country`: The country code (alpha-2) associated with the subnet.
+  - `region`: The region code (ISO 3166-2) associated with the subnet, if provided.
+  - `city`: The city name associated with the subnet, if provided.
+  - `status`: The highest severity status assigned to the entry after validation (ERROR > WARNING > SUGGESTION > OK).
+  - `messages`: An array of validation messages (errors, warnings, suggestions) related to the entry.
+    - `status`: The severity level of the message (ERROR, WARNING, SUGGESTION).
+    - `message`: A descriptive message explaining the issue or suggestion.
+  - `need_region`: A boolean flag indicating whether a region suggestion is needed for this entry.
+  - `has_error`: A boolean flag indicating whether this entry has any ERROR messages.
+  - `has_warning`: A boolean flag indicating whether this entry has any WARNING messages.
+  - `has_suggestion`: A boolean flag indicating whether this entry has any SUGGESTION messages.
+  - `is_small_territory`: A boolean flag indicating whether the country is classified as a small territory based on the provided dataset.
 
 The agent MUST NOT:
 
