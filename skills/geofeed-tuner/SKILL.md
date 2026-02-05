@@ -285,6 +285,8 @@ This phase runs after structural checks pass.
   - Check `alpha2code` (RFC 8805 Section 2.1.1.2) against the `alpha_2` attribute.
   - Sample code is available in the `references/` directory.
 
+  - If a country is found in [`assets/small-territories.json`](assets/small-territories.json) set `is_small_territory` to `true`. This will be used for later checks and suggestions related to small territories.
+
   - **ERROR** 
     - **Invalid country code**
       - Condition: `alpha2code` is present but not found in the `alpha_2` set
@@ -315,11 +317,8 @@ This phase runs after structural checks pass.
       - Message: `Region code does not match the specified country code`
     - **Region specified for small territory**
       - Condition:
-        - `alpha2code` is present in the **small territories list**, AND
+        - `is_small_territory` is `true` 
         - `region` is non-empty.
-      - Reference:
-        - Small territories identified using
-          [`assets/small-territories.json`](assets/small-territories.json).
       - Message: `Region must not be specified for small territories`
 
 
@@ -373,14 +372,16 @@ This phase applies **opinionated recommendations** beyond RFC 8805 — suggestio
 - **SUGGESTION**
 
   - **City value specified for small territories**
-    - Condition: A `city` value is present and `alpha2code` belongs to a **small-sized territory**
-    - Reference:
-      - Small territories identified using
-        [`assets/small-territories.json`](assets/small-territories.json).
+    - Condition:
+      - `is_small_territory` is `true` 
+      - `city` is non-empty.
     - Message: `City-level granularity is usually unnecessary for small territories; consider removing the city value`
 
   - **Missing region code when city is specified**
-    - Condition: A `city` value is present but `region` is empty.
+    - Condition:
+      - `city` is non-empty
+      - `region` is empty
+      - `is_small_territory` is `false`
     - Action: Set `need_region = true` 
     - Message: `Region code is recommended when a city is specified; choose a region from the dropdown`
 
