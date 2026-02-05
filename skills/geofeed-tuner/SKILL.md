@@ -64,14 +64,39 @@ All generated, temporary, and output files must be written to these directories:
 
 ## Processing Pipeline: Sequential Phase Execution
 
-- **MANDATORY** Read this file completely from start to finish. NEVER set any range limits when reading this file.
-- All phases of the skill must be executed **in order**, from Phase 1 through Phase 7.
-- Each phase depends on the successful completion of the previous phase.  
-  - For example, **structure checks** must complete before **quality analysis** can run.
+### Global Execution Rules
 
-- Users or automation agents should **not skip phases**, as each phase provides critical checks or data transformations required for the next stage.
+- The agent MUST read this entire file from **start to finish** before performing any action.
+- The agent MUST NOT apply range limits, partial reads, or lazy loading when reading this file.
+- All phases MUST execute **strictly in order**
+- A phase MUST NOT begin until the previous phase has **fully completed successfully**.
+- Phases are **state-dependent** — skipping a phase will corrupt downstream validation.
 
+**Phase skipping is strictly prohibited.**
 
+### Execution Constraint (CRITICAL)
+
+Each step MUST be executed as an **independent checkpoint**.
+After completing a step, the agent MUST verify success before proceeding.
+
+The agent MUST NOT:
+
+- Merge multiple steps into one script  
+- Execute steps in parallel  
+- Batch steps into a single tool call  
+- Infer or auto-complete future steps  
+
+### Agent Task Contract (REQUIRED)
+
+### Execution Plan Requirements
+Before executing this phase, the agent MUST generate a visible TODO checklist.
+
+The plan MUST:
+- Appear at the very start of the phase
+- List every step in order
+- Use a checkbox format
+- Be updated live as steps complete
+- Never skip steps
 
 ### Phase 1: Understand the Standard
 
@@ -98,12 +123,77 @@ This research phase establishes the conceptual foundation needed before performi
 - Normalize all input data to **UTF-8** encoding.
 
 
+### Phase 3: Checks & Suggestions
 
-### Phase 3: Structure & Format Check
+- Generate a script for this phase
+- Store the output as a JSON file at: [`./run/data/temp.json`](./run/data/temp.json)
+
+#### Execution Rules
+- Generate **exactly one script** for this phase.
+- Do NOT combine this phase with others.
+- Do NOT precompute future-phase data.
+
+#### Schema Lock (CRITICAL)
+
+The JSON structure below is **IMMUTABLE**.
+
+```json
+{
+  "input_file": "",          // Filename or URL
+  "tuning_timestamp": "",   // ISO 8601 format recommended
+
+  "total_entries": 0,
+  "ipv4_entries": 0,
+  "ipv6_entries": 0,
+
+  "error_count": 0,
+  "warning_count": 0,
+  "ok_count": 0,
+
+  "city_level_accuracy": 0,
+  "region_level_accuracy": 0,
+  "country_level_accuracy": 0,
+  "do_not_geolocate_entries": 0,
+
+  "entries": [
+    {
+      "line": 0,                 // Line number in CSV
+      "ip_prefix": "",
+      "country": "",
+      "region": "",
+      "city": "",
+
+      "status": "",              // Highest severity: ERROR | WARNING | SUGGESTION | OK
+
+      "messages": [],            // List of validation messages
+
+      "need_region": false,
+      "has_error": false,
+      "has_warning": false,
+      "has_suggestion": false,
+      "is_small_territory": false
+    }
+  ]
+}
+```
+
+The agent MUST NOT:
+
+- Rename fields  
+- Add or remove fields  
+- Change data types  
+- Reorder keys  
+- Alter nesting  
+- Wrap the object  
+- Split into multiple files  
+
+If a value is unknown, **leave it empty** — never invent data.
+
+#### Structure & Format Check
 
 This phase verifies that your feed is well-formed and parseable. **Critical structural errors** must be resolved before the tuner can analyze geolocation quality.
 
-#### CSV Structure
+##### CSV Structure
 
 This subsection defines rules for **CSV-formatted input files** used for IP geolocation feeds.
 The goal is to ensure the file can be parsed reliably and normalized into a **consistent internal representation**.
@@ -133,7 +223,7 @@ The goal is to ensure the file can be parsed reliably and normalized into a **co
   - Both implementation paths (`pandas` and built-in `csv`) must write output using
     the `utf-8-sig` encoding to ensure a **UTF-8 BOM** is present.
 
-#### IP Prefix Analysis
+##### IP Prefix Analysis
   - Extract and identify the full set of **IP subnets** referenced in the input.
   - These subnets act as **hashing keys** in an internal map or dictionary.
   - All subnets must be **de-duplicated** so each subnet is referenced only once.
@@ -179,12 +269,12 @@ The goal is to ensure the file can be parsed reliably and normalized into a **co
       - Geolocation attributes for the subnet
       - Any user-provided hints or preferences related to that subnet's geolocation.
 
-### Phase 4: Geolocation Quality Check
+#### Geolocation Quality Check
 
 Analyze the **accuracy and consistency** of geolocation data — country codes, region codes, city names, and deprecated fields.
 This phase runs after structural checks pass.
 
-#### Country Code Analysis
+##### Country Code Analysis
   - Use the locally available data table [`ISO3166-1`](assets/iso3166-1.json) for checking.
     - JSON array of countries and territories with ISO codes
     - Each object includes:
@@ -193,8 +283,7 @@ This phase runs after structural checks pass.
       - `flag`: flag emoji
     - This file represents the **superset of valid `alpha2code` values** for an RFC 8805 CSV
   - Check `alpha2code` (RFC 8805 Section 2.1.1.2) against the `alpha_2` attribute.
-  - Sample code is available in
-    [`references`](references/snippets-*.md).
+  - Sample code is available in the `references/` directory.
 
   - **ERROR** 
     - **Invalid country code**
@@ -202,7 +291,7 @@ This phase runs after structural checks pass.
       - Message: `Invalid country code: not a valid ISO 3166-1 alpha-2 value`
 
 
-#### Region Code Analysis
+##### Region Code Analysis
   - Use the locally available data table [`ISO3166-2`](assets/iso3166-2.json) for checking.
     - JSON array of country subdivisions with ISO-assigned codes
     - Each object includes:
@@ -234,7 +323,7 @@ This phase runs after structural checks pass.
       - Message: `Region must not be specified for small territories`
 
 
-#### City Name Analysis
+##### City Name Analysis
 
   City names are validated using **heuristic checks only**.  
   There is currently **no authoritative dataset** available for validating city names.
@@ -267,7 +356,7 @@ This phase runs after structural checks pass.
         - Mixed casing or unexpected script usage
       - Message: `City name formatting is inconsistent; consider normalizing the value`
 
-#### Postal Code Check
+##### Postal Code Check
   - RFC 8805 Section 2.1.1.5 explicitly **deprecates postal or ZIP codes**.
   - Postal codes can represent very small populations and are **not considered privacy-safe**
     for mapping IP address ranges, which are statistical in nature.
@@ -277,90 +366,7 @@ This phase runs after structural checks pass.
       - Condition: A non-empty value is present in the postal/ZIP code field.
       - Message: `Postal codes are deprecated by RFC 8805 and must be removed for privacy reasons`
 
-### Phase 5: Region Suggestion Batch Lookup**
-
-  - **Objective**
-    - Generate region suggestions for rows where a `city` is present but `region` is empty. 
-
-  - **Preconditions**
-    - Include rows where:
-      - `city` is NOT empty 
-      - `region` is empty
-      - `alpha2code` is NOT listed in [`assets/small-territories.json`](assets/small-territories.json)
-
-    - Exclude rows where:
-      - `city` is empty
-      - `region` is already populated
-      - `alpha2code` belongs to a small territory
-
-  - **Step 1 — Build Lookup Payload**
-    - Create a JSON array containing only the required lookup fields:
-
-    ```json
-    [
-      {
-        "city": "<city>",
-        "country": "<alpha2code>"
-      }
-    ]
-    ```
-
-    - Do NOT include duplicate city–country pairs.
-
-
-  - **Step 2 — Persist Input**
-    - Store the generated JSON at:
-
-    ```
-    ./run/data/region-lookup-input.json
-    ```
-
-    - Ensure the directory exists before writing.
-
-
-  - **Step 3 — Invoke Mapbox MCP Tool**
-    - Tool: `reverse_geocode`  
-    - Server: `https://mcp.mapbox.com/mcp`
-
-    - Send the JSON array as the request body.
-
-  - **Step 4 — Normalize Results**
-    - For each lookup entry:
-
-      - Deduplicate suggestions by `region_code`
-      - Preserve response order (assumed relevance-ranked)
-      - Keep **at least three** suggestions when available
-      - If fewer than three exist, keep all returned values
-      - If none exist, return an empty suggestion array (do NOT raise an error)
-
-  - **Step 5 — Persist Output**
-    - Store the response at:
-      - [region-lookup-output.json](./run/data/region-lookup-output.json)
-      - Example structure:
-
-      ```json
-      [
-        {
-          "city": "San Jose",
-          "country": "US",
-          "suggestions": [
-            {
-              "region_code": "US-CA",
-              "region_name": "California",
-              "relevance": 0.98
-            }
-          ]
-        }
-      ]
-      ```
-
-
-  - **Operational Rules**
-    - Perform this lookup **once per validation run** (batch mode).
-    - Do NOT automatically populate the CSV `region` field.
-    - Failure to retrieve suggestions must NOT block validation.
-
-### Phase 6: Tuning & Recommendations
+#### Tuning & Recommendations
 
 This phase applies **opinionated recommendations** beyond RFC 8805 — suggestions learned from real-world geofeed deployments that improve accuracy and usability.
 
@@ -375,17 +381,105 @@ This phase applies **opinionated recommendations** beyond RFC 8805 — suggestio
 
   - **Missing region code when city is specified**
     - Condition: A `city` value is present but `region` is empty.
-    - Reference:
-      - [region-lookup-output.json](./run/data/region-lookup-output.json).
-    - Message: `Consider selecting a region code based on city name or suggested options: {REGION_CODE} – {Region Name}`
+    - Action: Set `need_region = true` 
+    - Message: `Region code is recommended when a city is specified; choose a region from the dropdown`
 
   - **Unspecified geolocation for subnet**
     - Condition: All geographical fields (`alpha2code`, `region`, `city`) are empty for a subnet.
     - Message: `Confirm whether this subnet is intentionally marked as do-not-geolocate or missing location data`
 
 
+### Phase 4: Region Suggestion Batch Lookup
 
-### Phase 7: Generate Tuning Report
+#### Objective
+Generate region suggestions for applicable entries using the Mapbox reverse geocode tool.
+
+#### Execution Rules
+- Use **separate script** for payload generation.
+- Perform the lookup **once per validation run** (batch mode).
+- Construct the payload and send it to the MCP server.
+- Failure to retrieve suggestions must **NOT block validation**.
+- Suggestions are **advisory only** — **never auto-populate** the `region` field.
+
+#### Step 1: Load Dataset
+Load the dataset from: [./run/data/temp.json](./run/data/temp.json)
+- Read the `entries` array.
+- Include entries where:
+  - `need_region == true`
+- Exclude all others.
+
+#### Step 2: Build Lookup Payload
+
+Construct a deduplicated list of city–country pairs:
+
+```json
+[
+  {
+    "city": "<city>",
+    "country": "<alpha2code>"
+  }
+]
+```
+Rules:
+- Deduplicate identical pairs.
+- Write payload to: [./run/data/region-lookup-input.json](./run/data/region-lookup-input.json)
+- Exit the script after writing the payload.
+
+#### Step 3: Invoke Mapbox MCP Tool
+Do NOT use local data.
+
+- Server: `https://mcp.mapbox.com/mcp`
+- Tool: `reverse_geocode`
+- Mode: `batch`
+
+Send the entire payload in a single request.
+
+#### Step 4: Normalize Suggestions
+
+Use the data received from the MCP server.
+
+Rules:
+- Deduplicate suggestions by `region_code`.
+- Preserve response order (assumed relevance-ranked)
+- Keep **at least three suggestions** when available
+- If fewer than three exist, keep all returned values
+- If none exist:
+  - Store an empty array
+  - Do NOT raise an error
+
+#### Step 5: Attach Suggestions to Entries
+
+- Use **separate script** for attaching suggestions.
+- Load: [./run/data/temp.json](./run/data/temp.json)
+- Match responses back to entries using:
+  - `city`
+  - `country`
+
+Create the field if it does not exist:
+
+```json
+"region_suggestions": []
+```
+
+Populate with:
+
+```json
+{
+  "region_code": "",
+  "region_name": "",
+  "relevance": 0.0
+}
+```
+
+#### Step 6: Persist Updated Dataset
+
+- Write the dataset back to: [./run/data/temp.json](./run/data/temp.json)
+- Rules:
+  - Maintain all existing validation flags.
+  - Do NOT modify the `region` field.
+  - Do NOT create additional intermediate files.
+  
+### Phase 5: Generate Tuning Report
 
 - Generate a **deterministic, self-contained HTML validation report** using **HTML5** and **inline CSS only** (no external assets).  
 - If inline rendering is supported by the UI, render the report directly. Otherwise, write the HTML report to `./run/report/`, using the **input CSV filename** (with a `.html` extension), and open it with the system default browser.
