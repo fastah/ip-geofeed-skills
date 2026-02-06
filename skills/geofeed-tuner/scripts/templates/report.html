@@ -240,7 +240,7 @@
     <div class="report-container">
         <h1>Geofeed Tuner Report<br><span style="font-size: 0.4em; font-weight: 700; display: block; margin-top: 10px;">RFC 8805 Validation & Recommendations</span></h1>
         
-        <table class="metrics-table feed-metadata" style="margin-top: 30px; margin-bottom: 20px;">
+        <table class="metrics-table feed-metadata" style="margin-top: 30px; margin-bottom: 30px;">
             <tr style="background-color: #6b6b6b;">
                 <td colspan="2" style="padding: 12px 15px; font-weight: bold; color: #ffffff; font-size: 1.1em; font-family: 'Raleway', sans-serif;">Feed Metadata</td>
             </tr>
@@ -300,7 +300,7 @@
             </table>
         </div>
         
-        <div style="margin-bottom: 20px;">
+        <div style="margin-bottom: 40px;">
             <table class="metrics-table accuracy-summary-table" style="margin-top: 0; margin-bottom: 0; table-layout: fixed; width: 100%;">
                 <colgroup>
                     <col style="width: 20%;">
@@ -386,6 +386,7 @@
       "line": 1,
       "ip_prefix": "202.125.100.144/28",
       "country": "ID",
+      "flag_svg": "https://flagcdn.com/id.svg",
       "region": "",
       "city": "Jakarta",
       "status": "SUGGESTION",
@@ -410,6 +411,7 @@
       "ip_prefix": "2605:59c8:2700::/40",
       "country": "CA",
       "region": "",
+      "flag_svg": "https://flagcdn.com/ca.svg",
       "city": "Montreal",
       "status": "WARNING",
       "messages": [
@@ -434,6 +436,7 @@
       "ip_prefix": "150.228.170.0/24",
       "country": "SG",
       "region": "",
+      "flag_svg": "https://flagcdn.com/sg.svg",
       "city": "Singapore",
       "status": "SUGGESTION",
       "messages": [
@@ -450,6 +453,7 @@
       "line": 5,
       "ip_prefix": "2406:2d40:8100::/42",
       "country": "SG",
+      "flag_svg": "https://flagcdn.com/sg.svg",
       "region": "SG",
       "city": "Singapore",
       "status": "ERROR",
@@ -555,7 +559,7 @@
                 row.innerHTML = `
                     <td>${entry.line}</td>
                     <td><strong>${escapeHtml(entry.ip_prefix)}</strong></td>
-                    <td>${escapeHtml(entry.country)}</td>
+                    <td><img src="${entry.flag_svg}" style="width: 24px; height: 16px; margin-right: 8px; vertical-align: middle; border-radius: 2px; box-shadow: 0 1px 3px rgba(0,0,0,0.2);"> ${escapeHtml(entry.country)}</td>
                     <td>${entry.region ? escapeHtml(entry.region) : '<span style="color: #999;">-</span>'}</td>
                     <td>${entry.city ? escapeHtml(entry.city) : '<span style="color: #999;">-</span>'}</td>
                     <td><span class="status-badge ${statusClass}">${statusIcon}${entry.status}</span></td>

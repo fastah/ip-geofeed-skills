@@ -161,6 +161,7 @@ The JSON structure below is **IMMUTABLE**.
       "line": 0,                 // Line number in CSV
       "ip_prefix": "",
       "country": "",
+      "flag_svg": "",              // Optional: country flag emoji or SVG data URI
       "region": "",
       "city": "",
 
@@ -194,6 +195,7 @@ The JSON structure below is **IMMUTABLE**.
   - `line`: The line number in the original CSV file (1-based index).
   - `ip_prefix`: The normalized IP prefix in CIDR notation.
   - `country`: The country code (alpha-2) associated with the subnet.
+  - `flag_svg`: The country flag emoji or SVG data URI for visual representation in the report.
   - `region`: The region code (ISO 3166-2) associated with the subnet, if provided.
   - `city`: The city name associated with the subnet, if provided.
   - `status`: The highest severity status assigned to the entry after validation (ERROR > WARNING > SUGGESTION > OK).
