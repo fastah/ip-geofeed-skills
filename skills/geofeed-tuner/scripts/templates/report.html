@@ -391,7 +391,10 @@
       "city": "Jakarta",
       "status": "SUGGESTION",
       "messages": [
-        "Region code is recommended when a city is specified; choose a region from the dropdown"
+        {
+            "status": "SUGGESTION",
+            "message": "Region code is recommended when a city is specified; choose a region from the dropdown"
+        }
       ],
       "need_region": true,
       "has_error": false,
@@ -415,8 +418,14 @@
       "city": "Montreal",
       "status": "WARNING",
       "messages": [
-        "IPv6 prefix is unusually large and may indicate a typo",
-        "Region code is recommended when a city is specified; choose a region from the dropdown"
+        {
+            "status": "WARNING",
+            "message": "IPv6 prefix is unusually large and may indicate a typo"
+        },
+        {
+            "status": "SUGGESTION",
+            "message": "Region code is recommended when a city is specified; choose a region from the dropdown"
+        }
       ],
       "need_region": true,
       "has_error": false,
@@ -440,7 +449,10 @@
       "city": "Singapore",
       "status": "SUGGESTION",
       "messages": [
-        "City-level granularity is usually unnecessary for small territories; consider removing the city value"
+        {
+            "status": "SUGGESTION",
+            "message": "City-level granularity is usually unnecessary for small territories; consider removing the city value"
+        }
       ],
       "need_region": false,
       "has_error": false,
@@ -458,8 +470,14 @@
       "city": "Singapore",
       "status": "ERROR",
       "messages": [
-        "IPv6 prefix is unusually large and may indicate a typo",
-        "Invalid region format; expected COUNTRY-SUBDIVISION (e.g., US-CA)"
+        {
+            "status": "WARNING",
+            "message": "IPv6 prefix is unusually large and may indicate a typo"
+        },
+        {
+            "status": "ERROR",
+            "message": "Invalid region format; expected COUNTRY-SUBDIVISION (e.g., US-CA)"
+        }
       ],
       "need_region": false,
       "has_error": true,
@@ -534,7 +552,21 @@
                 let messagesHtml = '<ul class="messages-list">';
                 if (entry.messages && entry.messages.length > 0) {
                     entry.messages.forEach(msg => {
-                        messagesHtml += `<li><i class="fas fa-info-circle" style="margin-right: 6px; opacity: 0.7;"></i>${escapeHtml(msg)}</li>`;
+                        let msgStatus = msg.status || 'INFO';
+                        let msgText = msg.message || msg;
+                        let msgIcon = '<i class="fas fa-info-circle" style="margin-right: 6px; color: #999; opacity: 0.7;"></i>';
+                        
+                        if (msgStatus === 'ERROR') {
+                            msgIcon = '<i class="fas fa-times-circle" style="margin-right: 6px; color: #999; opacity: 0.7;"></i>';
+                        } else if (msgStatus === 'WARNING') {
+                            msgIcon = '<i class="fas fa-exclamation-triangle" style="margin-right: 6px; color: #999; opacity: 0.7;"></i>';
+                        } else if (msgStatus === 'SUGGESTION') {
+                            msgIcon = '<i class="fas fa-lightbulb" style="margin-right: 6px; color: #999; opacity: 0.7;"></i>';
+                        } else if (msgStatus === 'OK') {
+                            msgIcon = '<i class="fas fa-check-circle" style="margin-right: 6px; color: #999; opacity: 0.7;"></i>';
+                        }
+                        
+                        messagesHtml += `<li>${msgIcon}${escapeHtml(msgText)}</li>`;
                     });
                 }
                 messagesHtml += '</ul>';

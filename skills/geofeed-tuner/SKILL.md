@@ -167,7 +167,12 @@ The JSON structure below is **IMMUTABLE**.
 
       "status": "",              // Highest severity: ERROR | WARNING | SUGGESTION | OK
 
-      "messages": [],            // List of validation messages
+      "messages": [
+        {
+          "status": "",            // ERROR | WARNING | SUGGESTION
+          "message": ""            // Descriptive message for the issue or suggestion
+        }
+      ],            // List of validation messages
 
       "need_region": false,
       "has_error": false,
