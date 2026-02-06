@@ -823,7 +823,18 @@
             rows.forEach(row => {
                 const cells = row.querySelectorAll('td');
                 const country = cells[2]?.textContent.toLowerCase() || '';
-                const region = cells[3]?.textContent.toLowerCase() || '';
+                
+                // For region, extract only the selected value from dropdown if present
+                let region = '';
+                const regionCell = cells[3];
+                const dropdownButton = regionCell?.querySelector('.dropdown-button');
+                if (dropdownButton) {
+                    const buttonText = dropdownButton.querySelector('.button-text')?.textContent;
+                    region = (buttonText && buttonText !== '-- Select Region --') ? buttonText.toLowerCase() : '';
+                } else {
+                    region = regionCell?.textContent.toLowerCase() || '';
+                }
+                
                 const city = cells[4]?.textContent.toLowerCase() || '';
                 const status = cells[5]?.textContent.trim().toUpperCase() || '';
                 
