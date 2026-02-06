@@ -221,6 +221,17 @@
         .accuracy-summary-table .metrics-value {
             width: 35% !important;
         }
+        #filterCountry, #filterRegion, #filterCity, #filterStatus {
+            box-sizing: border-box;
+            font-family: 'Raleway', sans-serif;
+        }
+        #filterCountry::placeholder, #filterRegion::placeholder, #filterCity::placeholder {
+            color: #aaa;
+        }
+        #resetFilters:hover {
+            background-color: #6a6a6a;
+            border-color: #aaa;
+        }
     </style>
 </head>
 <body>
@@ -316,8 +327,25 @@
         <div style="overflow-x: auto;">
             <table class="entries-table">
                 <thead>
-                    <tr>
-                        <th colspan="8" style="padding: 15px; font-weight: bold; color: #ffffff; font-size: 1.4em; font-family: 'Raleway', sans-serif; text-align: left; background-color: #4a4a4a;">Entries</th>
+                    <tr style="background-color: #4a4a4a;">
+                        <th colspan="8" style="padding: 15px; font-weight: bold; color: #ffffff; font-size: 1.4em; font-family: 'Raleway', sans-serif;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span><i class="fas fa-list" style="margin-right: 10px;"></i>Entries</span>
+                                <div style="display: flex; gap: 10px; font-size: 0.75em; font-weight: 400;">
+                                    <input type="text" id="filterCountry" placeholder="Country" style="padding: 6px 10px; border: 1px solid #888; border-radius: 4px; background-color: #5a5a5a; color: #ffffff;">
+                                    <input type="text" id="filterRegion" placeholder="Region" style="padding: 6px 10px; border: 1px solid #888; border-radius: 4px; background-color: #5a5a5a; color: #ffffff;">
+                                    <input type="text" id="filterCity" placeholder="City" style="padding: 6px 10px; border: 1px solid #888; border-radius: 4px; background-color: #5a5a5a; color: #ffffff;">
+                                    <select id="filterStatus" style="padding: 6px 10px; border: 1px solid #888; border-radius: 4px; background-color: #5a5a5a; color: #ffffff;">
+                                        <option value="">Status</option>
+                                        <option value="ERROR">ERROR</option>
+                                        <option value="WARNING">WARNING</option>
+                                        <option value="SUGGESTION">SUGGESTION</option>
+                                        <option value="OK">OK</option>
+                                    </select>
+                                    <button id="resetFilters" style="padding: 6px 12px; border: 1px solid #888; border-radius: 4px; background-color: #5a5a5a; color: #ffffff; cursor: pointer; font-weight: 600;">Reset</button>
+                                </div>
+                            </div>
+                        </th>
                     </tr>
                     <tr>
                         <th>Line</th>
@@ -549,8 +577,55 @@
             return text.replace(/[&<>"']/g, m => map[m]);
         }
         
+        // Function to apply filters
+        function applyFilters() {
+            const countryFilter = document.getElementById('filterCountry').value.toLowerCase();
+            const regionFilter = document.getElementById('filterRegion').value.toLowerCase();
+            const cityFilter = document.getElementById('filterCity').value.toLowerCase();
+            const statusFilter = document.getElementById('filterStatus').value;
+            
+            const tableBody = document.getElementById('entriesTableBody');
+            const rows = tableBody.querySelectorAll('tr');
+            
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                const country = cells[2]?.textContent.toLowerCase() || '';
+                const region = cells[3]?.textContent.toLowerCase() || '';
+                const city = cells[4]?.textContent.toLowerCase() || '';
+                const status = cells[5]?.textContent.trim().toUpperCase() || '';
+                
+                const countryMatch = country.includes(countryFilter);
+                const regionMatch = region.includes(regionFilter);
+                const cityMatch = city.includes(cityFilter);
+                const statusMatch = statusFilter === '' || status.includes(statusFilter);
+                
+                if (countryMatch && regionMatch && cityMatch && statusMatch) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+        
         // Load data when page loads
-        window.addEventListener('DOMContentLoaded', loadData);
+        window.addEventListener('DOMContentLoaded', function() {
+            loadData();
+            
+            // Add filter event listeners
+            document.getElementById('filterCountry').addEventListener('input', applyFilters);
+            document.getElementById('filterRegion').addEventListener('input', applyFilters);
+            document.getElementById('filterCity').addEventListener('input', applyFilters);
+            document.getElementById('filterStatus').addEventListener('change', applyFilters);
+            
+            // Reset filters button
+            document.getElementById('resetFilters').addEventListener('click', function() {
+                document.getElementById('filterCountry').value = '';
+                document.getElementById('filterRegion').value = '';
+                document.getElementById('filterCity').value = '';
+                document.getElementById('filterStatus').value = '';
+                applyFilters();
+            });
+        });
     </script>
 </body>
 </html>
