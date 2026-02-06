@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Geofeed Tuner Report</title>
     <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../assets/bootstrap-5.3.8-dist/css/bootstrap.min.css">
     <style>
         body {
@@ -231,11 +232,11 @@
                 <td colspan="2" style="padding: 12px 15px; font-weight: bold; color: #ffffff; font-size: 1.1em; font-family: 'Raleway', sans-serif;">Feed Metadata</td>
             </tr>
             <tr>
-                <td class="metrics-label">Input file</td>
+                <td class="metrics-label"><i class="fas fa-file-csv" style="margin-right: 8px;"></i>Input file</td>
                 <td class="metrics-value"><span id="inputFileMetrics">geolocation.csv</span></td>
             </tr>
             <tr>
-                <td class="metrics-label">Tuning timestamp</td>
+                <td class="metrics-label"><i class="fas fa-calendar-alt" style="margin-right: 8px;"></i>Tuning timestamp</td>
                 <td class="metrics-value"><span id="tuningTimestamp">2026-01-31T12:00:00.000000+00:00</span></td>
             </tr>
         </table>
@@ -246,19 +247,19 @@
                     <td colspan="2" style="padding: 12px 15px; font-weight: bold; color: #ffffff; font-size: 1.1em; font-family: 'Raleway', sans-serif;">Entries</td>
                 </tr>
                 <tr>
-                    <td class="metrics-label">Total entries</td>
+                    <td class="metrics-label"><i class="fas fa-list" style="margin-right: 8px;"></i>Total entries</td>
                     <td class="metrics-value"><span id="totalEntriesMetrics">0</span></td>
                 </tr>
                 <tr>
-                    <td class="metrics-label">IPv4 entries</td>
+                    <td class="metrics-label"><i class="fas fa-network-wired" style="margin-right: 8px;"></i>IPv4 entries</td>
                     <td class="metrics-value"><span id="ipv4EntriesMetrics">0</span></td>
                 </tr>
                 <tr>
-                    <td class="metrics-label">IPv6 entries</td>
+                    <td class="metrics-label"><i class="fas fa-network-wired" style="margin-right: 8px;"></i>IPv6 entries</td>
                     <td class="metrics-value"><span id="ipv6EntriesMetrics">0</span></td>
                 </tr>
                 <tr>
-                    <td class="metrics-label">Invalid entries</td>
+                    <td class="metrics-label"><i class="fas fa-exclamation-circle" style="margin-right: 8px;"></i>Invalid entries</td>
                     <td class="metrics-value"><span id="invalidEntriesMetrics">0</span></td>
                 </tr>
             </table>
@@ -268,19 +269,19 @@
                     <td colspan="2" style="padding: 12px 15px; font-weight: bold; color: #ffffff; font-size: 1.1em; font-family: 'Raleway', sans-serif;">Analysis Summary</td>
                 </tr>
                 <tr>
-                    <td class="metrics-label">Errors</td>
+                    <td class="metrics-label"><i class="fas fa-times-circle" style="margin-right: 8px;"></i>Errors</td>
                     <td class="metrics-value"><span id="errorCountMetrics">0</span></td>
                 </tr>
                 <tr>
-                    <td class="metrics-label">Warnings</td>
+                    <td class="metrics-label"><i class="fas fa-exclamation-triangle" style="margin-right: 8px;"></i>Warnings</td>
                     <td class="metrics-value"><span id="warningCountMetrics">0</span></td>
                 </tr>
                 <tr>
-                    <td class="metrics-label">Suggestions</td>
+                    <td class="metrics-label"><i class="fas fa-lightbulb" style="margin-right: 8px;"></i>Suggestions</td>
                     <td class="metrics-value"><span id="suggestionsMetrics">0</span></td>
                 </tr>
                 <tr>
-                    <td class="metrics-label">OK </td>
+                    <td class="metrics-label"><i class="fas fa-check-circle" style="margin-right: 8px;"></i>OK </td>
                     <td class="metrics-value"><span id="okCountMetrics">0</span></td>
                 </tr>
             </table>
@@ -298,15 +299,15 @@
                     <td colspan="4" style="padding: 12px 15px; font-weight: bold; color: #ffffff; font-size: 1.1em; font-family: 'Raleway', sans-serif;">Accuracy Summary</td>
                 </tr>
                 <tr>
-                    <td class="metrics-label">City-level accuracy</td>
+                    <td class="metrics-label"><i class="fas fa-city" style="margin-right: 8px;"></i>City-level accuracy</td>
                     <td class="metrics-value"><span id="cityAccuracy">0</span></td>
-                    <td class="metrics-label">Region-level accuracy</td>
+                    <td class="metrics-label"><i class="fas fa-map" style="margin-right: 8px;"></i>Region-level accuracy</td>
                     <td class="metrics-value"><span id="regionAccuracy">0</span></td>
                 </tr>
                 <tr>
-                    <td class="metrics-label">Country-level accuracy</td>
+                    <td class="metrics-label"><i class="fas fa-globe" style="margin-right: 8px;"></i>Country-level accuracy</td>
                     <td class="metrics-value"><span id="countryAccuracy">0</span></td>
-                    <td class="metrics-label">Do-not-geolocate entries</td>
+                    <td class="metrics-label"><i class="fas fa-ban" style="margin-right: 8px;"></i>Do-not-geolocate entries</td>
                     <td class="metrics-value"><span id="doNotGeolocate">0</span></td>
                 </tr>
             </table>
@@ -481,17 +482,25 @@
             data.entries.forEach(entry => {
                 const row = document.createElement('tr');
                 
-                // Determine status badge class
+                // Determine status badge class and icon
                 let statusClass = 'status-ok';
-                if (entry.status === 'ERROR') statusClass = 'status-error';
-                else if (entry.status === 'WARNING') statusClass = 'status-warning';
-                else if (entry.status === 'SUGGESTION') statusClass = 'status-suggestion';
+                let statusIcon = '<i class="fas fa-check-circle" style="margin-right: 6px;"></i>';
+                if (entry.status === 'ERROR') {
+                    statusClass = 'status-error';
+                    statusIcon = '<i class="fas fa-times-circle" style="margin-right: 6px;"></i>';
+                } else if (entry.status === 'WARNING') {
+                    statusClass = 'status-warning';
+                    statusIcon = '<i class="fas fa-exclamation-triangle" style="margin-right: 6px;"></i>';
+                } else if (entry.status === 'SUGGESTION') {
+                    statusClass = 'status-suggestion';
+                    statusIcon = '<i class="fas fa-lightbulb" style="margin-right: 6px;"></i>';
+                }
                 
                 // Messages list
                 let messagesHtml = '<ul class="messages-list">';
                 if (entry.messages && entry.messages.length > 0) {
                     entry.messages.forEach(msg => {
-                        messagesHtml += `<li>${escapeHtml(msg)}</li>`;
+                        messagesHtml += `<li><i class="fas fa-info-circle" style="margin-right: 6px; opacity: 0.7;"></i>${escapeHtml(msg)}</li>`;
                     });
                 }
                 messagesHtml += '</ul>';
@@ -503,14 +512,14 @@
                     entry.region_suggestions.forEach(suggestion => {
                         suggestionsHtml += `
                             <div class="region-suggestion-item">
-                                <strong>${escapeHtml(suggestion.region_code)}</strong> - ${escapeHtml(suggestion.region_name)}
-                                <br><small style="color: #999;">Relevance: ${(suggestion.relevance * 100).toFixed(0)}%</small>
+                                <i class="fas fa-map-marker-alt" style="margin-right: 6px; color: #4a4a4a;"></i><strong>${escapeHtml(suggestion.region_code)}</strong> - ${escapeHtml(suggestion.region_name)}
+                                <br><small style="color: #999;"><i class="fas fa-check" style="margin-right: 4px;"></i>Relevance: ${(suggestion.relevance * 100).toFixed(0)}%</small>
                             </div>
                         `;
                     });
                     suggestionsHtml += '</div>';
                 } else {
-                    suggestionsHtml = '<span style="color: #999;">None</span>';
+                    suggestionsHtml = '<span style="color: #999;"><i class="fas fa-minus-circle" style="margin-right: 6px;"></i>None</span>';
                 }
                 
                 row.innerHTML = `
@@ -519,7 +528,7 @@
                     <td>${escapeHtml(entry.country)}</td>
                     <td>${entry.region ? escapeHtml(entry.region) : '<span style="color: #999;">-</span>'}</td>
                     <td>${entry.city ? escapeHtml(entry.city) : '<span style="color: #999;">-</span>'}</td>
-                    <td><span class="status-badge ${statusClass}">${entry.status}</span></td>
+                    <td><span class="status-badge ${statusClass}">${statusIcon}${entry.status}</span></td>
                     <td>${messagesHtml}</td>
                     <td>${suggestionsHtml}</td>
                 `;
