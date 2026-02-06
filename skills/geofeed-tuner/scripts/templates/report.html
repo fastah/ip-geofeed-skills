@@ -43,13 +43,16 @@
             color: #333333;
         }
         .status-badge {
-            padding: 8px 12px;
+            padding: 6px 10px;
             border-radius: 4px;
             font-weight: bold;
-            font-size: 0.9em;
-            display: inline-block;
-            min-width: 120px;
-            text-align: center;
+            font-size: 0.75em;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            width: 80%;
+            white-space: nowrap;
         }
         .status-error {
             background-color: #ff707f;
@@ -76,6 +79,7 @@
             border-collapse: collapse;
             border-radius: 8px;
             overflow: hidden;
+            table-layout: fixed;
         }
         .entries-table thead {
             background-color: #4a4a4a;
@@ -92,6 +96,12 @@
         .entries-table td {
             padding: 12px;
             border: 1px solid #d3d3d3;
+            vertical-align: top;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+        .entries-table td:nth-child(6) {
+            text-align: center;
             vertical-align: top;
         }
         .entries-table tbody tr:nth-child(odd) {
@@ -234,6 +244,92 @@
             background-color: #6a6a6a;
             border-color: #aaa;
         }
+        .custom-dropdown {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+        .dropdown-button {
+            width: 100%;
+            padding: 6px;
+            border: 1px solid #d3d3d3;
+            border-radius: 3px;
+            background-color: white;
+            color: #333;
+            font-family: Raleway, sans-serif;
+            cursor: pointer;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .dropdown-button:hover {
+            background-color: #f9f9f9;
+        }
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            background-color: white;
+            min-width: 100%;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            border: 1px solid #d3d3d3;
+            border-top: none;
+            border-radius: 0 0 3px 3px;
+            top: 100%;
+            left: 0;
+            right: 0;
+        }
+        .dropdown-menu.show {
+            display: block;
+        }
+        .dropdown-option {
+            padding: 8px 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 0.9em;
+        }
+        .dropdown-option:hover {
+            background-color: #f0f0f0;
+        }
+        .dropdown-option.selected {
+            background-color: #e8f4f8;
+            font-weight: 500;
+        }
+        .dropdown-option i {
+            margin-right: 8px;
+            color: #666;
+            width: 16px;
+            text-align: center;
+        }
+        .dropdown-option-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .dropdown-option-code {
+            font-weight: 600;
+            color: #333;
+            white-space: nowrap;
+        }
+        .dropdown-option-name {
+            color: #666;
+            font-size: 0.85em;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .dropdown-option-relevance {
+            margin-left: 8px;
+            color: #999;
+            font-size: 0.85em;
+            white-space: nowrap;
+        }
     </style>
 </head>
 <body>
@@ -328,9 +424,18 @@
 
         <div style="overflow-x: auto;">
             <table class="entries-table">
+                <colgroup>
+                    <col style="width: 4%;">
+                    <col style="width: 15%;">
+                    <col style="width: 7%;">
+                    <col style="width: 13%;">
+                    <col style="width: 12%;">
+                    <col style="width: 10%;">
+                    <col style="width: 39%;">
+                </colgroup>
                 <thead>
                     <tr style="background-color: #4a4a4a;">
-                        <th colspan="8" style="padding: 15px; font-weight: bold; color: #ffffff; font-size: 1.4em; font-family: 'Raleway', sans-serif;">
+                        <th colspan="7" style="padding: 15px; font-weight: bold; color: #ffffff; font-size: 1.4em; font-family: 'Raleway', sans-serif;">
                             <div style="display: flex; justify-content: space-between; align-items: center;">
                                 <span><i class="fas fa-list" style="margin-right: 10px;"></i>Entries</span>
                                 <div style="display: flex; gap: 10px; font-size: 0.75em; font-weight: 400;">
@@ -357,7 +462,6 @@
                         <th>City</th>
                         <th>Status</th>
                         <th>Messages</th>
-                        <th>Region Suggestions</th>
                     </tr>
                 </thead>
                 <tbody id="entriesTableBody">
@@ -434,8 +538,8 @@
       "is_small_territory": false,
       "region_suggestions": [
         {
-          "region_code": "CA-QC",
-          "region_name": "Quebec",
+          "region_code": "WW-WW",
+          "region_name": "Quebeqfuhefiuheqigeswjrbjrufhqic",
           "relevance": 1.0
         }
       ]
@@ -536,16 +640,16 @@
                 
                 // Determine status badge class and icon
                 let statusClass = 'status-ok';
-                let statusIcon = '<i class="fas fa-check-circle" style="margin-right: 6px;"></i>';
+                let statusIcon = '<i class="fas fa-check-circle"></i>';
                 if (entry.status === 'ERROR') {
                     statusClass = 'status-error';
-                    statusIcon = '<i class="fas fa-times-circle" style="margin-right: 6px;"></i>';
+                    statusIcon = '<i class="fas fa-times-circle"></i>';
                 } else if (entry.status === 'WARNING') {
                     statusClass = 'status-warning';
-                    statusIcon = '<i class="fas fa-exclamation-triangle" style="margin-right: 6px;"></i>';
+                    statusIcon = '<i class="fas fa-exclamation-triangle"></i>';
                 } else if (entry.status === 'SUGGESTION') {
                     statusClass = 'status-suggestion';
-                    statusIcon = '<i class="fas fa-lightbulb" style="margin-right: 6px;"></i>';
+                    statusIcon = '<i class="fas fa-lightbulb"></i>';
                 }
                 
                 // Messages list
@@ -571,6 +675,30 @@
                 }
                 messagesHtml += '</ul>';
                 
+                // Region field - dropdown if need_region is true
+                let regionHtml = '';
+                if (entry.need_region && entry.region_suggestions && entry.region_suggestions.length > 0) {
+                    const cellId = `region-cell-${entry.line}`;
+                    regionHtml = `<div id="${cellId}" class="region-selector" data-line="${entry.line}">`;
+                    regionHtml += `<div class="custom-dropdown" data-suggestions='${JSON.stringify(entry.region_suggestions).replace(/'/g, "&apos;")}'>`;
+                    regionHtml += `<button class="dropdown-button"><span class="button-text">-- Select Region --</span><i class="fas fa-chevron-down" style="font-size: 0.8em;"></i></button>`;
+                    regionHtml += `<div class="dropdown-menu">`;
+                    entry.region_suggestions.forEach(suggestion => {
+                        const relevancePercent = (suggestion.relevance * 100).toFixed(0);
+                        regionHtml += `<div class="dropdown-option" data-value="${escapeHtml(suggestion.region_code)}">`;
+                        regionHtml += `<i class="fas fa-map-marker-alt"></i>`;
+                        regionHtml += `<div class="dropdown-option-content">`;
+                        regionHtml += `<span class="dropdown-option-code">${escapeHtml(suggestion.region_code)}</span>`;
+                        regionHtml += `<span class="dropdown-option-name">${escapeHtml(suggestion.region_name)}</span>`;
+                        regionHtml += `</div>`;
+                        regionHtml += `<span class="dropdown-option-relevance"><i class="fas fa-check" style="margin-right: 4px;"></i>${relevancePercent}%</span>`;
+                        regionHtml += `</div>`;
+                    });
+                    regionHtml += `</div></div></div>`;
+                } else {
+                    regionHtml = entry.region ? escapeHtml(entry.region) : '<span style="color: #999;">-</span>';
+                }
+                
                 // Region suggestions
                 let suggestionsHtml = '';
                 if (entry.region_suggestions && entry.region_suggestions.length > 0) {
@@ -592,14 +720,81 @@
                     <td>${entry.line}</td>
                     <td><strong>${escapeHtml(entry.ip_prefix)}</strong></td>
                     <td><img src="${entry.flag_svg}" style="width: 24px; height: 16px; margin-right: 8px; vertical-align: middle; border-radius: 2px; box-shadow: 0 1px 3px rgba(0,0,0,0.2);"> ${escapeHtml(entry.country)}</td>
-                    <td>${entry.region ? escapeHtml(entry.region) : '<span style="color: #999;">-</span>'}</td>
+                    <td>${regionHtml}</td>
                     <td>${entry.city ? escapeHtml(entry.city) : '<span style="color: #999;">-</span>'}</td>
                     <td><span class="status-badge ${statusClass}">${statusIcon}${entry.status}</span></td>
                     <td>${messagesHtml}</td>
-                    <td>${suggestionsHtml}</td>
                 `;
                 
                 tableBody.appendChild(row);
+            });
+        }
+        
+        // Handle region selector dropdowns
+        function setupRegionSelectors() {
+            const customDropdowns = document.querySelectorAll('.custom-dropdown');
+            
+            customDropdowns.forEach(dropdown => {
+                const button = dropdown.querySelector('.dropdown-button');
+                const menu = dropdown.querySelector('.dropdown-menu');
+                const options = dropdown.querySelectorAll('.dropdown-option');
+                const container = dropdown.closest('.region-selector');
+                
+                // Parse suggestions from data attribute
+                const suggestionsJson = dropdown.getAttribute('data-suggestions');
+                const suggestions = suggestionsJson ? JSON.parse(suggestionsJson.replace(/&apos;/g, "'")) : [];
+                
+                // Toggle menu
+                button.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const isOpen = menu.classList.contains('show');
+                    // Close all other menus
+                    document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show'));
+                    if (!isOpen) {
+                        menu.classList.add('show');
+                    }
+                });
+                
+                // Handle option selection
+                options.forEach(option => {
+                    option.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const value = this.getAttribute('data-value');
+                        const text = this.querySelector('.dropdown-option-code').textContent;
+                        const relevance = this.querySelector('.dropdown-option-relevance').textContent;
+                        
+                        // Update button text
+                        button.innerHTML = `<span class="button-text">${escapeHtml(text)}</span><button class="region-edit-btn" style="margin-left: 6px; padding: 2px 6px; border: 1px solid #d3d3d3; border-radius: 3px; background-color: #f0f0f0; color: #333; cursor: pointer; font-size: 0.85em;" title="Edit region">✎</button>`;
+                        
+                        // Mark as selected
+                        options.forEach(opt => opt.classList.remove('selected'));
+                        this.classList.add('selected');
+                        
+                        // Close menu
+                        menu.classList.remove('show');
+                        
+                        // Attach edit button listener
+                        const editBtn = button.querySelector('.region-edit-btn');
+                        if (editBtn) {
+                            editBtn.addEventListener('click', function(e) {
+                                e.stopPropagation();
+                                restoreDropdown();
+                            });
+                        }
+                    });
+                });
+                
+                function restoreDropdown() {
+                    button.innerHTML = `<span class="button-text">-- Select Region --</span><i class="fas fa-chevron-down" style="font-size: 0.8em;"></i>`;
+                    options.forEach(opt => opt.classList.remove('selected'));
+                    menu.classList.remove('show');
+                    button.click();
+                }
+                
+                // Close menu when clicking outside
+                document.addEventListener('click', function() {
+                    menu.classList.remove('show');
+                });
             });
         }
         
@@ -648,6 +843,7 @@
         // Load data when page loads
         window.addEventListener('DOMContentLoaded', function() {
             loadData();
+            setupRegionSelectors();
             
             // Add filter event listeners
             document.getElementById('filterCountry').addEventListener('input', applyFilters);
