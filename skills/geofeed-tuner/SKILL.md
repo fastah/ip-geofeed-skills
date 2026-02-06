@@ -508,7 +508,7 @@ Populate with:
 }
 ```
 
-#### Step 6: Persist Updated Dataset
+#### Step 6: Store Updated Dataset
 
 - Write the dataset back to: [./run/data/temp.json](./run/data/temp.json)
 - Rules:
@@ -517,165 +517,13 @@ Populate with:
   - Do NOT create additional intermediate files.
   
 ### Phase 5: Generate Tuning Report
+- Use the dataset from: [./run/data/temp.json](./run/data/temp.json)
+- Insert the data into the HTML template at: [`./scripts/templates/report.html`](./scripts/templates/report.html)
+- Write the final report to: [./run/report/final-report.html](./run/report/final-report.html)
 
-- Generate a **deterministic, self-contained HTML validation report** using **HTML5** and **inline CSS only** (no external assets).  
-- If inline rendering is supported by the UI, render the report directly. Otherwise, write the HTML report to `./run/report/`, using the **input CSV filename** (with a `.html` extension), and open it with the system default browser.
-- Prefer Bootstrap layout classes, tables, badges, alerts, and collapsible UI elements for readability and consistency.
-
-#### Summary Section
-
-Render a **fixed metrics panel** at the top of the report, consisting of **four separate tables stacked vertically (top-down)**.
-Each table must appear **one after the other**, never side-by-side.
-
-##### Table layout and styling requirements
-
-- Use `./scripts/templates/report_header.html` as the **visual and structural reference** for the metrics panel.
-- **Style the template and all summary tables using Bootstrap (v5.3.x)** for layout, spacing, and typography.
-  - Use Bootstrap table utilities (`.table`, `.table-bordered`, `.table-sm`, etc.) where appropriate.
-  - Use Bootstrap spacing and container classes to enforce margins and alignment.
-- All tables must have a **consistent width** across the report.
-- Table width must **fit within the page viewport** and respect horizontal margins.
-- Apply equal **left and right margins** so tables are visually centered.
-- Use a **clean, readable report style**:
-  - Clear table borders
-  - Bold header row
-  - Adequate cell padding
-- Do not allow tables to overflow horizontally.
-- Tables must scale cleanly for typical desktop screen widths and printing.
-
-Each table must use a **two-column key–value layout**:
-- **Left column**: metric label
-- **Right column**: computed value only
-
-
-###### Feed Metadata
-
-- Input file: display the source as a URL if provided; otherwise show the local file path and resolved filename.
-- Timestamp must be UTC, ISO-8601.
-
-| Metric               | Value |
-|----------------------|-------|
-| Input file           |       |
-| Tuning timestamp     |       |
-
-
-###### Entries
-
-| Metric                     | Value |
-|----------------------------|-------|
-| Total entries              |       |
-| IPv4 entries               |       |
-| IPv6 entries               |       |
-
-
-###### Analysis Summary
-
-| Metric            | Value |
-|-------------------|-------|
-| **ERROR** count   |       |
-| **WARNING** count |       |
-| **OK** count      |       |
-
-
-###### Geographical Accuracy Classification
-
-| Metric                     | Value |
-|----------------------------|-------|
-| City-level accuracy        |       |
-| Region-level accuracy      |       |
-| Country-level accuracy     |       |
-| Do-not-geolocate entries   |       |
-
-
-#### Results Table
-
-Render a **single, stable, sortable HTML table** with **one row per input CSV entry**.
-- Preserve the **original CSV row order** by default.
-- Use `./scripts/templates/report_table.html` as the **visual and structural reference** for the table.
-
-Columns **must appear in this exact order**:
-
-| Column    | Description                                               |
-|-----------|-----------------------------------------------------------|
-| Line      | 1-based CSV line number                                   |
-| IP Prefix | Normalized CIDR notation                                  |
-| Country   | `alpha2code` with the corresponding country flag emoji    |
-| Region    | Region code or empty                                      |
-| City      | City name or empty                                        |
-| Status    | ERROR, WARNING, SUGGESTION, or OK                         |
-| Messages  | Ordered list of issues and suggestions                    |
-
-##### Large Feed Optimization
-
-- If the input CSV contains **10,000 or more entries**, the Results Table MUST include **only rows with issues** (ERROR, WARNING, SUGGESTION status) to prevent browser performance degradation.
-- OK entries are excluded from the table but **still counted** in the summary statistics.
-- This threshold balances completeness with browser rendering performance — a 10K-row table renders smoothly, while 100K+ rows cause browsers to hang.
-
-##### Column Definitions
-
-- **Line**  
-  - The **1-based line number** from the original input CSV file.  
-  - This value must refer to the physical line in the source file after comment handling.
-
-- **IP Prefix**  
-  - The IP subnet expressed in **normalized CIDR notation**.  
-
-- **Country**  
-  The two-letter ISO 3166-1 `alpha2code` associated with the subnet.  
-  - Always display the **country flag emoji** alongside the code in the HTML report.
-  - If the country code is invalid, display the raw value with the emoji omitted or replaced according to the rules.
-
-- **Region**  
-
-The **ISO 3166-2 subdivision code** (for example, `US-CA`).
-
-  - UI Behavior
-    - Render the **Region** field as a **dropdown menu**.
-    - The **default selected value** MUST be the value provided in the CSV.
-    - If the CSV value is present and valid, **skip any lookup** and proceed to the next step.
-
-  - Auto-suggestion (Fallback)
-    - If the CSV value is **empty or missing**:
-      - Invoke the [Mapbox](https://mcp.mapbox.com/mcp) MCP server **reverse-geocode** tool using the **City** field.
-      - Populate the dropdown with **at least three suggested region codes**.
-      - Suggestions SHOULD be ordered by **confidence or relevance**, when available.
-      - Leave the field empty if no region is specified or applicable.
-      - The user MAY override the suggested value by selecting a different option from the dropdown.
-
-- **City**  
-  The city name associated with the subnet.  
-  - Leave empty if no city is provided.
-
-- **Status**  
-  - The **highest severity level** assigned to the row after all phases complete.  
-  - Severity order: **ERROR** > **WARNING** > **SUGGESTION** > **OK**
-
-
-- **Messages**  
-  An **ordered list** of issues and suggestions for the row.  
-  - Includes **ERROR**, **WARNING** and  **SUGGESTION**.
-
-##### Filtering and Visual Encoding
-
-- Apply **row-level visual styling** based on status:
-  - **ERROR**: light red background
-  - **WARNING**: light yellow background
-  - **SUGGESTION**: light blue or neutral background
-  - **OK**: light green background
-
-- Provide a **status filter dropdown** positioned **above the table**, aligned with the table title.
-  - Options:
-    - **ERROR**
-    - **WARNING**
-    - **SUGGESTION**
-    - **OK**
-    - All (default)
-
-- Filtering must:
-  - Operate on the **single table**
-  - Preserve original row order
-  - Toggle visibility only (do not remove rows from the DOM)
-
+#### Report Requirements
+- Do not change the structure of the HTML template.
+- Hardcode the values from the dataset into the script section of the HTML.
 
 #### Output Guarantees
 
