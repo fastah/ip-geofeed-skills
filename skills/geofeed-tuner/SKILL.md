@@ -68,7 +68,7 @@ All generated, temporary, and output files must be written to these directories:
 - Each phase depends on the successful completion of the previous phase.  
   - For example, **structure checks** must complete before **quality analysis** can run.
 
-- The phases are:
+- The phases are summarized as follows, but the agent must follow the detailed steps outlined further below for each phase:
 
   - **Phase 1: Understand the Standard**  
     Learn RFC 8805 requirements for self-published IP geolocation feeds.
@@ -103,11 +103,19 @@ All generated, temporary, and output files must be written to these directories:
 
 - Users or automation agents should **not skip phases**, as each phase provides critical checks or data transformations required for the next stage.
 
+### Execution Plan Rules
+Before executing this phase, the agent MUST generate a visible TODO checklist.
+
+The plan MUST:
+- Appear at the very start of the phase
+- List every step in order
+- Use a checkbox format
+- Be updated live as steps complete
 
 
 ### Phase 1: Understand the Standard
 
-Read Section 1 (**Introduction**) and Section 2 (**Self-Published IP Geolocation Feeds**) of the plain-text  
+Think deeply about Section 1 (**Introduction**) and Section 2 (**Self-Published IP Geolocation Feeds**) of the plain-text, locally-available document
 [RFC 8805 – A Format for Self-Published IP Geolocation Feeds](references/rfc8805.txt).
 
 The goal of this phase is to understand the **foundation** for IP geolocation feeds, including:
