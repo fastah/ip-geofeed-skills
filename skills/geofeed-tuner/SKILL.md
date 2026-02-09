@@ -64,29 +64,22 @@ All generated, temporary, and output files must be written to these directories:
 
 ## Processing Pipeline: Sequential Phase Execution
 
-### Global Execution Rules
+### Execution Constraint 
 
 - The agent MUST read this entire file from **start to finish** before performing any action.
 - The agent MUST NOT apply range limits, partial reads, or lazy loading when reading this file.
 - All phases MUST execute **strictly in order**
 - A phase MUST NOT begin until the previous phase has **fully completed successfully**.
 - Phases are **state-dependent** — skipping a phase will corrupt downstream validation.
-
-**Phase skipping is strictly prohibited.**
-
-### Execution Constraint (CRITICAL)
-
-Each step MUST be executed as an **independent checkpoint**.
-After completing a step, the agent MUST verify success before proceeding.
+- **Phase skipping is strictly prohibited.**
+- Each step MUST be executed as an **independent checkpoint**.
+- After completing a step, the agent MUST verify success before proceeding.
 
 The agent MUST NOT:
-
 - Merge multiple steps into one script  
 - Execute steps in parallel  
 - Batch steps into a single tool call  
 - Infer or auto-complete future steps  
-
-### Agent Task Contract (REQUIRED)
 
 ### Execution Plan Requirements
 Before executing this phase, the agent MUST generate a visible TODO checklist.
@@ -100,8 +93,7 @@ The plan MUST:
 
 ### Phase 1: Understand the Standard
 
-Read Section 1 (**Introduction**) and Section 2 (**Self-Published IP Geolocation Feeds**) of the plain-text  
-[RFC 8805 – A Format for Self-Published IP Geolocation Feeds](references/rfc8805.txt).
+Think deeply about Section 1 (**Introduction**) and Section 2 (**Self-Published IP Geolocation Feeds**) of the plain-text, locally-available document [RFC 8805 – A Format for Self-Published IP Geolocation Feeds](references/rfc8805.txt).
 
 The goal of this phase is to understand the **foundation** for IP geolocation feeds, including:
 - The overall purpose and scope of RFC 8805
@@ -125,15 +117,13 @@ This research phase establishes the conceptual foundation needed before performi
 
 ### Phase 3: Checks & Suggestions
 
-- Generate a script for this phase
-- Store the output as a JSON file at: [`./run/data/temp.json`](./run/data/temp.json)
-
 #### Execution Rules
 - Generate **exactly one script** for this phase.
 - Do NOT combine this phase with others.
 - Do NOT precompute future-phase data.
+- Store the output as a JSON file at: [`./run/data/temp.json`](./run/data/temp.json)
 
-#### Schema Lock (CRITICAL)
+#### Schema Definition
 
 The JSON structure below is **IMMUTABLE**.
 
@@ -145,6 +135,7 @@ The JSON structure below is **IMMUTABLE**.
   "total_entries": 0,
   "ipv4_entries": 0,
   "ipv6_entries": 0,
+  "invalid_subnet_entries": 0,
 
   "error_count": 0,
   "warning_count": 0,
@@ -188,6 +179,7 @@ The JSON structure below is **IMMUTABLE**.
 - `total_entries`: The total number of entries processed from the input CSV.
 - `ipv4_entries`: The count of entries that are IPv4 subnets.
 - `ipv6_entries`: The count of entries that are IPv6 subnets.
+- `invalid_subnet_entries`: The count of entries that failed subnet parsing and validation.
 - `error_count`: The total number of entries flagged with an ERROR status.
 - `warning_count`: The total number of entries flagged with a WARNING status.
 - `ok_count`: The total number of entries flagged with an OK status.
@@ -271,7 +263,7 @@ The goal is to ensure the file can be parsed reliably and normalized into a **co
       - Single-host IPv6 subnets must be represented as **`/128`**
       
   - **ERROR** 
-    - Report the following conditions as **ERROR** and require correction before continuing:
+    - Report the following conditions as **ERROR**:
 
     - **Invalid subnet syntax**
       - Message: `Invalid IP prefix: unable to parse as IPv4 or IPv6 network`
@@ -288,7 +280,7 @@ The goal is to ensure the file can be parsed reliably and normalized into a **co
 
 
    - **WARNING**
-      - Flag the following conditions for **user review**, without blocking execution:
+      - Report the following conditions as **WARNING**:
 
       - **Overly large IPv6 subnets**
         - Prefixes shorter than `/64`
@@ -297,13 +289,6 @@ The goal is to ensure the file can be parsed reliably and normalized into a **co
       - **Overly large IPv4 subnets**
         - Prefixes shorter than `/24`
         - Message: `IPv4 prefix is unusually large and may indicate a typo`
-
-
-  - **Subnet Storage**
-    - Once checked, store each subnet as a **key** in a map or dictionary.
-    - The corresponding value must be a **custom object** containing:
-      - Geolocation attributes for the subnet
-      - Any user-provided hints or preferences related to that subnet's geolocation.
 
 #### Geolocation Quality Check
 
@@ -324,6 +309,7 @@ This phase runs after structural checks pass.
   - If a country is found in [`assets/small-territories.json`](assets/small-territories.json) set `is_small_territory` to `true`. This will be used for later checks and suggestions related to small territories.
 
   - **ERROR** 
+    - Report the following conditions as **ERROR**:
     - **Invalid country code**
       - Condition: `alpha2code` is present but not found in the `alpha_2` set
       - Message: `Invalid country code: not a valid ISO 3166-1 alpha-2 value`
@@ -342,6 +328,7 @@ This phase runs after structural checks pass.
     - Check the value against the `code` attribute (already prefixed with the country code).
 
   - **ERROR** 
+    - Report the following conditions as **ERROR**:
     - **Invalid region format**
       - Condition: `region` does not match `{COUNTRY}-{SUBDIVISION}`
       - Message: `Invalid region format; expected COUNTRY-SUBDIVISION (e.g., US-CA)`
@@ -351,11 +338,7 @@ This phase runs after structural checks pass.
     - **Country–region mismatch**
       - Condition: Country portion of `region` does not match `alpha2code`
       - Message: `Region code does not match the specified country code`
-    - **Region specified for small territory**
-      - Condition:
-        - `is_small_territory` is `true` 
-        - `region` is non-empty.
-      - Message: `Region must not be specified for small territories`
+
 
 
 ##### City Name Analysis
@@ -364,6 +347,7 @@ This phase runs after structural checks pass.
   There is currently **no authoritative dataset** available for validating city names.
 
   - **ERROR**
+    - Report the following conditions as **ERROR**:
     - **Placeholder or non-meaningful values**
       - Condition: Placeholder or non-meaningful values including but not limited to:
         - `undefined`
@@ -385,6 +369,7 @@ This phase runs after structural checks pass.
       - Message: `Invalid city name: abbreviated or code-based value detected`
   
   - **WARNING**
+    - Report the following conditions as **WARNING**:
     - **Inconsistent casing or formatting**
       - Condition: City names with inconsistent casing, spacing, or formatting that may reduce data quality, for example:
         - `HongKong` vs `Hong Kong`
@@ -397,6 +382,7 @@ This phase runs after structural checks pass.
     for mapping IP address ranges, which are statistical in nature.
 
   - **ERROR**
+    - Report the following conditions as **ERROR**:
     - **Postal code present**
       - Condition: A non-empty value is present in the postal/ZIP code field.
       - Message: `Postal codes are deprecated by RFC 8805 and must be removed for privacy reasons`
@@ -406,6 +392,13 @@ This phase runs after structural checks pass.
 This phase applies **opinionated recommendations** beyond RFC 8805 — suggestions learned from real-world geofeed deployments that improve accuracy and usability.
 
 - **SUGGESTION**
+  - Report the following conditions as **SUGGESTION**:
+
+  - **Region specified for small territory**
+    - Condition:
+      - `is_small_territory` is `true` 
+      - `region` is non-empty.
+    - Message: `Region is usually unnecessary for small territories; consider removing the region value`
 
   - **City value specified for small territories**
     - Condition:
@@ -462,12 +455,12 @@ Rules:
 - Exit the script after writing the payload.
 
 #### Step 3: Invoke Mapbox MCP Tool
-Do NOT use local data.
 
 - Server: `https://mcp.mapbox.com/mcp`
 - Tool: `search_and_geocode_tool `
+- Open [./run/data/region-lookup-input.json](./run/data/region-lookup-input.json) and send all entries parallely.
 
-Open [./run/data/region-lookup-input.json](./run/data/region-lookup-input.json) and send all entries parallely.
+- Do NOT use local data.
 
 #### Step 4: Normalize Suggestions
 
@@ -515,7 +508,7 @@ Populate with:
   - Do NOT create additional intermediate files.
   
 ### Phase 5: Generate Tuning Report
-- Use the dataset from: [./run/data/temp.json](./run/data/temp.json)
+- Use the data from: [./run/data/temp.json](./run/data/temp.json)
 - Insert the data into the HTML template at: [`./scripts/templates/report.html`](./scripts/templates/report.html)
 - Write the final report to: [./run/report/final-report.html](./run/report/final-report.html)
 
@@ -526,5 +519,4 @@ Populate with:
 #### Output Guarantees
 
 - Report must be readable in any modern browser without external network dependencies.
-- All Bootstrap CSS/JS must be referenced from local `assets/bootstrap-5.3.8-dist/` files.
 - All values must be derived **only from analysis output**, not recomputed heuristically.
