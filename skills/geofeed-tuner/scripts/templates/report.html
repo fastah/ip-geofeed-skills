@@ -348,11 +348,11 @@
                 <td colspan="2" style="padding: 12px 15px; font-weight: bold; color: #ffffff; font-size: 1.1em; font-family: 'Raleway', sans-serif;">Feed Metadata</td>
             </tr>
             <tr>
-                <td class="metrics-label"><i class="bi bi-file-earmark-text" style="margin-right: 8px;"></i>Input file</td>
+                <td class="metrics-label"><i class="bi bi-filetype-csv" style="margin-right: 8px;"></i>Input file</td>
                 <td class="metrics-value"><span id="inputFileMetrics">geolocation.csv</span></td>
             </tr>
             <tr>
-                <td class="metrics-label"><i class="bi bi-calendar-event" style="margin-right: 8px;"></i>Tuning timestamp</td>
+                <td class="metrics-label"><i class="bi bi-calendar-event-fill" style="margin-right: 8px;"></i>Tuning timestamp</td>
                 <td class="metrics-value"><span id="tuningTimestamp">2026-01-31T12:00:00.000000+00:00</span></td>
             </tr>
         </table>
@@ -367,15 +367,15 @@
                     <td class="metrics-value"><span id="totalEntriesMetrics">0</span></td>
                 </tr>
                 <tr>
-                    <td class="metrics-label"><i class="bi bi-diagram-3" style="margin-right: 8px;"></i>IPv4 entries</td>
+                    <td class="metrics-label"><i class="bi bi-diagram-3-fill" style="margin-right: 8px;"></i>IPv4 entries</td>
                     <td class="metrics-value"><span id="ipv4EntriesMetrics">0</span></td>
                 </tr>
                 <tr>
-                    <td class="metrics-label"><i class="bi bi-diagram-3" style="margin-right: 8px;"></i>IPv6 entries</td>
+                    <td class="metrics-label"><i class="bi bi-diagram-3-fill" style="margin-right: 8px;"></i>IPv6 entries</td>
                     <td class="metrics-value"><span id="ipv6EntriesMetrics">0</span></td>
                 </tr>
                 <tr>
-                    <td class="metrics-label"><i class="bi bi-exclamation-circle" style="margin-right: 8px;"></i>Invalid entries</td>
+                    <td class="metrics-label"><i class="bi bi-exclamation-circle-fill" style="margin-right: 8px;"></i>Invalid entries</td>
                     <td class="metrics-value"><span id="invalidEntriesMetrics">0</span></td>
                 </tr>
             </table>
@@ -385,19 +385,19 @@
                     <td colspan="2" style="padding: 12px 15px; font-weight: bold; color: #ffffff; font-size: 1.1em; font-family: 'Raleway', sans-serif;">Analysis Summary</td>
                 </tr>
                 <tr>
-                    <td class="metrics-label"><i class="bi bi-x-circle" style="margin-right: 8px;"></i>Errors</td>
+                    <td class="metrics-label"><i class="bi bi-x-circle-fill" style="margin-right: 8px;"></i>Errors</td>
                     <td class="metrics-value"><span id="errorCountMetrics">0</span></td>
                 </tr>
                 <tr>
-                    <td class="metrics-label"><i class="bi bi-exclamation-triangle" style="margin-right: 8px;"></i>Warnings</td>
+                    <td class="metrics-label"><i class="bi bi-exclamation-triangle-fill" style="margin-right: 8px;"></i>Warnings</td>
                     <td class="metrics-value"><span id="warningCountMetrics">0</span></td>
                 </tr>
                 <tr>
-                    <td class="metrics-label"><i class="bi bi-lightbulb" style="margin-right: 8px;"></i>Suggestions</td>
+                    <td class="metrics-label"><i class="bi bi-lightbulb-fill" style="margin-right: 8px;"></i>Suggestions</td>
                     <td class="metrics-value"><span id="suggestionsMetrics">0</span></td>
                 </tr>
                 <tr>
-                    <td class="metrics-label"><i class="bi bi-check-circle" style="margin-right: 8px;"></i>OK </td>
+                    <td class="metrics-label"><i class="bi bi-check-circle-fill" style="margin-right: 8px;"></i>OK </td>
                     <td class="metrics-value"><span id="okCountMetrics">0</span></td>
                 </tr>
             </table>
@@ -415,15 +415,15 @@
                     <td colspan="4" style="padding: 12px 15px; font-weight: bold; color: #ffffff; font-size: 1.1em; font-family: 'Raleway', sans-serif;">Accuracy Summary</td>
                 </tr>
                 <tr>
-                    <td class="metrics-label"><i class="bi bi-building" style="margin-right: 8px;"></i>City-level accuracy</td>
+                    <td class="metrics-label"><i class="bi bi-building-fill" style="margin-right: 8px;"></i>City-level accuracy</td>
                     <td class="metrics-value"><span id="cityAccuracy">0</span></td>
-                    <td class="metrics-label"><i class="bi bi-map" style="margin-right: 8px;"></i>Region-level accuracy</td>
+                    <td class="metrics-label"><i class="bi bi-map-fill" style="margin-right: 8px;"></i>Region-level accuracy</td>
                     <td class="metrics-value"><span id="regionAccuracy">0</span></td>
                 </tr>
                 <tr>
-                    <td class="metrics-label"><i class="bi bi-globe" style="margin-right: 8px;"></i>Country-level accuracy</td>
+                    <td class="metrics-label"><i class="bi bi-globe-americas" style="margin-right: 8px;"></i>Country-level accuracy</td>
                     <td class="metrics-value"><span id="countryAccuracy">0</span></td>
-                    <td class="metrics-label"><i class="bi bi-ban" style="margin-right: 8px;"></i>Do-not-geolocate entries</td>
+                    <td class="metrics-label"><i class="bi bi-ban-fill" style="margin-right: 8px;"></i>Do-not-geolocate entries</td>
                     <td class="metrics-value"><span id="doNotGeolocate">0</span></td>
                 </tr>
             </table>
@@ -647,16 +647,16 @@
                 
                 // Determine status badge class and icon
                 let statusClass = 'status-ok';
-                let statusIcon = '<i class="bi bi-check-circle"></i>';
+                let statusIcon = '<i class="bi bi-check-circle-fill"></i>';
                 if (entry.status === 'ERROR') {
                     statusClass = 'status-error';
-                    statusIcon = '<i class="bi bi-x-circle"></i>';
+                    statusIcon = '<i class="bi bi-x-circle-fill"></i>';
                 } else if (entry.status === 'WARNING') {
                     statusClass = 'status-warning';
-                    statusIcon = '<i class="bi bi-exclamation-triangle"></i>';
+                    statusIcon = '<i class="bi bi-exclamation-triangle-fill"></i>';
                 } else if (entry.status === 'SUGGESTION') {
                     statusClass = 'status-suggestion';
-                    statusIcon = '<i class="bi bi-lightbulb"></i>';
+                    statusIcon = '<i class="bi bi-lightbulb-fill"></i>';
                 }
                 
                 // Messages list
@@ -665,16 +665,16 @@
                     entry.messages.forEach(msg => {
                         let msgStatus = msg.status || 'INFO';
                         let msgText = msg.message || msg;
-                        let msgIcon = '<i class="bi bi-info-circle" style="margin-right: 6px; color: #999; opacity: 0.7;"></i>';
+                        let msgIcon = '<i class="bi bi-info-circle-fill" style="margin-right: 6px; color: #999; opacity: 0.7;"></i>';
                         
                         if (msgStatus === 'ERROR') {
-                            msgIcon = '<i class="bi bi-x-circle" style="margin-right: 6px; color: #999; opacity: 0.7;"></i>';
+                            msgIcon = '<i class="bi bi-x-circle-fill" style="margin-right: 6px; color: #999; opacity: 0.7;"></i>';
                         } else if (msgStatus === 'WARNING') {
-                            msgIcon = '<i class="bi bi-exclamation-triangle" style="margin-right: 6px; color: #999; opacity: 0.7;"></i>';
+                            msgIcon = '<i class="bi bi-exclamation-triangle-fill" style="margin-right: 6px; color: #999; opacity: 0.7;"></i>';
                         } else if (msgStatus === 'SUGGESTION') {
-                            msgIcon = '<i class="bi bi-lightbulb" style="margin-right: 6px; color: #999; opacity: 0.7;"></i>';
+                            msgIcon = '<i class="bi bi-lightbulb-fill" style="margin-right: 6px; color: #999; opacity: 0.7;"></i>';
                         } else if (msgStatus === 'OK') {
-                            msgIcon = '<i class="bi bi-check-circle" style="margin-right: 6px; color: #999; opacity: 0.7;"></i>';
+                            msgIcon = '<i class="bi bi-check-circle-fill" style="margin-right: 6px; color: #999; opacity: 0.7;"></i>';
                         }
                         
                         messagesHtml += `<li>${msgIcon}${escapeHtml(msgText)}</li>`;
@@ -693,12 +693,12 @@
                     entry.region_suggestions.forEach(suggestion => {
                         const relevancePercent = (suggestion.relevance * 100).toFixed(0);
                         regionHtml += `<div class="dropdown-option" data-value="${escapeHtml(suggestion.region_code)}">`;
-                        regionHtml += `<i class="bi bi-geo-alt"></i>`;
+                        regionHtml += `<i class="bi bi-geo-alt-fill"></i>`;
                         regionHtml += `<div class="dropdown-option-content">`;
                         regionHtml += `<span class="dropdown-option-code">${escapeHtml(suggestion.region_code)}</span>`;
                         regionHtml += `<span class="dropdown-option-name">${escapeHtml(suggestion.region_name)}</span>`;
                         regionHtml += `</div>`;
-                        regionHtml += `<span class="dropdown-option-relevance"><i class="bi bi-check" style="margin-right: 4px;"></i>${relevancePercent}%</span>`;
+                        regionHtml += `<span class="dropdown-option-relevance"><i class="bi bi-check-fill" style="margin-right: 4px;"></i>${relevancePercent}%</span>`;
                         regionHtml += `</div>`;
                     });
                     regionHtml += `</div></div></div>`;
@@ -713,14 +713,14 @@
                     entry.region_suggestions.forEach(suggestion => {
                         suggestionsHtml += `
                             <div class="region-suggestion-item">
-                                <i class="bi bi-geo-alt" style="margin-right: 6px; color: #4a4a4a;"></i><strong>${escapeHtml(suggestion.region_code)}</strong> - ${escapeHtml(suggestion.region_name)}
-                                <br><small style="color: #999;"><i class="bi bi-check" style="margin-right: 4px;"></i>Relevance: ${(suggestion.relevance * 100).toFixed(0)}%</small>
+                                <i class="bi bi-geo-alt-fill" style="margin-right: 6px; color: #4a4a4a;"></i><strong>${escapeHtml(suggestion.region_code)}</strong> - ${escapeHtml(suggestion.region_name)}
+                                <br><small style="color: #999;"><i class="bi bi-check-fill" style="margin-right: 4px;"></i>Relevance: ${(suggestion.relevance * 100).toFixed(0)}%</small>
                             </div>
                         `;
                     });
                     suggestionsHtml += '</div>';
                 } else {
-                    suggestionsHtml = '<span style="color: #999;"><i class="bi bi-dash-circle" style="margin-right: 6px;"></i>None</span>';
+                    suggestionsHtml = '<span style="color: #999;"><i class="bi bi-dash-circle-fill" style="margin-right: 6px;"></i>None</span>';
                 }
                 
                 row.innerHTML = `
