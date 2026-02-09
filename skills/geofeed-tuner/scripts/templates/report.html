@@ -5,13 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Geofeed Tuner Report</title>
     <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="../assets/bootstrap-5.3.8-dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
     <style>
         body {
             background-color: #adadad;
             padding: 20px;
             font-family: 'Raleway', sans-serif;
+        }
+        i[class*="bi"] {
+            font-weight: 700;
+            text-shadow: 0 0 0.3px currentColor;
         }
         .report-container {
             background-color: white;
@@ -43,7 +47,7 @@
             color: #333333;
         }
         .status-badge {
-            padding: 6px 10px;
+            padding: 3px 10px;
             border-radius: 4px;
             font-weight: bold;
             font-size: 0.75em;
@@ -51,7 +55,7 @@
             align-items: center;
             justify-content: center;
             gap: 4px;
-            width: 80%;
+            width: 100%;
             white-space: nowrap;
         }
         .status-error {
@@ -116,7 +120,7 @@
             margin: 0;
         }
         .messages-list li {
-            padding: 5px 0;
+            padding: 1px 0;
             border-left: 3px solid #b0b0b0;
             padding-left: 10px;
             color: #696969;
@@ -251,7 +255,7 @@
         }
         .dropdown-button {
             width: 100%;
-            padding: 6px;
+            padding: 4px 5px;
             border: 1px solid #d3d3d3;
             border-radius: 3px;
             background-color: white;
@@ -262,6 +266,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            font-size: 0.9em;
         }
         .dropdown-button:hover {
             background-color: #f9f9f9;
@@ -281,17 +286,19 @@
             top: 100%;
             left: 0;
             right: 0;
+            padding: 0;
+            margin: 0;
         }
         .dropdown-menu.show {
             display: block;
         }
         .dropdown-option {
-            padding: 8px 10px;
+            padding: 6px 8px;
             cursor: pointer;
             display: flex;
             align-items: center;
             border-bottom: 1px solid #f0f0f0;
-            font-size: 0.9em;
+            font-size: 0.85em;
         }
         .dropdown-option:hover {
             background-color: #f0f0f0;
@@ -341,11 +348,11 @@
                 <td colspan="2" style="padding: 12px 15px; font-weight: bold; color: #ffffff; font-size: 1.1em; font-family: 'Raleway', sans-serif;">Feed Metadata</td>
             </tr>
             <tr>
-                <td class="metrics-label"><i class="fas fa-file-csv" style="margin-right: 8px;"></i>Input file</td>
+                <td class="metrics-label"><i class="bi bi-file-earmark-text" style="margin-right: 8px;"></i>Input file</td>
                 <td class="metrics-value"><span id="inputFileMetrics">geolocation.csv</span></td>
             </tr>
             <tr>
-                <td class="metrics-label"><i class="fas fa-calendar-alt" style="margin-right: 8px;"></i>Tuning timestamp</td>
+                <td class="metrics-label"><i class="bi bi-calendar-event" style="margin-right: 8px;"></i>Tuning timestamp</td>
                 <td class="metrics-value"><span id="tuningTimestamp">2026-01-31T12:00:00.000000+00:00</span></td>
             </tr>
         </table>
@@ -356,19 +363,19 @@
                     <td colspan="2" style="padding: 12px 15px; font-weight: bold; color: #ffffff; font-size: 1.1em; font-family: 'Raleway', sans-serif;">Entries</td>
                 </tr>
                 <tr>
-                    <td class="metrics-label"><i class="fas fa-list" style="margin-right: 8px;"></i>Total entries</td>
+                    <td class="metrics-label"><i class="bi bi-list-ul" style="margin-right: 8px;"></i>Total entries</td>
                     <td class="metrics-value"><span id="totalEntriesMetrics">0</span></td>
                 </tr>
                 <tr>
-                    <td class="metrics-label"><i class="fas fa-network-wired" style="margin-right: 8px;"></i>IPv4 entries</td>
+                    <td class="metrics-label"><i class="bi bi-diagram-3" style="margin-right: 8px;"></i>IPv4 entries</td>
                     <td class="metrics-value"><span id="ipv4EntriesMetrics">0</span></td>
                 </tr>
                 <tr>
-                    <td class="metrics-label"><i class="fas fa-network-wired" style="margin-right: 8px;"></i>IPv6 entries</td>
+                    <td class="metrics-label"><i class="bi bi-diagram-3" style="margin-right: 8px;"></i>IPv6 entries</td>
                     <td class="metrics-value"><span id="ipv6EntriesMetrics">0</span></td>
                 </tr>
                 <tr>
-                    <td class="metrics-label"><i class="fas fa-exclamation-circle" style="margin-right: 8px;"></i>Invalid entries</td>
+                    <td class="metrics-label"><i class="bi bi-exclamation-circle" style="margin-right: 8px;"></i>Invalid entries</td>
                     <td class="metrics-value"><span id="invalidEntriesMetrics">0</span></td>
                 </tr>
             </table>
@@ -378,19 +385,19 @@
                     <td colspan="2" style="padding: 12px 15px; font-weight: bold; color: #ffffff; font-size: 1.1em; font-family: 'Raleway', sans-serif;">Analysis Summary</td>
                 </tr>
                 <tr>
-                    <td class="metrics-label"><i class="fas fa-times-circle" style="margin-right: 8px;"></i>Errors</td>
+                    <td class="metrics-label"><i class="bi bi-x-circle" style="margin-right: 8px;"></i>Errors</td>
                     <td class="metrics-value"><span id="errorCountMetrics">0</span></td>
                 </tr>
                 <tr>
-                    <td class="metrics-label"><i class="fas fa-exclamation-triangle" style="margin-right: 8px;"></i>Warnings</td>
+                    <td class="metrics-label"><i class="bi bi-exclamation-triangle" style="margin-right: 8px;"></i>Warnings</td>
                     <td class="metrics-value"><span id="warningCountMetrics">0</span></td>
                 </tr>
                 <tr>
-                    <td class="metrics-label"><i class="fas fa-lightbulb" style="margin-right: 8px;"></i>Suggestions</td>
+                    <td class="metrics-label"><i class="bi bi-lightbulb" style="margin-right: 8px;"></i>Suggestions</td>
                     <td class="metrics-value"><span id="suggestionsMetrics">0</span></td>
                 </tr>
                 <tr>
-                    <td class="metrics-label"><i class="fas fa-check-circle" style="margin-right: 8px;"></i>OK </td>
+                    <td class="metrics-label"><i class="bi bi-check-circle" style="margin-right: 8px;"></i>OK </td>
                     <td class="metrics-value"><span id="okCountMetrics">0</span></td>
                 </tr>
             </table>
@@ -408,15 +415,15 @@
                     <td colspan="4" style="padding: 12px 15px; font-weight: bold; color: #ffffff; font-size: 1.1em; font-family: 'Raleway', sans-serif;">Accuracy Summary</td>
                 </tr>
                 <tr>
-                    <td class="metrics-label"><i class="fas fa-city" style="margin-right: 8px;"></i>City-level accuracy</td>
+                    <td class="metrics-label"><i class="bi bi-building" style="margin-right: 8px;"></i>City-level accuracy</td>
                     <td class="metrics-value"><span id="cityAccuracy">0</span></td>
-                    <td class="metrics-label"><i class="fas fa-map" style="margin-right: 8px;"></i>Region-level accuracy</td>
+                    <td class="metrics-label"><i class="bi bi-map" style="margin-right: 8px;"></i>Region-level accuracy</td>
                     <td class="metrics-value"><span id="regionAccuracy">0</span></td>
                 </tr>
                 <tr>
-                    <td class="metrics-label"><i class="fas fa-globe" style="margin-right: 8px;"></i>Country-level accuracy</td>
+                    <td class="metrics-label"><i class="bi bi-globe" style="margin-right: 8px;"></i>Country-level accuracy</td>
                     <td class="metrics-value"><span id="countryAccuracy">0</span></td>
-                    <td class="metrics-label"><i class="fas fa-ban" style="margin-right: 8px;"></i>Do-not-geolocate entries</td>
+                    <td class="metrics-label"><i class="bi bi-ban" style="margin-right: 8px;"></i>Do-not-geolocate entries</td>
                     <td class="metrics-value"><span id="doNotGeolocate">0</span></td>
                 </tr>
             </table>
@@ -435,21 +442,21 @@
                 </colgroup>
                 <thead>
                     <tr style="background-color: #4a4a4a;">
-                        <th colspan="7" style="padding: 15px; font-weight: bold; color: #ffffff; font-size: 1.4em; font-family: 'Raleway', sans-serif;">
+                        <th colspan="7" style="padding: 12px; font-weight: bold; color: #ffffff; font-size: 1.3em; font-family: 'Raleway', sans-serif;">
                             <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <span><i class="fas fa-list" style="margin-right: 10px;"></i>Entries</span>
-                                <div style="display: flex; gap: 10px; font-size: 0.75em; font-weight: 400;">
-                                    <input type="text" id="filterCountry" placeholder="Country" style="padding: 6px 10px; border: 1px solid #888; border-radius: 4px; background-color: #5a5a5a; color: #ffffff;">
-                                    <input type="text" id="filterRegion" placeholder="Region" style="padding: 6px 10px; border: 1px solid #888; border-radius: 4px; background-color: #5a5a5a; color: #ffffff;">
-                                    <input type="text" id="filterCity" placeholder="City" style="padding: 6px 10px; border: 1px solid #888; border-radius: 4px; background-color: #5a5a5a; color: #ffffff;">
-                                    <select id="filterStatus" style="padding: 6px 10px; border: 1px solid #888; border-radius: 4px; background-color: #5a5a5a; color: #ffffff;">
+                                <span><i class="bi bi-list-ul" style="margin-right: 10px;"></i>Entries</span>
+                                <div style="display: flex; gap: 9px; font-size: 0.72em; font-weight: 400;">
+                                    <input type="text" id="filterCountry" placeholder="Country" style="padding: 5px 9px; border: 1px solid #888; border-radius: 3px; background-color: #5a5a5a; color: #ffffff; font-size: 0.9em;">
+                                    <input type="text" id="filterRegion" placeholder="Region" style="padding: 5px 9px; border: 1px solid #888; border-radius: 3px; background-color: #5a5a5a; color: #ffffff; font-size: 0.9em;">
+                                    <input type="text" id="filterCity" placeholder="City" style="padding: 5px 9px; border: 1px solid #888; border-radius: 3px; background-color: #5a5a5a; color: #ffffff; font-size: 0.9em;">
+                                    <select id="filterStatus" style="padding: 5px 9px; border: 1px solid #888; border-radius: 3px; background-color: #5a5a5a; color: #ffffff; font-size: 0.9em;">
                                         <option value="">Status</option>
                                         <option value="ERROR">ERROR</option>
                                         <option value="WARNING">WARNING</option>
                                         <option value="SUGGESTION">SUGGESTION</option>
                                         <option value="OK">OK</option>
                                     </select>
-                                    <button id="resetFilters" style="padding: 6px 12px; border: 1px solid #888; border-radius: 4px; background-color: #5a5a5a; color: #ffffff; cursor: pointer; font-weight: 600;">Reset</button>
+                                    <button id="resetFilters" style="padding: 5px 11px; border: 1px solid #888; border-radius: 3px; background-color: #5a5a5a; color: #ffffff; cursor: pointer; font-weight: 600; font-size: 0.9em;">Reset</button>
                                 </div>
                             </div>
                         </th>
@@ -490,7 +497,7 @@
       "line": 1,
       "ip_prefix": "202.125.100.144/28",
       "country": "ID",
-      "flag_svg": "https://flagcdn.com/id.svg",
+      "flag": "🇮🇩",
       "region": "",
       "city": "Jakarta",
       "status": "SUGGESTION",
@@ -518,7 +525,7 @@
       "ip_prefix": "2605:59c8:2700::/40",
       "country": "CA",
       "region": "",
-      "flag_svg": "https://flagcdn.com/ca.svg",
+      "flag": "🇨🇦",
       "city": "Montreal",
       "status": "WARNING",
       "messages": [
@@ -549,7 +556,7 @@
       "ip_prefix": "150.228.170.0/24",
       "country": "SG",
       "region": "",
-      "flag_svg": "https://flagcdn.com/sg.svg",
+      "flag": "🇸🇬",
       "city": "Singapore",
       "status": "SUGGESTION",
       "messages": [
@@ -569,7 +576,7 @@
       "line": 5,
       "ip_prefix": "2406:2d40:8100::/42",
       "country": "SG",
-      "flag_svg": "https://flagcdn.com/sg.svg",
+      "flag": "🇸🇬",
       "region": "SG",
       "city": "Singapore",
       "status": "ERROR",
@@ -640,16 +647,16 @@
                 
                 // Determine status badge class and icon
                 let statusClass = 'status-ok';
-                let statusIcon = '<i class="fas fa-check-circle"></i>';
+                let statusIcon = '<i class="bi bi-check-circle"></i>';
                 if (entry.status === 'ERROR') {
                     statusClass = 'status-error';
-                    statusIcon = '<i class="fas fa-times-circle"></i>';
+                    statusIcon = '<i class="bi bi-x-circle"></i>';
                 } else if (entry.status === 'WARNING') {
                     statusClass = 'status-warning';
-                    statusIcon = '<i class="fas fa-exclamation-triangle"></i>';
+                    statusIcon = '<i class="bi bi-exclamation-triangle"></i>';
                 } else if (entry.status === 'SUGGESTION') {
                     statusClass = 'status-suggestion';
-                    statusIcon = '<i class="fas fa-lightbulb"></i>';
+                    statusIcon = '<i class="bi bi-lightbulb"></i>';
                 }
                 
                 // Messages list
@@ -658,16 +665,16 @@
                     entry.messages.forEach(msg => {
                         let msgStatus = msg.status || 'INFO';
                         let msgText = msg.message || msg;
-                        let msgIcon = '<i class="fas fa-info-circle" style="margin-right: 6px; color: #999; opacity: 0.7;"></i>';
+                        let msgIcon = '<i class="bi bi-info-circle" style="margin-right: 6px; color: #999; opacity: 0.7;"></i>';
                         
                         if (msgStatus === 'ERROR') {
-                            msgIcon = '<i class="fas fa-times-circle" style="margin-right: 6px; color: #999; opacity: 0.7;"></i>';
+                            msgIcon = '<i class="bi bi-x-circle" style="margin-right: 6px; color: #999; opacity: 0.7;"></i>';
                         } else if (msgStatus === 'WARNING') {
-                            msgIcon = '<i class="fas fa-exclamation-triangle" style="margin-right: 6px; color: #999; opacity: 0.7;"></i>';
+                            msgIcon = '<i class="bi bi-exclamation-triangle" style="margin-right: 6px; color: #999; opacity: 0.7;"></i>';
                         } else if (msgStatus === 'SUGGESTION') {
-                            msgIcon = '<i class="fas fa-lightbulb" style="margin-right: 6px; color: #999; opacity: 0.7;"></i>';
+                            msgIcon = '<i class="bi bi-lightbulb" style="margin-right: 6px; color: #999; opacity: 0.7;"></i>';
                         } else if (msgStatus === 'OK') {
-                            msgIcon = '<i class="fas fa-check-circle" style="margin-right: 6px; color: #999; opacity: 0.7;"></i>';
+                            msgIcon = '<i class="bi bi-check-circle" style="margin-right: 6px; color: #999; opacity: 0.7;"></i>';
                         }
                         
                         messagesHtml += `<li>${msgIcon}${escapeHtml(msgText)}</li>`;
@@ -681,17 +688,17 @@
                     const cellId = `region-cell-${entry.line}`;
                     regionHtml = `<div id="${cellId}" class="region-selector" data-line="${entry.line}">`;
                     regionHtml += `<div class="custom-dropdown" data-suggestions='${JSON.stringify(entry.region_suggestions).replace(/'/g, "&apos;")}'>`;
-                    regionHtml += `<button class="dropdown-button"><span class="button-text">-- Select Region --</span><i class="fas fa-chevron-down" style="font-size: 0.8em;"></i></button>`;
+                    regionHtml += `<button class="dropdown-button"><span class="button-text">-- Select Region --</span><i class="bi bi-chevron-down" style="font-size: 0.8em;"></i></button>`;
                     regionHtml += `<div class="dropdown-menu">`;
                     entry.region_suggestions.forEach(suggestion => {
                         const relevancePercent = (suggestion.relevance * 100).toFixed(0);
                         regionHtml += `<div class="dropdown-option" data-value="${escapeHtml(suggestion.region_code)}">`;
-                        regionHtml += `<i class="fas fa-map-marker-alt"></i>`;
+                        regionHtml += `<i class="bi bi-geo-alt"></i>`;
                         regionHtml += `<div class="dropdown-option-content">`;
                         regionHtml += `<span class="dropdown-option-code">${escapeHtml(suggestion.region_code)}</span>`;
                         regionHtml += `<span class="dropdown-option-name">${escapeHtml(suggestion.region_name)}</span>`;
                         regionHtml += `</div>`;
-                        regionHtml += `<span class="dropdown-option-relevance"><i class="fas fa-check" style="margin-right: 4px;"></i>${relevancePercent}%</span>`;
+                        regionHtml += `<span class="dropdown-option-relevance"><i class="bi bi-check" style="margin-right: 4px;"></i>${relevancePercent}%</span>`;
                         regionHtml += `</div>`;
                     });
                     regionHtml += `</div></div></div>`;
@@ -706,14 +713,14 @@
                     entry.region_suggestions.forEach(suggestion => {
                         suggestionsHtml += `
                             <div class="region-suggestion-item">
-                                <i class="fas fa-map-marker-alt" style="margin-right: 6px; color: #4a4a4a;"></i><strong>${escapeHtml(suggestion.region_code)}</strong> - ${escapeHtml(suggestion.region_name)}
-                                <br><small style="color: #999;"><i class="fas fa-check" style="margin-right: 4px;"></i>Relevance: ${(suggestion.relevance * 100).toFixed(0)}%</small>
+                                <i class="bi bi-geo-alt" style="margin-right: 6px; color: #4a4a4a;"></i><strong>${escapeHtml(suggestion.region_code)}</strong> - ${escapeHtml(suggestion.region_name)}
+                                <br><small style="color: #999;"><i class="bi bi-check" style="margin-right: 4px;"></i>Relevance: ${(suggestion.relevance * 100).toFixed(0)}%</small>
                             </div>
                         `;
                     });
                     suggestionsHtml += '</div>';
                 } else {
-                    suggestionsHtml = '<span style="color: #999;"><i class="fas fa-minus-circle" style="margin-right: 6px;"></i>None</span>';
+                    suggestionsHtml = '<span style="color: #999;"><i class="bi bi-dash-circle" style="margin-right: 6px;"></i>None</span>';
                 }
                 
                 row.innerHTML = `
@@ -785,7 +792,7 @@
                 });
                 
                 function restoreDropdown() {
-                    button.innerHTML = `<span class="button-text">-- Select Region --</span><i class="fas fa-chevron-down" style="font-size: 0.8em;"></i>`;
+                    button.innerHTML = `<span class="button-text">-- Select Region --</span><i class="bi bi-chevron-down" style="font-size: 0.8em;"></i>`;
                     options.forEach(opt => opt.classList.remove('selected'));
                     menu.classList.remove('show');
                     button.click();
