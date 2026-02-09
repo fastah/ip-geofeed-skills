@@ -726,7 +726,7 @@
                 row.innerHTML = `
                     <td>${entry.line}</td>
                     <td><strong>${escapeHtml(entry.ip_prefix)}</strong></td>
-                    <td><img src="${entry.flag_svg}" style="width: 24px; height: 16px; margin-right: 8px; vertical-align: middle; border-radius: 2px; box-shadow: 0 1px 3px rgba(0,0,0,0.2);"> ${escapeHtml(entry.country)}</td>
+                    <td><span style="font-size: 1.2em; margin-right: 8px;">${entry.flag}</span> ${escapeHtml(entry.country)}</td>
                     <td>${regionHtml}</td>
                     <td>${entry.city ? escapeHtml(entry.city) : '<span style="color: #999;">-</span>'}</td>
                     <td><span class="status-badge ${statusClass}">${statusIcon}${entry.status}</span></td>
