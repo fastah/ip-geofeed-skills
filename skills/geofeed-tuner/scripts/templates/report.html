@@ -271,6 +271,10 @@
         .dropdown-button:hover {
             background-color: #f9f9f9;
         }
+        .dropdown-button:focus {
+            outline: 2px solid #4a90e2;
+            outline-offset: -1px;
+        }
         .dropdown-menu {
             display: none;
             position: absolute;
@@ -302,6 +306,11 @@
         }
         .dropdown-option:hover {
             background-color: #f0f0f0;
+        }
+        .dropdown-option.focused {
+            background-color: #d0e8f0;
+            outline: 2px solid #4a90e2;
+            outline-offset: -2px;
         }
         .dropdown-option.selected {
             background-color: #e8f4f8;
@@ -747,9 +756,15 @@
                 const options = dropdown.querySelectorAll('.dropdown-option');
                 const container = dropdown.closest('.region-selector');
                 
+                // Make button focusable
+                button.setAttribute('tabindex', '0');
+                
                 // Parse suggestions from data attribute
                 const suggestionsJson = dropdown.getAttribute('data-suggestions');
                 const suggestions = suggestionsJson ? JSON.parse(suggestionsJson.replace(/&apos;/g, "'")) : [];
+                
+                // Track currently focused option
+                let focusedIndex = -1;
                 
                 // Toggle menu
                 button.addEventListener('click', function(e) {
@@ -759,7 +774,74 @@
                     document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show'));
                     if (!isOpen) {
                         menu.classList.add('show');
+                        focusedIndex = -1;
                     }
+                });
+                
+                // Handle keyboard navigation
+                button.addEventListener('keydown', function(e) {
+                    const isOpen = menu.classList.contains('show');
+                    
+                    if (!isOpen && (e.key === 'ArrowDown' || e.key === 'ArrowUp' || e.key === 'Enter' || e.key === ' ')) {
+                        // Open menu with keyboard
+                        e.preventDefault();
+                        menu.classList.add('show');
+                        focusedIndex = 0;
+                        if (options.length > 0) {
+                            options[0].classList.add('focused');
+                        }
+                    } else if (isOpen) {
+                        if (e.key === 'ArrowDown') {
+                            e.preventDefault();
+                            // Remove previous focus
+                            if (focusedIndex >= 0) {
+                                options[focusedIndex].classList.remove('focused');
+                            }
+                            // Move to next option
+                            focusedIndex = (focusedIndex + 1) % options.length;
+                            options[focusedIndex].classList.add('focused');
+                            // Scroll into view
+                            options[focusedIndex].scrollIntoView({ block: 'nearest' });
+                        } else if (e.key === 'ArrowUp') {
+                            e.preventDefault();
+                            // Remove previous focus
+                            if (focusedIndex >= 0) {
+                                options[focusedIndex].classList.remove('focused');
+                            }
+                            // Move to previous option
+                            focusedIndex = focusedIndex <= 0 ? options.length - 1 : focusedIndex - 1;
+                            options[focusedIndex].classList.add('focused');
+                            // Scroll into view
+                            options[focusedIndex].scrollIntoView({ block: 'nearest' });
+                        } else if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            // Select focused option
+                            if (focusedIndex >= 0) {
+                                options[focusedIndex].click();
+                            }
+                        } else if (e.key === 'Escape') {
+                            e.preventDefault();
+                            // Close menu
+                            menu.classList.remove('show');
+                            focusedIndex = -1;
+                            button.focus();
+                        }
+                    }
+                });
+                
+                // Remove focus class on mouse enter
+                options.forEach((option, index) => {
+                    option.addEventListener('mouseenter', function() {
+                        if (focusedIndex >= 0) {
+                            options[focusedIndex].classList.remove('focused');
+                        }
+                        focusedIndex = index;
+                        this.classList.add('focused');
+                    });
+                    option.addEventListener('mouseleave', function() {
+                        this.classList.remove('focused');
+                        focusedIndex = -1;
+                    });
                 });
                 
                 // Handle option selection
@@ -774,11 +856,12 @@
                         button.innerHTML = `<span class="button-text">${escapeHtml(text)}</span><button class="region-edit-btn" style="margin-left: 6px; padding: 2px 6px; border: 1px solid #d3d3d3; border-radius: 3px; background-color: #f0f0f0; color: #333; cursor: pointer; font-size: 0.85em;" title="Edit region">✎</button>`;
                         
                         // Mark as selected
-                        options.forEach(opt => opt.classList.remove('selected'));
+                        options.forEach(opt => opt.classList.remove('selected', 'focused'));
                         this.classList.add('selected');
                         
                         // Close menu
                         menu.classList.remove('show');
+                        focusedIndex = -1;
                         
                         // Attach edit button listener
                         const editBtn = button.querySelector('.region-edit-btn');
@@ -793,8 +876,9 @@
                 
                 function restoreDropdown() {
                     button.innerHTML = `<span class="button-text">-- Select Region --</span><i class="bi bi-chevron-down" style="font-size: 0.8em;"></i>`;
-                    options.forEach(opt => opt.classList.remove('selected'));
+                    options.forEach(opt => opt.classList.remove('selected', 'focused'));
                     menu.classList.remove('show');
+                    focusedIndex = -1;
                     button.click();
                 }
                 
