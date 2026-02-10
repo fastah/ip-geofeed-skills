@@ -303,14 +303,26 @@ This phase runs after structural checks pass.
 
 This phase applies **opinionated recommendations** beyond RFC 8805 — suggestions learned from real-world geofeed deployments that improve accuracy and usability.
 
-- **Region Code Recommendations**
-  - Recommend **adding region codes** whenever a city is specified.
-  - Ignore the absence of region code when country code matches a **small-sized territory** (by area or population) where state/province usage is uncommon. Load and use the JSON array of 2-letter country codes in [assets/small-territories.json](assets/small-territories.json) for this check.
+- **SUGGESTION**
+  - Report the following conditions as **SUGGESTION**:
 
-- **Subnet Confirmation**
-  - Recommend confirming with the user when a subnet is left **unspecified for all geographical columns**.
-    - Warn the user whether they **intend for the subnet to remain un-geolocated** (literal interpretation of RFC 8805),  
-      or whether they **forgot to specify** the country, state, or city for it.
+  - **Region or city specified for small territory**
+    - Condition:
+      - If a `country` is found in [`assets/small-territories.json`](assets/small-territories.json)
+      - `region` is non-empty **OR**.
+      - `city` is non-empty.
+    - Message: `Region or City-level granularity is usually unnecessary for small territories; consider removing the region and city values`
+
+  - **Missing region code when city is specified**
+    - Condition:
+      - `city` is non-empty
+      - `region` is empty
+      - If a `country` is NOT found in [`assets/small-territories.json`](assets/small-territories.json)
+    - Message: `Region code is recommended when a city is specified; choose a region from the dropdown`
+
+  - **Unspecified geolocation for subnet**
+    - Condition: All geographical fields (`alpha2code`, `region`, `city`) are empty for a subnet.
+    - Message: `Confirm whether this subnet is intentionally marked as do-not-geolocate or missing location data`
 
 
 ### Phase 6: Generate Tuning Report
