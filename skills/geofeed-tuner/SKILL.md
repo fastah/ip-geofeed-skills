@@ -107,7 +107,7 @@ All generated, temporary, and output files must be written to these directories:
 
 ### Phase 1: Understand the Standard
 
-Read Section 1 (**Introduction**) and Section 2 (**Self-Published IP Geolocation Feeds**) of the plain-text  
+Think deeply about Section 1 (**Introduction**) and Section 2 (**Self-Published IP Geolocation Feeds**) of the plain-text  
 [RFC 8805 – A Format for Self-Published IP Geolocation Feeds](references/rfc8805.txt).
 
 The goal of this phase is to understand the **foundation** for IP geolocation feeds, including:
@@ -128,7 +128,6 @@ This research phase establishes the conceptual foundation needed before performi
 - If the input is a **remote URL**, download the CSV file into the `./run/data/` directory before processing.
 - If the input is a **local file**, continue processing it directly without downloading.
 - Normalize all input data to **UTF-8** encoding.
-
 
 
 ### Phase 3: Structure & Format Check
@@ -175,14 +174,32 @@ The goal is to ensure the file can be parsed reliably and normalized into a **co
     - Subnets must be normalized and displayed in **CIDR slash notation**.
       - Single-host IPv4 subnets must be represented as **`/32`**
       - Single-host IPv6 subnets must be represented as **`/128`**
-    - Flag **overly large subnets** as potential errors or typos for user review:
-      - **IPv6**: Prefixes shorter than `/64` (for example, `2001:db8::/32`) should be flagged, as they represent an unrealistically large address space for a geolocation feed.
-      - **IPv4**: Prefixes shorter than `/24` should be flagged.
-    - Flag **non-public IP address ranges** that are accidentally or intentionally included in the subnet list.
-    - Treat any subnet identified as **private, loopback, link-local, multicast, or otherwise non-public** as invalid for a geofeed.
-    - In Python, use the built-in `is_private` (and related address properties) as shown in the code snippets provided in the `references/` folder.
-    - Report detected non-public subnets to the user as **ERRORS** and require correction before continuing.
+      
+  - **ERROR** 
+    - Report the following conditions as **ERROR**:
 
+    - **Invalid subnet syntax**
+      - Message: `Invalid IP prefix: unable to parse as IPv4 or IPv6 network`
+
+    - **Non-public address space**
+      - Applies to subnets that are **private, loopback, link-local, multicast, or otherwise non-public**
+        - In Python, detect non-public ranges using `is_private` and related address properties as shown in `./references`.
+      - Message: `Non-public IP range is not allowed in an RFC 8805 feed`
+
+    - **RFC 8805–incompatible subnet**
+      - Any subnet failing mandatory RFC 8805 constraints
+      - Message: `Subnet is not valid for publication in an RFC 8805 geofeed`
+
+  - **WARNING**
+    - Report the following conditions as **WARNING**:
+
+    - **Overly large IPv6 subnets**
+      - Prefixes shorter than `/64`
+      - Message: `IPv6 prefix is unusually large and may indicate a typo`
+
+    - **Overly large IPv4 subnets**
+      - Prefixes shorter than `/24`
+      - Message: `IPv4 prefix is unusually large and may indicate a typo`
 
   - **Subnet Storage**
     - Once checked, store each subnet as a **key** in a map or dictionary.
