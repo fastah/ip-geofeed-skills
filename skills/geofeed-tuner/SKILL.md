@@ -221,12 +221,13 @@ This phase runs after structural checks pass.
       - `flag`: flag emoji
     - This file represents the **superset of valid `alpha2code` values** for an RFC 8805 CSV
   - Check `alpha2code` (RFC 8805 Section 2.1.1.2) against the `alpha_2` attribute.
-  - Sample code is available in
-    [`references/snippets-python3.md`](references/snippets-python3.md).
-  - Flag an `alpha2code` not present in the `alpha_2` set as **ERROR**.
-  - Flag an empty `alpha2code` as **WARNING**.
-    - RFC 8805 allows empty values when geolocation should not be attempted
-      (for example, infrastructure devices such as routers).
+  - Sample code is available in the `references/` directory.
+
+  - **ERROR** 
+    - Report the following conditions as **ERROR**:
+    - **Invalid country code**
+      - Condition: `alpha2code` is present but not found in the `alpha_2` set
+      - Message: `Invalid country code: not a valid ISO 3166-1 alpha-2 value`
 
 #### Region Code Analysis
   - Use the locally available data table [`assets/iso3166-2.json`](assets/iso3166-2.json) for checking.
