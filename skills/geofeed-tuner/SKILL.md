@@ -254,13 +254,39 @@ This phase runs after structural checks pass.
       - Message: `Region code does not match the specified country code`
 
 #### City Name Analysis
-  - Flag placeholder values as **ERROR**:
-    - `undefined`, `Please select`, `null`, `N/A`, `TBD`, `unknown`
-  - Flag truncated names, abbreviations, or airport codes as **ERROR**:
-    - `LA`, `Frft`, `sin01`, `LHR`, `SIN`, `MAA`
-  - Flag inconsistent casing or formatting as **WARNING**:
-    - `HongKong` vs `Hong Kong` vs `香港`
-  - There is currently **no authoritative dataset** available for city name verification.
+
+  City names are validated using **heuristic checks only**.  
+  There is currently **no authoritative dataset** available for validating city names.
+
+  - **ERROR**
+    - Report the following conditions as **ERROR**:
+    - **Placeholder or non-meaningful values**
+      - Condition: Placeholder or non-meaningful values including but not limited to:
+        - `undefined`
+        - `Please select`
+        - `null`
+        - `N/A`
+        - `TBD`
+        - `unknown` 
+      - Message: `Invalid city name: placeholder value is not allowed`
+
+    - **Truncated names, abbreviations, or airport codes**  
+      - Condition: Truncated names, abbreviations, or airport codes that do not represent valid city names:
+        - `LA`
+        - `Frft`
+        - `sin01`
+        - `LHR`
+        - `SIN`
+        - `MAA`
+      - Message: `Invalid city name: abbreviated or code-based value detected`
+  
+  - **WARNING**
+    - Report the following conditions as **WARNING**:
+    - **Inconsistent casing or formatting**
+      - Condition: City names with inconsistent casing, spacing, or formatting that may reduce data quality, for example:
+        - `HongKong` vs `Hong Kong`
+        - Mixed casing or unexpected script usage
+      - Message: `City name formatting is inconsistent; consider normalizing the value`
 
 #### Postal Code Check
   - RFC 8805 Section 2.1.1.5 explicitly **deprecates postal or ZIP codes**.
