@@ -292,9 +292,12 @@ This phase runs after structural checks pass.
   - RFC 8805 Section 2.1.1.5 explicitly **deprecates postal or ZIP codes**.
   - Postal codes can represent very small populations and are **not considered privacy-safe**
     for mapping IP address ranges, which are statistical in nature.
-  - If a postal code is present:
-    - Produce an **ERROR** indicating that postal codes are deprecated.
-    - Indicate that the field should be **removed for privacy reasons**.
+
+  - **ERROR**
+    - Report the following conditions as **ERROR**:
+    - **Postal code present**
+      - Condition: A non-empty value is present in the postal/ZIP code field.
+      - Message: `Postal codes are deprecated by RFC 8805 and must be removed for privacy reasons`
 
 ### Phase 5: Tuning & Recommendations
 
