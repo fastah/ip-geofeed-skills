@@ -230,7 +230,7 @@ This phase runs after structural checks pass.
       - Message: `Invalid country code: not a valid ISO 3166-1 alpha-2 value`
 
 #### Region Code Analysis
-  - Use the locally available data table [`assets/iso3166-2.json`](assets/iso3166-2.json) for checking.
+  - Use the locally available data table [`ISO3166-2`](assets/iso3166-2.json) for checking.
     - JSON array of country subdivisions with ISO-assigned codes
     - Each object includes:
       - `code`: subdivision code prefixed with country code (for example, `US-CA`)
@@ -240,6 +240,18 @@ This phase runs after structural checks pass.
     - Check that the format matches `{COUNTRY}-{SUBDIVISION}`
       (for example, `US-CA`, `AU-NSW`).
     - Check the value against the `code` attribute (already prefixed with the country code).
+
+  - **ERROR** 
+    - Report the following conditions as **ERROR**:
+    - **Invalid region format**
+      - Condition: `region` does not match `{COUNTRY}-{SUBDIVISION}`
+      - Message: `Invalid region format; expected COUNTRY-SUBDIVISION (e.g., US-CA)`
+    - **Unknown region code**
+      - Condition: `region` value is not found in the `code` set
+      - Message: `Invalid region code: not a valid ISO 3166-2 subdivision`
+    - **Country–region mismatch**
+      - Condition: Country portion of `region` does not match `alpha2code`
+      - Message: `Region code does not match the specified country code`
 
 #### City Name Analysis
   - Flag placeholder values as **ERROR**:
