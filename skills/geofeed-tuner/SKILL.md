@@ -431,6 +431,94 @@ This phase applies **opinionated recommendations** beyond RFC 8805 — suggestio
     - Condition: All geographical fields (`alpha2code`, `region`, `city`) are empty for a subnet.
     - Message: `Confirm whether this subnet is intentionally marked as do-not-geolocate or missing location data`
 
+  
+### Phase 4: Region Suggestion Batch Lookup
+
+#### Objective
+Generate region suggestions for applicable entries using the Mapbox reverse geocode tool.
+
+#### Execution Rules
+- Use **separate script** for payload generation.
+- Perform the lookup **once per validation run** (batch mode).
+- Construct the payload and send it to the MCP server.
+- Failure to retrieve suggestions must **NOT block validation**.
+- Suggestions are **advisory only** — **never auto-populate** the `region` field.
+
+#### Step 1: Load Dataset
+Load the dataset from: [./run/data/temp.json](./run/data/temp.json)
+- Read the `entries` array.
+- Include entries where:
+  - `need_region == true`
+- Exclude all others.
+
+#### Step 2: Build Lookup Payload
+
+Construct a deduplicated list of city–country pairs:
+
+```json
+[
+  {"q": "Bangalore", "country": ["IN"], "limit": 3},
+  {"q": "Mumbai", "country": ["IN"], "limit": 3},
+  {"q": "Pune", "country": ["IN"], "limit": 3}
+]
+```
+Rules:
+- Deduplicate identical pairs.
+- Write payload to: [./run/data/region-lookup-input.json](./run/data/region-lookup-input.json)
+- Exit the script after writing the payload.
+
+#### Step 3: Invoke Mapbox MCP Tool
+
+- Server: `https://mcp.mapbox.com/mcp`
+- Tool: `search_and_geocode_tool `
+- Open [./run/data/region-lookup-input.json](./run/data/region-lookup-input.json) and send all entries parallely.
+
+- Do NOT use local data.
+
+#### Step 4: Normalize Suggestions
+
+Use the data received from the MCP server.
+
+Rules:
+- Deduplicate suggestions by `region_code`.
+- Preserve response order (assumed relevance-ranked)
+- Keep **at least three suggestions** when available
+- If fewer than three exist, keep all returned values
+- If none exist:
+  - Store an empty array
+  - Do NOT raise an error
+
+#### Step 5: Attach Suggestions to Entries
+
+- Use **separate script** for attaching suggestions.
+- Load: [./run/data/temp.json](./run/data/temp.json)
+- Match responses back to entries using:
+  - `city`
+  - `country`
+
+Create the field if it does not exist:
+
+```json
+"region_suggestions": []
+```
+
+Populate with:
+
+```json
+{
+  "region_code": "",
+  "region_name": "",
+  "relevance": 0.0
+}
+```
+
+#### Step 6: Store Updated Dataset
+
+- Write the dataset back to: [./run/data/temp.json](./run/data/temp.json)
+- Rules:
+  - Maintain all existing validation flags.
+  - Do NOT modify the `region` field.
+  - Do NOT create additional intermediate files.
 
 ### Phase 6: Generate Tuning Report
 
