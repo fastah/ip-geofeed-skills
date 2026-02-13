@@ -137,12 +137,113 @@ This research phase establishes the conceptual foundation needed before performi
 - If the input is a **local file**, continue processing it directly without downloading.
 - Normalize all input data to **UTF-8** encoding.
 
+### Phase 3: Checks & Suggestions
 
-### Phase 3: Structure & Format Check
+#### Execution Rules
+- Generate **exactly one script** for this phase.
+- Do NOT combine this phase with others.
+- Do NOT precompute future-phase data.
+- Store the output as a JSON file at: [`./run/data/temp.json`](./run/data/temp.json)
+
+#### Schema Definition
+
+The JSON structure below is **IMMUTABLE**.
+
+```json
+{
+  "input_file": "",          // Filename or URL
+  "tuning_timestamp": "",   // ISO 8601 format recommended
+
+  "total_entries": 0,
+  "ipv4_entries": 0,
+  "ipv6_entries": 0,
+  "invalid_subnet_entries": 0,
+
+  "error_count": 0,
+  "warning_count": 0,
+  "ok_count": 0,
+  "suggestion_count": 0,
+
+  "city_level_accuracy": 0,
+  "region_level_accuracy": 0,
+  "country_level_accuracy": 0,
+  "do_not_geolocate_entries": 0,
+
+  "entries": [
+    {
+      "line": 0,                 // Line number in CSV
+      "ip_prefix": "",
+      "country": "",
+      "flag": "",             
+      "region": "",
+      "city": "",
+
+      "status": "",              // Highest severity: ERROR | WARNING | SUGGESTION | OK
+
+      "messages": [
+        {
+          "status": "",            // ERROR | WARNING | SUGGESTION
+          "message": ""            // Descriptive message for the issue or suggestion
+        }
+      ],            // List of validation messages
+
+      "need_region": false,
+      "has_error": false,
+      "has_warning": false,
+      "has_suggestion": false,
+      "is_small_territory": false
+    }
+  ]
+}
+```
+- `input_file`: The original input source, either a local filename or a remote URL.
+- `tuning_timestamp`: The timestamp when the tuning was performed, in ISO 8601 format.
+- `total_entries`: The total number of entries processed from the input CSV.
+- `ipv4_entries`: The count of entries that are IPv4 subnets.
+- `ipv6_entries`: The count of entries that are IPv6 subnets.
+- `invalid_subnet_entries`: The count of entries that failed subnet parsing and validation.
+- `error_count`: The total number of entries flagged with an ERROR status.
+- `warning_count`: The total number of entries flagged with a WARNING status.
+- `ok_count`: The total number of entries flagged with an OK status.
+- `suggestion_count`: The total number of entries flagged with a SUGGESTION status.
+- `city_level_accuracy`: The count of entries with city-level geolocation accuracy.
+- `region_level_accuracy`: The count of entries with region-level geolocation accuracy.
+- `country_level_accuracy`: The count of entries with country-level geolocation accuracy.
+- `do_not_geolocate_entries`: The count of entries that are intentionally marked as do-not-geolocate (no geolocation data provided).
+- `entries`: An array of objects, each representing a single entry from the input CSV, with the following fields:
+  - `line`: The line number in the original CSV file (1-based index).
+  - `ip_prefix`: The normalized IP prefix in CIDR notation.
+  - `country`: The country code (alpha-2) associated with the subnet.
+  - `flag`: The country flag emoji associated with the country code, if available.
+  - `region`: The region code (ISO 3166-2) associated with the subnet, if provided.
+  - `city`: The city name associated with the subnet, if provided.
+  - `status`: The highest severity status assigned to the entry after validation (ERROR > WARNING > SUGGESTION > OK).
+  - `messages`: An array of validation messages (errors, warnings, suggestions) related to the entry.
+    - `status`: The severity level of the message (ERROR, WARNING, SUGGESTION).
+    - `message`: A descriptive message explaining the issue or suggestion.
+  - `need_region`: A boolean flag indicating whether a region suggestion is needed for this entry.
+  - `has_error`: A boolean flag indicating whether this entry has any ERROR messages.
+  - `has_warning`: A boolean flag indicating whether this entry has any WARNING messages.
+  - `has_suggestion`: A boolean flag indicating whether this entry has any SUGGESTION messages.
+  - `is_small_territory`: A boolean flag indicating whether the country is classified as a small territory based on the provided dataset.
+
+The agent MUST NOT:
+
+- Rename fields  
+- Add or remove fields  
+- Change data types  
+- Reorder keys  
+- Alter nesting  
+- Wrap the object  
+- Split into multiple files  
+
+If a value is unknown, **leave it empty** — never invent data.
+
+#### Structure & Format Check
 
 This phase verifies that your feed is well-formed and parseable. **Critical structural errors** must be resolved before the tuner can analyze geolocation quality.
 
-#### CSV Structure
+##### CSV Structure
 
 This subsection defines rules for **CSV-formatted input files** used for IP geolocation feeds.
 The goal is to ensure the file can be parsed reliably and normalized into a **consistent internal representation**.
@@ -209,19 +310,14 @@ The goal is to ensure the file can be parsed reliably and normalized into a **co
       - Prefixes shorter than `/24`
       - Message: `IPv4 prefix is unusually large and may indicate a typo`
 
-  - **Subnet Storage**
-    - Once checked, store each subnet as a **key** in a map or dictionary.
-    - The corresponding value must be a **custom object** containing:
-      - Geolocation attributes for the subnet
-      - Any user-provided hints or preferences related to that subnet's geolocation.
 
-### Phase 4: Geolocation Quality Check
+#### Geolocation Quality Check
 
 Analyze the **accuracy and consistency** of geolocation data — country codes, region codes, city names, and deprecated fields.
 This phase runs after structural checks pass.
 
-#### Country Code Analysis
-  - Use the locally available data table [`assets/iso3166-1.json`](assets/iso3166-1.json) for checking.
+##### Country Code Analysis
+  - Use the locally available data table [`ISO3166-1`](assets/iso3166-1.json) for checking.
     - JSON array of countries and territories with ISO codes
     - Each object includes:
       - `alpha_2`: two-letter country code
@@ -231,13 +327,15 @@ This phase runs after structural checks pass.
   - Check `alpha2code` (RFC 8805 Section 2.1.1.2) against the `alpha_2` attribute.
   - Sample code is available in the `references/` directory.
 
+  - If a country is found in [`assets/small-territories.json`](assets/small-territories.json) set `is_small_territory` to `true`. This will be used for later checks and suggestions related to small territories.
+
   - **ERROR** 
     - Report the following conditions as **ERROR**:
     - **Invalid country code**
       - Condition: `alpha2code` is present but not found in the `alpha_2` set
       - Message: `Invalid country code: not a valid ISO 3166-1 alpha-2 value`
 
-#### Region Code Analysis
+##### Region Code Analysis
   - Use the locally available data table [`ISO3166-2`](assets/iso3166-2.json) for checking.
     - JSON array of country subdivisions with ISO-assigned codes
     - Each object includes:
@@ -261,10 +359,10 @@ This phase runs after structural checks pass.
       - Condition: Country portion of `region` does not match `alpha2code`
       - Message: `Region code does not match the specified country code`
 
-#### City Name Analysis
+##### City Name Analysis
 
-  City names are validated using **heuristic checks only**.  
-  There is currently **no authoritative dataset** available for validating city names.
+  - City names are validated using **heuristic checks only**.  
+  - There is currently **no authoritative dataset** available for validating city names.
 
   - **ERROR**
     - Report the following conditions as **ERROR**:
@@ -296,7 +394,7 @@ This phase runs after structural checks pass.
         - Mixed casing or unexpected script usage
       - Message: `City name formatting is inconsistent; consider normalizing the value`
 
-#### Postal Code Check
+##### Postal Code Check
   - RFC 8805 Section 2.1.1.5 explicitly **deprecates postal or ZIP codes**.
   - Postal codes can represent very small populations and are **not considered privacy-safe**
     for mapping IP address ranges, which are statistical in nature.
