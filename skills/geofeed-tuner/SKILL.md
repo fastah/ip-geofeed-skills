@@ -90,7 +90,7 @@ All generated, temporary, and output files must be written to these directories:
     For entries needing region suggestions, generate a batch payload and retrieve suggestions from the MCP server.
 
   - **Phase 5: Generate Tuning Report**  
-    Create a comprehensive HTML report summarizing the analysis and suggestions.
+    Create a HTML report summarizing the analysis and suggestions.
 
 The agent MUST NOT:
 - Merge multiple steps into one script  
