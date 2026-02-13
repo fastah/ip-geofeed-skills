@@ -138,7 +138,6 @@ This research phase establishes the conceptual foundation needed before performi
 - Normalize all input data to **UTF-8** encoding.
 
 
-
 ### Phase 3: Structure & Format Check
 
 This phase verifies that your feed is well-formed and parseable. **Critical structural errors** must be resolved before the tuner can analyze geolocation quality.
@@ -183,14 +182,32 @@ The goal is to ensure the file can be parsed reliably and normalized into a **co
     - Subnets must be normalized and displayed in **CIDR slash notation**.
       - Single-host IPv4 subnets must be represented as **`/32`**
       - Single-host IPv6 subnets must be represented as **`/128`**
-    - Flag **overly large subnets** as potential errors or typos for user review:
-      - **IPv6**: Prefixes shorter than `/64` (for example, `2001:db8::/32`) should be flagged, as they represent an unrealistically large address space for a geolocation feed.
-      - **IPv4**: Prefixes shorter than `/24` should be flagged.
-    - Flag **non-public IP address ranges** that are accidentally or intentionally included in the subnet list.
-    - Treat any subnet identified as **private, loopback, link-local, multicast, or otherwise non-public** as invalid for a geofeed.
-    - In Python, use the built-in `is_private` (and related address properties) as shown in the code snippets provided in the `references/` folder.
-    - Report detected non-public subnets to the user as **ERRORS** and require correction before continuing.
+      
+  - **ERROR** 
+    - Report the following conditions as **ERROR**:
 
+    - **Invalid subnet syntax**
+      - Message: `Invalid IP prefix: unable to parse as IPv4 or IPv6 network`
+
+    - **Non-public address space**
+      - Applies to subnets that are **private, loopback, link-local, multicast, or otherwise non-public**
+        - In Python, detect non-public ranges using `is_private` and related address properties as shown in `./references`.
+      - Message: `Non-public IP range is not allowed in an RFC 8805 feed`
+
+    - **RFC 8805–incompatible subnet**
+      - Any subnet failing mandatory RFC 8805 constraints
+      - Message: `Subnet is not valid for publication in an RFC 8805 geofeed`
+
+  - **WARNING**
+    - Report the following conditions as **WARNING**:
+
+    - **Overly large IPv6 subnets**
+      - Prefixes shorter than `/64`
+      - Message: `IPv6 prefix is unusually large and may indicate a typo`
+
+    - **Overly large IPv4 subnets**
+      - Prefixes shorter than `/24`
+      - Message: `IPv4 prefix is unusually large and may indicate a typo`
 
   - **Subnet Storage**
     - Once checked, store each subnet as a **key** in a map or dictionary.
@@ -212,15 +229,16 @@ This phase runs after structural checks pass.
       - `flag`: flag emoji
     - This file represents the **superset of valid `alpha2code` values** for an RFC 8805 CSV
   - Check `alpha2code` (RFC 8805 Section 2.1.1.2) against the `alpha_2` attribute.
-  - Sample code is available in
-    [`references/snippets-python3.md`](references/snippets-python3.md).
-  - Flag an `alpha2code` not present in the `alpha_2` set as **ERROR**.
-  - Flag an empty `alpha2code` as **WARNING**.
-    - RFC 8805 allows empty values when geolocation should not be attempted
-      (for example, infrastructure devices such as routers).
+  - Sample code is available in the `references/` directory.
+
+  - **ERROR** 
+    - Report the following conditions as **ERROR**:
+    - **Invalid country code**
+      - Condition: `alpha2code` is present but not found in the `alpha_2` set
+      - Message: `Invalid country code: not a valid ISO 3166-1 alpha-2 value`
 
 #### Region Code Analysis
-  - Use the locally available data table [`assets/iso3166-2.json`](assets/iso3166-2.json) for checking.
+  - Use the locally available data table [`ISO3166-2`](assets/iso3166-2.json) for checking.
     - JSON array of country subdivisions with ISO-assigned codes
     - Each object includes:
       - `code`: subdivision code prefixed with country code (for example, `US-CA`)
@@ -231,35 +249,88 @@ This phase runs after structural checks pass.
       (for example, `US-CA`, `AU-NSW`).
     - Check the value against the `code` attribute (already prefixed with the country code).
 
+  - **ERROR** 
+    - Report the following conditions as **ERROR**:
+    - **Invalid region format**
+      - Condition: `region` does not match `{COUNTRY}-{SUBDIVISION}`
+      - Message: `Invalid region format; expected COUNTRY-SUBDIVISION (e.g., US-CA)`
+    - **Unknown region code**
+      - Condition: `region` value is not found in the `code` set
+      - Message: `Invalid region code: not a valid ISO 3166-2 subdivision`
+    - **Country–region mismatch**
+      - Condition: Country portion of `region` does not match `alpha2code`
+      - Message: `Region code does not match the specified country code`
+
 #### City Name Analysis
-  - Flag placeholder values as **ERROR**:
-    - `undefined`, `Please select`, `null`, `N/A`, `TBD`, `unknown`
-  - Flag truncated names, abbreviations, or airport codes as **ERROR**:
-    - `LA`, `Frft`, `sin01`, `LHR`, `SIN`, `MAA`
-  - Flag inconsistent casing or formatting as **WARNING**:
-    - `HongKong` vs `Hong Kong` vs `香港`
-  - There is currently **no authoritative dataset** available for city name verification.
+
+  City names are validated using **heuristic checks only**.  
+  There is currently **no authoritative dataset** available for validating city names.
+
+  - **ERROR**
+    - Report the following conditions as **ERROR**:
+    - **Placeholder or non-meaningful values**
+      - Condition: Placeholder or non-meaningful values including but not limited to:
+        - `undefined`
+        - `Please select`
+        - `null`
+        - `N/A`
+        - `TBD`
+        - `unknown` 
+      - Message: `Invalid city name: placeholder value is not allowed`
+
+    - **Truncated names, abbreviations, or airport codes**  
+      - Condition: Truncated names, abbreviations, or airport codes that do not represent valid city names:
+        - `LA`
+        - `Frft`
+        - `sin01`
+        - `LHR`
+        - `SIN`
+        - `MAA`
+      - Message: `Invalid city name: abbreviated or code-based value detected`
+  
+  - **WARNING**
+    - Report the following conditions as **WARNING**:
+    - **Inconsistent casing or formatting**
+      - Condition: City names with inconsistent casing, spacing, or formatting that may reduce data quality, for example:
+        - `HongKong` vs `Hong Kong`
+        - Mixed casing or unexpected script usage
+      - Message: `City name formatting is inconsistent; consider normalizing the value`
 
 #### Postal Code Check
   - RFC 8805 Section 2.1.1.5 explicitly **deprecates postal or ZIP codes**.
   - Postal codes can represent very small populations and are **not considered privacy-safe**
     for mapping IP address ranges, which are statistical in nature.
-  - If a postal code is present:
-    - Produce an **ERROR** indicating that postal codes are deprecated.
-    - Indicate that the field should be **removed for privacy reasons**.
+
+  - **ERROR**
+    - Report the following conditions as **ERROR**:
+    - **Postal code present**
+      - Condition: A non-empty value is present in the postal/ZIP code field.
+      - Message: `Postal codes are deprecated by RFC 8805 and must be removed for privacy reasons`
 
 ### Phase 5: Tuning & Recommendations
 
 This phase applies **opinionated recommendations** beyond RFC 8805 — suggestions learned from real-world geofeed deployments that improve accuracy and usability.
 
-- **Region Code Recommendations**
-  - Recommend **adding region codes** whenever a city is specified.
-  - Ignore the absence of region code when country code matches a **small-sized territory** (by area or population) where state/province usage is uncommon. Load and use the JSON array of 2-letter country codes in [assets/small-territories.json](assets/small-territories.json) for this check.
+- **SUGGESTION**
+  - Report the following conditions as **SUGGESTION**:
 
-- **Subnet Confirmation**
-  - Recommend confirming with the user when a subnet is left **unspecified for all geographical columns**.
-    - Warn the user whether they **intend for the subnet to remain un-geolocated** (literal interpretation of RFC 8805),  
-      or whether they **forgot to specify** the country, state, or city for it.
+  - **Region or city specified for small territory**
+    - Condition:
+      - If a `country` is found in [`assets/small-territories.json`](assets/small-territories.json)
+      - `region` is non-empty **OR**.
+      - `city` is non-empty.
+    - Message: `Region or City-level granularity is usually unnecessary for small territories; consider removing the region and city values`
+
+  - **Missing region code when city is specified**
+    - Condition:
+      - `city` is non-empty
+      - `region` is empty
+      - If a `country` is NOT found in [`assets/small-territories.json`](assets/small-territories.json)
+    - Message: `Region code is recommended when a city is specified; choose a region from the dropdown`
+
+  - **Unspecified geolocation for subnet**
+    - Condition: All geographical fields (`alpha2code`, `region`, `city`) are empty for a subnet.
+    - Message: `Confirm whether this subnet is intentionally marked as do-not-geolocate or missing location data`
 
 
 ### Phase 6: Generate Tuning Report
