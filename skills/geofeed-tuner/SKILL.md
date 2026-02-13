@@ -62,12 +62,19 @@ All generated, temporary, and output files must be written to these directories:
 4. **All generated Python scripts** must be saved to `./run/`.
 5. The `run/` directory may be cleared between sessions; do not store permanent data there.
 
+
 ## Processing Pipeline: Sequential Phase Execution
 
-- All phases of the skill must be executed **in order**, from Phase 1 through Phase 7.
-- Each phase depends on the successful completion of the previous phase.  
-  - For example, **structure checks** must complete before **quality analysis** can run.
+### Execution Constraint 
 
+- The agent MUST read this entire file from **start to finish** before performing any action.
+- The agent MUST NOT apply range limits, partial reads, or lazy loading when reading this file.
+- All phases MUST execute **strictly in order**
+- A phase MUST NOT begin until the previous phase has **fully completed successfully**.
+- Phases are **state-dependent** — skipping a phase will corrupt downstream validation.
+- **Phase skipping is strictly prohibited.**
+- Each step MUST be executed as an **independent checkpoint**.
+- After completing a step, the agent MUST verify success before proceeding.
 - The phases are summarized as follows, but the agent must follow the detailed steps outlined further below for each phase:
 
   - **Phase 1: Understand the Standard**  
@@ -76,32 +83,21 @@ All generated, temporary, and output files must be written to these directories:
   - **Phase 2: Gather Input**  
     Collect IP subnet data from local files or remote URLs.
 
-  - **Phase 3: Structure & Format Check**  
-    Verify CSV format, structure, and IP subnet correctness.
+  - **Phase 3: Checks & Suggestions**  
+    Validate CSV structure, analyze IP prefixes, and check geolocation data quality.
 
-  - **Phase 4: Geolocation Quality Check**  
-    Analyze country codes, region codes, city names, and deprecated fields.
+  - **Phase 4: Region Suggestion Lookup**  
+    For entries needing region suggestions, generate a batch payload and retrieve suggestions from the MCP server.
 
-  - **Phase 5: Tuning & Recommendations**  
-    Apply opinionated best practices and suggest improvements.
+  - **Phase 5: Generate Tuning Report**  
+    Create a comprehensive HTML report summarizing the analysis and suggestions.
 
-  - **Phase 6: Generate Tuning Report**  
-    Create an HTML report summarizing the analysis, issues, and suggestions.
+The agent MUST NOT:
+- Merge multiple steps into one script  
+- Execute steps in parallel  
+- Batch steps into a single tool call  
+- Infer or auto-complete future steps  
 
-  - **Phase 7: Final Review**  
-    Perform a final pass to ensure consistency and completeness.
-
-- **Tuning Script Generation**
-  - Generate a **single Python script** that incorporates **all steps from Phases 2–6**.
-  - Store the generated script in the `./run/` directory.
-  - The script must include:
-    - Load CSV input — download if a URL is provided, otherwise use local (**Phase 2**).
-    - CSV and IP structure checks (**Phase 3**).
-    - Geolocation quality analysis including country, region, city, and postal code checks (**Phase 4**).
-    - Best practices and improvement suggestions (**Phase 5**).
-    - HTML report generation summarizing results (**Phase 6**).
-
-- Users or automation agents should **not skip phases**, as each phase provides critical checks or data transformations required for the next stage.
 
 ### Execution Plan Rules
 Before executing this phase, the agent MUST generate a visible TODO checklist.
@@ -432,7 +428,7 @@ This phase applies **opinionated recommendations** beyond RFC 8805 — suggestio
     - Message: `Confirm whether this subnet is intentionally marked as do-not-geolocate or missing location data`
 
 
-### Phase 4: Region Suggestion Batch Lookup
+### Phase 4: Region Suggestion Lookup
 
 #### Objective
 Generate region suggestions for applicable entries using the Mapbox reverse geocode tool.
@@ -520,17 +516,175 @@ Populate with:
   - Do NOT modify the `region` field.
   - Do NOT create additional intermediate files.
 
-  
-### Phase 5: Generate Tuning Report
-- Use the data from: [./run/data/temp.json](./run/data/temp.json)
-- Insert the data into the HTML template at: [`./scripts/templates/report.html`](./scripts/templates/report.html)
-- Write the final report to: [./run/report/final-report.html](./run/report/final-report.html)
 
-#### Report Requirements
-- Do not change the structure of the HTML template.
-- Hardcode the values from the dataset into the script section of the HTML.
+### Phase 5: Generate Tuning Report
+
+- Generate a **self-contained HTML report** summarizing the analysis, issues, and improvement suggestions.
+- The report must use **local Bootstrap 5.3.8 assets** bundled in [`assets/bootstrap-5.3.8-dist/`](assets/bootstrap-5.3.8-dist/) for styling.
+  - Reference the local CSS file: `assets/bootstrap-5.3.8-dist/css/bootstrap.min.css`
+  - Reference the local JS file (if needed): `assets/bootstrap-5.3.8-dist/js/bootstrap.bundle.min.js`
+  - **Do not use CDN links** — the report must work offline without network access.
+- If inline rendering is supported by the UI, render the report directly. 
+- Write the HTML report to `./run/report/`, using [`./run/data/temp.json`](./run/data/temp.json) and open it with the system default browser.
+- Prefer Bootstrap layout classes, tables, badges, alerts, and collapsible UI elements for readability and consistency.
+
+#### Summary Section
+
+Render a **fixed metrics panel** at the top of the report, consisting of **four separate tables stacked vertically (top-down)**.
+Each table must appear **one after the other**, never side-by-side.
+
+##### Table layout and styling requirements
+
+- Use `./scripts/templates/report_header.html` as the **visual and structural reference** for the metrics panel.
+- **Style the template and all summary tables using Bootstrap (v5.3.x)** for layout, spacing, and typography.
+  - Use Bootstrap table utilities (`.table`, `.table-bordered`, `.table-sm`, etc.) where appropriate.
+  - Use Bootstrap spacing and container classes to enforce margins and alignment.
+- All tables must have a **consistent width** across the report.
+- Table width must **fit within the page viewport** and respect horizontal margins.
+- Apply equal **left and right margins** so tables are visually centered.
+- Use a **clean, readable report style**:
+  - Clear table borders
+  - Bold header row
+  - Adequate cell padding
+- Do not allow tables to overflow horizontally.
+- Tables must scale cleanly for typical desktop screen widths and printing.
+
+Each table must use a **two-column key–value layout**:
+- **Left column**: metric label
+- **Right column**: computed value only
+
+
+###### Feed Metadata
+
+- Input file: display the source as a URL if provided; otherwise show the local file path and resolved filename.
+- Timestamp must be UTC, ISO-8601.
+
+| Metric               | Value |
+|----------------------|-------|
+| Input file           |       |
+| Tuning timestamp     |       |
+
+
+###### Entries
+
+| Metric                     | Value |
+|----------------------------|-------|
+| Total entries              |       |
+| IPv4 entries               |       |
+| IPv6 entries               |       |
+
+
+###### Analysis Summary
+
+| Metric        | Value |
+|---------------|-------|
+| ERROR count   |       |
+| WARNING count |       |
+| OK count      |       |
+
+
+###### Geographical Accuracy Classification
+
+| Metric                     | Value |
+|----------------------------|-------|
+| City-level accuracy        |       |
+| Region-level accuracy      |       |
+| Country-level accuracy     |       |
+| Do-not-geolocate entries   |       |
+
+
+#### Results Table
+
+Render a **single, stable, sortable HTML table** with **one row per input CSV entry**.
+- Preserve the **original CSV row order** by default.
+- Use `./scripts/templates/report_table.html` as the **visual and structural reference** for the table.
+
+Columns **must appear in this exact order**:
+
+| Column    | Description                                               |
+|-----------|-----------------------------------------------------------|
+| Line      | 1-based CSV line number                                   |
+| IP Prefix | Normalized CIDR notation                                  |
+| Country   | `alpha2code` with the corresponding country flag emoji    |
+| Region    | Region code or empty                                      |
+| City      | City name or empty                                        |
+| Status    | ERROR, WARNING, SUGGESTION, or OK                         |
+| Messages  | Ordered list of issues and suggestions                    |
+
+##### Large Feed Optimization
+
+- If the input CSV contains **10,000 or more entries**, the Results Table MUST include **only rows with issues** (ERROR, WARNING, SUGGESTION status) to prevent browser performance degradation.
+- OK entries are excluded from the table but **still counted** in the summary statistics.
+- This threshold balances completeness with browser rendering performance — a 10K-row table renders smoothly, while 100K+ rows cause browsers to hang.
+
+##### Column Definitions
+
+- **Line**  
+  - The **1-based line number** from the original input CSV file.  
+  - This value must refer to the physical line in the source file after comment handling.
+
+- **IP Prefix**  
+  - The IP subnet expressed in **normalized CIDR notation**.  
+
+- **Country**  
+  The two-letter ISO 3166-1 `alpha2code` associated with the subnet.  
+  - Always display the **country flag emoji** alongside the code in the HTML report.
+  - If the country code is invalid, display the raw value with the emoji omitted or replaced according to the rules.
+
+- **Region**  
+
+The **ISO 3166-2 subdivision code** (for example, `US-CA`).
+
+  - UI Behavior
+    - Render the **Region** field as a **dropdown menu**.
+    - The **default selected value** MUST be the value provided in the CSV.
+    - If the CSV value is present and valid, **skip any lookup** and proceed to the next step.
+
+  - Auto-suggestion (Fallback)
+    - If the CSV value is **empty or missing**:
+      - Invoke the [Mapbox](https://mcp.mapbox.com/mcp) MCP server **reverse-geocode** tool using the **City** field.
+      - Populate the dropdown with **at least three suggested region codes**.
+      - Suggestions SHOULD be ordered by **confidence or relevance**, when available.
+      - Leave the field empty if no region is specified or applicable.
+      - The user MAY override the suggested value by selecting a different option from the dropdown.
+
+- **City**  
+  The city name associated with the subnet.  
+  - Leave empty if no city is provided.
+
+- **Status**  
+  - The **highest severity level** assigned to the row after all phases complete.  
+  - Severity order: `ERROR` > `WARNING` > `SUGGESTION` > `OK`
+
+
+- **Messages**  
+  An **ordered list** of issues and suggestions for the row.  
+  - Includes **ERROR**, **WARNING**, **SUGGESTION**, and **OBSERVATION** messages.
+
+##### Filtering and Visual Encoding
+
+- Apply **row-level visual styling** based on status:
+  - **ERROR**: light red background
+  - **WARNING**: light yellow background
+  - **SUGGESTION**: light blue or neutral background
+  - **OK**: light green background
+
+- Provide a **status filter dropdown** positioned **above the table**, aligned with the table title.
+  - Options:
+    - ERROR
+    - WARNING
+    - SUGGESTION
+    - OK
+    - All (default)
+
+- Filtering must:
+  - Operate on the **single table**
+  - Preserve original row order
+  - Toggle visibility only (do not remove rows from the DOM)
+
 
 #### Output Guarantees
 
 - Report must be readable in any modern browser without external network dependencies.
-- All values must be derived **only from analysis output**, not recomputed heuristically.
+- All Bootstrap CSS/JS must be referenced from local `assets/bootstrap-5.3.8-dist/` files.
+- All values must be derived **only from analysis output**, not recomputed heuristically
