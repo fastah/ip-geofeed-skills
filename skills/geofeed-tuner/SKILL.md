@@ -80,13 +80,10 @@ All generated, temporary, and output files must be written to these directories:
   - **Phase 3: Checks & Suggestions**  
     Validate CSV structure, analyze IP prefixes, and check geolocation data quality.
 
-  - **Phase 4: Region Suggestion Lookup**  
-    For entries needing region suggestions, generate a batch payload and retrieve suggestions from the MCP server.
-
-  - **Phase 5: Generate Tuning Report**  
+  - **Phase 4: Generate Tuning Report**  
     Create a HTML report summarizing the analysis and suggestions.
 
-  - **Phase 6: Final Review**  
+  - **Phase 5: Final Review**  
     Perform a final pass to ensure consistency and completeness of the report.
 
 - Users or automation agents should **not skip phases**, as each phase provides critical checks or data transformations required for the next stage.
@@ -421,96 +418,7 @@ This phase applies **opinionated recommendations** beyond RFC 8805 — suggestio
     - Message: `Confirm whether this subnet is intentionally marked as do-not-geolocate or missing location data`
 
 
-### Phase 4: Region Suggestion Lookup
-
-#### Objective
-Generate region suggestions for applicable entries using the Mapbox reverse geocode tool.
-
-#### Execution Rules
-- Use **separate script** for payload generation.
-- Perform the lookup **once per validation run** (batch mode).
-- Construct the payload and send it to the MCP server.
-- Failure to retrieve suggestions must **NOT block validation**.
-- Suggestions are **advisory only** — **never auto-populate** the `region` field.
-
-#### Step 1: Load Dataset
-Load the dataset from: [./run/data/temp.json](./run/data/temp.json)
-- Read the `entries` array.
-- Include entries where:
-  - `need_region == true`
-- Exclude all others.
-
-#### Step 2: Build Lookup Payload
-
-Construct a deduplicated list of city–country pairs:
-
-```json
-[
-  {"q": "Bangalore", "country": ["IN"], "limit": 3},
-  {"q": "Mumbai", "country": ["IN"], "limit": 3},
-  {"q": "Pune", "country": ["IN"], "limit": 3}
-]
-```
-Rules:
-- Deduplicate identical pairs.
-- Write payload to: [./run/data/region-lookup-input.json](./run/data/region-lookup-input.json)
-- Exit the script after writing the payload.
-
-#### Step 3: Invoke Mapbox MCP Tool
-
-- Server: `https://mcp.mapbox.com/mcp`
-- Tool: `search_and_geocode_tool `
-- Open [./run/data/region-lookup-input.json](./run/data/region-lookup-input.json) and send all entries parallely.
-
-- Do NOT use local data.
-
-#### Step 4: Normalize Suggestions
-
-Use the data received from the MCP server.
-
-Rules:
-- Deduplicate suggestions by `region_code`.
-- Preserve response order (assumed relevance-ranked)
-- Keep **at least three suggestions** when available
-- If fewer than three exist, keep all returned values
-- If none exist:
-  - Store an empty array
-  - Do NOT raise an error
-
-#### Step 5: Attach Suggestions to Entries
-
-- Use **separate script** for attaching suggestions.
-- Load: [./run/data/temp.json](./run/data/temp.json)
-- Match responses back to entries using:
-  - `city`
-  - `country`
-
-Create the field if it does not exist:
-
-```json
-"region_suggestions": []
-```
-
-Populate with:
-
-```json
-{
-  "region_code": "",
-  "region_name": "",
-  "relevance": 0.0
-}
-```
-
-#### Step 6: Store Updated Dataset
-
-- Write the dataset back to: [./run/data/temp.json](./run/data/temp.json)
-- Rules:
-  - Maintain all existing validation flags.
-  - Do NOT modify the `region` field.
-  - Do NOT create additional intermediate files.
-
-
-### Phase 5: Generate Tuning Report
+### Phase 4: Generate Tuning Report
 
 - Generate a **self-contained HTML report** summarizing the analysis, issues, and improvement suggestions.
 - The report must use **local Bootstrap 5.3.8 assets** bundled in [`assets/bootstrap-5.3.8-dist/`](assets/bootstrap-5.3.8-dist/) for styling.
@@ -682,7 +590,7 @@ The **ISO 3166-2 subdivision code** (for example, `US-CA`).
 - All Bootstrap CSS/JS must be referenced from local `assets/bootstrap-5.3.8-dist/` files.
 - All values must be derived **only from analysis output**, not recomputed heuristically.
 
-### Phase 6: Final Review
+### Phase 5: Final Review
 
 Perform a final pass over the analyzed data and generated outputs to ensure nothing was missed or left inconsistent.
 
