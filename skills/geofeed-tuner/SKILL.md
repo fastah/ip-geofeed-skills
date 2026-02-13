@@ -405,7 +405,7 @@ This phase runs after structural checks pass.
       - Condition: A non-empty value is present in the postal/ZIP code field.
       - Message: `Postal codes are deprecated by RFC 8805 and must be removed for privacy reasons`
 
-### Phase 5: Tuning & Recommendations
+#### Tuning & Recommendations
 
 This phase applies **opinionated recommendations** beyond RFC 8805 — suggestions learned from real-world geofeed deployments that improve accuracy and usability.
 
@@ -414,7 +414,7 @@ This phase applies **opinionated recommendations** beyond RFC 8805 — suggestio
 
   - **Region or city specified for small territory**
     - Condition:
-      - If a `country` is found in [`assets/small-territories.json`](assets/small-territories.json)
+      - `is_small_territory` is `true` 
       - `region` is non-empty **OR**.
       - `city` is non-empty.
     - Message: `Region or City-level granularity is usually unnecessary for small territories; consider removing the region and city values`
@@ -423,7 +423,8 @@ This phase applies **opinionated recommendations** beyond RFC 8805 — suggestio
     - Condition:
       - `city` is non-empty
       - `region` is empty
-      - If a `country` is NOT found in [`assets/small-territories.json`](assets/small-territories.json)
+      - `is_small_territory` is `false`
+    - Action: Set `need_region = true` 
     - Message: `Region code is recommended when a city is specified; choose a region from the dropdown`
 
   - **Unspecified geolocation for subnet**
