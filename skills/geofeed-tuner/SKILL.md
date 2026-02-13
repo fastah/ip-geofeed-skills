@@ -65,16 +65,10 @@ All generated, temporary, and output files must be written to these directories:
 
 ## Processing Pipeline: Sequential Phase Execution
 
-### Execution Constraint 
+- All phases of the skill must be executed **in order**, from Phase 1 through Phase 7.
+- Each phase depends on the successful completion of the previous phase.  
+  - For example, **structure checks** must complete before **quality analysis** can run.
 
-- The agent MUST read this entire file from **start to finish** before performing any action.
-- The agent MUST NOT apply range limits, partial reads, or lazy loading when reading this file.
-- All phases MUST execute **strictly in order**
-- A phase MUST NOT begin until the previous phase has **fully completed successfully**.
-- Phases are **state-dependent** — skipping a phase will corrupt downstream validation.
-- **Phase skipping is strictly prohibited.**
-- Each step MUST be executed as an **independent checkpoint**.
-- After completing a step, the agent MUST verify success before proceeding.
 - The phases are summarized as follows, but the agent must follow the detailed steps outlined further below for each phase:
 
   - **Phase 1: Understand the Standard**  
@@ -92,11 +86,7 @@ All generated, temporary, and output files must be written to these directories:
   - **Phase 5: Generate Tuning Report**  
     Create a HTML report summarizing the analysis and suggestions.
 
-The agent MUST NOT:
-- Merge multiple steps into one script  
-- Execute steps in parallel  
-- Batch steps into a single tool call  
-- Infer or auto-complete future steps  
+- Users or automation agents should **not skip phases**, as each phase provides critical checks or data transformations required for the next stage.
 
 
 ### Execution Plan Rules
