@@ -86,6 +86,9 @@ All generated, temporary, and output files must be written to these directories:
   - **Phase 5: Generate Tuning Report**  
     Create a HTML report summarizing the analysis and suggestions.
 
+  - **Phase 6: Final Review**  
+    Perform a final pass to ensure consistency and completeness of the report.
+
 - Users or automation agents should **not skip phases**, as each phase provides critical checks or data transformations required for the next stage.
 
 
@@ -678,3 +681,12 @@ The **ISO 3166-2 subdivision code** (for example, `US-CA`).
 - Report must be readable in any modern browser without external network dependencies.
 - All Bootstrap CSS/JS must be referenced from local `assets/bootstrap-5.3.8-dist/` files.
 - All values must be derived **only from analysis output**, not recomputed heuristically
+
+### Phase 6: Final Review
+
+Perform a final pass over the analyzed data and generated outputs to ensure nothing was missed or left inconsistent.
+
+- Verify that all CSV rows have been processed and appear in the report.
+- Confirm that error/warning/ok counts in the summary match the actual row statuses.
+- Ensure no duplicate entries exist in the results table.
+- Validate that all file paths and references in the report are correct.
