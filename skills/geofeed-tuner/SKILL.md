@@ -680,7 +680,7 @@ The **ISO 3166-2 subdivision code** (for example, `US-CA`).
 
 - Report must be readable in any modern browser without external network dependencies.
 - All Bootstrap CSS/JS must be referenced from local `assets/bootstrap-5.3.8-dist/` files.
-- All values must be derived **only from analysis output**, not recomputed heuristically
+- All values must be derived **only from analysis output**, not recomputed heuristically.
 
 ### Phase 6: Final Review
 
