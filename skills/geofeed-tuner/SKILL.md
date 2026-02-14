@@ -62,6 +62,7 @@ All generated, temporary, and output files must be written to these directories:
 4. **All generated Python scripts** must be saved to `./run/`.
 5. The `run/` directory may be cleared between sessions; do not store permanent data there.
 
+
 ## Processing Pipeline: Sequential Phase Execution
 
 - All phases of the skill must be executed **in order**, from Phase 1 through Phase 7.
@@ -76,32 +77,17 @@ All generated, temporary, and output files must be written to these directories:
   - **Phase 2: Gather Input**  
     Collect IP subnet data from local files or remote URLs.
 
-  - **Phase 3: Structure & Format Check**  
-    Verify CSV format, structure, and IP subnet correctness.
+  - **Phase 3: Checks & Suggestions**  
+    Validate CSV structure, analyze IP prefixes, and check geolocation data quality.
 
-  - **Phase 4: Geolocation Quality Check**  
-    Analyze country codes, region codes, city names, and deprecated fields.
+  - **Phase 4: Generate Tuning Report**  
+    Create a HTML report summarizing the analysis and suggestions.
 
-  - **Phase 5: Tuning & Recommendations**  
-    Apply opinionated best practices and suggest improvements.
-
-  - **Phase 6: Generate Tuning Report**  
-    Create an HTML report summarizing the analysis, issues, and suggestions.
-
-  - **Phase 7: Final Review**  
-    Perform a final pass to ensure consistency and completeness.
-
-- **Tuning Script Generation**
-  - Generate a **single Python script** that incorporates **all steps from Phases 2–6**.
-  - Store the generated script in the `./run/` directory.
-  - The script must include:
-    - Load CSV input — download if a URL is provided, otherwise use local (**Phase 2**).
-    - CSV and IP structure checks (**Phase 3**).
-    - Geolocation quality analysis including country, region, city, and postal code checks (**Phase 4**).
-    - Best practices and improvement suggestions (**Phase 5**).
-    - HTML report generation summarizing results (**Phase 6**).
+  - **Phase 5: Final Review**  
+    Perform a final pass to ensure consistency and completeness of the report.
 
 - Users or automation agents should **not skip phases**, as each phase provides critical checks or data transformations required for the next stage.
+
 
 ### Execution Plan Rules
 Before executing this phase, the agent MUST generate a visible TODO checklist.
@@ -137,12 +123,113 @@ This research phase establishes the conceptual foundation needed before performi
 - If the input is a **local file**, continue processing it directly without downloading.
 - Normalize all input data to **UTF-8** encoding.
 
+### Phase 3: Checks & Suggestions
 
-### Phase 3: Structure & Format Check
+#### Execution Rules
+- Generate **exactly one script** for this phase.
+- Do NOT combine this phase with others.
+- Do NOT precompute future-phase data.
+- Store the output as a JSON file at: [`./run/data/temp.json`](./run/data/temp.json)
+
+#### Schema Definition
+
+The JSON structure below is **IMMUTABLE**.
+
+```json
+{
+  "input_file": "",          // Filename or URL
+  "tuning_timestamp": "",   // ISO 8601 format recommended
+
+  "total_entries": 0,
+  "ipv4_entries": 0,
+  "ipv6_entries": 0,
+  "invalid_subnet_entries": 0,
+
+  "error_count": 0,
+  "warning_count": 0,
+  "ok_count": 0,
+  "suggestion_count": 0,
+
+  "city_level_accuracy": 0,
+  "region_level_accuracy": 0,
+  "country_level_accuracy": 0,
+  "do_not_geolocate_entries": 0,
+
+  "entries": [
+    {
+      "line": 0,                 // Line number in CSV
+      "ip_prefix": "",
+      "country": "",
+      "flag": "",             
+      "region": "",
+      "city": "",
+
+      "status": "",              // Highest severity: ERROR | WARNING | SUGGESTION | OK
+
+      "messages": [
+        {
+          "status": "",            // ERROR | WARNING | SUGGESTION
+          "message": ""            // Descriptive message for the issue or suggestion
+        }
+      ],            // List of validation messages
+
+      "need_region": false,
+      "has_error": false,
+      "has_warning": false,
+      "has_suggestion": false,
+      "is_small_territory": false
+    }
+  ]
+}
+```
+- `input_file`: The original input source, either a local filename or a remote URL.
+- `tuning_timestamp`: The timestamp when the tuning was performed, in ISO 8601 format.
+- `total_entries`: The total number of entries processed from the input CSV.
+- `ipv4_entries`: The count of entries that are IPv4 subnets.
+- `ipv6_entries`: The count of entries that are IPv6 subnets.
+- `invalid_subnet_entries`: The count of entries that failed subnet parsing and validation.
+- `error_count`: The total number of entries flagged with an ERROR status.
+- `warning_count`: The total number of entries flagged with a WARNING status.
+- `ok_count`: The total number of entries flagged with an OK status.
+- `suggestion_count`: The total number of entries flagged with a SUGGESTION status.
+- `city_level_accuracy`: The count of entries with city-level geolocation accuracy.
+- `region_level_accuracy`: The count of entries with region-level geolocation accuracy.
+- `country_level_accuracy`: The count of entries with country-level geolocation accuracy.
+- `do_not_geolocate_entries`: The count of entries that are intentionally marked as do-not-geolocate (no geolocation data provided).
+- `entries`: An array of objects, each representing a single entry from the input CSV, with the following fields:
+  - `line`: The line number in the original CSV file (1-based index).
+  - `ip_prefix`: The normalized IP prefix in CIDR notation.
+  - `country`: The country code (alpha-2) associated with the subnet.
+  - `flag`: The country flag emoji associated with the country code, if available.
+  - `region`: The region code (ISO 3166-2) associated with the subnet, if provided.
+  - `city`: The city name associated with the subnet, if provided.
+  - `status`: The highest severity status assigned to the entry after validation (ERROR > WARNING > SUGGESTION > OK).
+  - `messages`: An array of validation messages (errors, warnings, suggestions) related to the entry.
+    - `status`: The severity level of the message (ERROR, WARNING, SUGGESTION).
+    - `message`: A descriptive message explaining the issue or suggestion.
+  - `need_region`: A boolean flag indicating whether a region suggestion is needed for this entry.
+  - `has_error`: A boolean flag indicating whether this entry has any ERROR messages.
+  - `has_warning`: A boolean flag indicating whether this entry has any WARNING messages.
+  - `has_suggestion`: A boolean flag indicating whether this entry has any SUGGESTION messages.
+  - `is_small_territory`: A boolean flag indicating whether the country is classified as a small territory based on the provided dataset.
+
+The agent MUST NOT:
+
+- Rename fields  
+- Add or remove fields  
+- Change data types  
+- Reorder keys  
+- Alter nesting  
+- Wrap the object  
+- Split into multiple files  
+
+If a value is unknown, **leave it empty** — never invent data.
+
+#### Structure & Format Check
 
 This phase verifies that your feed is well-formed and parseable. **Critical structural errors** must be resolved before the tuner can analyze geolocation quality.
 
-#### CSV Structure
+##### CSV Structure
 
 This subsection defines rules for **CSV-formatted input files** used for IP geolocation feeds.
 The goal is to ensure the file can be parsed reliably and normalized into a **consistent internal representation**.
@@ -209,19 +296,14 @@ The goal is to ensure the file can be parsed reliably and normalized into a **co
       - Prefixes shorter than `/24`
       - Message: `IPv4 prefix is unusually large and may indicate a typo`
 
-  - **Subnet Storage**
-    - Once checked, store each subnet as a **key** in a map or dictionary.
-    - The corresponding value must be a **custom object** containing:
-      - Geolocation attributes for the subnet
-      - Any user-provided hints or preferences related to that subnet's geolocation.
 
-### Phase 4: Geolocation Quality Check
+#### Geolocation Quality Check
 
 Analyze the **accuracy and consistency** of geolocation data — country codes, region codes, city names, and deprecated fields.
 This phase runs after structural checks pass.
 
-#### Country Code Analysis
-  - Use the locally available data table [`assets/iso3166-1.json`](assets/iso3166-1.json) for checking.
+##### Country Code Analysis
+  - Use the locally available data table [`ISO3166-1`](assets/iso3166-1.json) for checking.
     - JSON array of countries and territories with ISO codes
     - Each object includes:
       - `alpha_2`: two-letter country code
@@ -231,13 +313,15 @@ This phase runs after structural checks pass.
   - Check `alpha2code` (RFC 8805 Section 2.1.1.2) against the `alpha_2` attribute.
   - Sample code is available in the `references/` directory.
 
+  - If a country is found in [`assets/small-territories.json`](assets/small-territories.json) set `is_small_territory` to `true`. This will be used for later checks and suggestions related to small territories.
+
   - **ERROR** 
     - Report the following conditions as **ERROR**:
     - **Invalid country code**
       - Condition: `alpha2code` is present but not found in the `alpha_2` set
       - Message: `Invalid country code: not a valid ISO 3166-1 alpha-2 value`
 
-#### Region Code Analysis
+##### Region Code Analysis
   - Use the locally available data table [`ISO3166-2`](assets/iso3166-2.json) for checking.
     - JSON array of country subdivisions with ISO-assigned codes
     - Each object includes:
@@ -261,10 +345,10 @@ This phase runs after structural checks pass.
       - Condition: Country portion of `region` does not match `alpha2code`
       - Message: `Region code does not match the specified country code`
 
-#### City Name Analysis
+##### City Name Analysis
 
-  City names are validated using **heuristic checks only**.  
-  There is currently **no authoritative dataset** available for validating city names.
+  - City names are validated using **heuristic checks only**.  
+  - There is currently **no authoritative dataset** available for validating city names.
 
   - **ERROR**
     - Report the following conditions as **ERROR**:
@@ -296,7 +380,7 @@ This phase runs after structural checks pass.
         - Mixed casing or unexpected script usage
       - Message: `City name formatting is inconsistent; consider normalizing the value`
 
-#### Postal Code Check
+##### Postal Code Check
   - RFC 8805 Section 2.1.1.5 explicitly **deprecates postal or ZIP codes**.
   - Postal codes can represent very small populations and are **not considered privacy-safe**
     for mapping IP address ranges, which are statistical in nature.
@@ -307,7 +391,7 @@ This phase runs after structural checks pass.
       - Condition: A non-empty value is present in the postal/ZIP code field.
       - Message: `Postal codes are deprecated by RFC 8805 and must be removed for privacy reasons`
 
-### Phase 5: Tuning & Recommendations
+#### Tuning & Recommendations
 
 This phase applies **opinionated recommendations** beyond RFC 8805 — suggestions learned from real-world geofeed deployments that improve accuracy and usability.
 
@@ -316,7 +400,7 @@ This phase applies **opinionated recommendations** beyond RFC 8805 — suggestio
 
   - **Region or city specified for small territory**
     - Condition:
-      - If a `country` is found in [`assets/small-territories.json`](assets/small-territories.json)
+      - `is_small_territory` is `true` 
       - `region` is non-empty **OR**.
       - `city` is non-empty.
     - Message: `Region or City-level granularity is usually unnecessary for small territories; consider removing the region and city values`
@@ -325,7 +409,8 @@ This phase applies **opinionated recommendations** beyond RFC 8805 — suggestio
     - Condition:
       - `city` is non-empty
       - `region` is empty
-      - If a `country` is NOT found in [`assets/small-territories.json`](assets/small-territories.json)
+      - `is_small_territory` is `false`
+    - Action: Set `need_region = true` 
     - Message: `Region code is recommended when a city is specified; choose a region from the dropdown`
 
   - **Unspecified geolocation for subnet**
@@ -333,14 +418,15 @@ This phase applies **opinionated recommendations** beyond RFC 8805 — suggestio
     - Message: `Confirm whether this subnet is intentionally marked as do-not-geolocate or missing location data`
 
 
-### Phase 6: Generate Tuning Report
+### Phase 4: Generate Tuning Report
 
 - Generate a **self-contained HTML report** summarizing the analysis, issues, and improvement suggestions.
 - The report must use **local Bootstrap 5.3.8 assets** bundled in [`assets/bootstrap-5.3.8-dist/`](assets/bootstrap-5.3.8-dist/) for styling.
   - Reference the local CSS file: `assets/bootstrap-5.3.8-dist/css/bootstrap.min.css`
   - Reference the local JS file (if needed): `assets/bootstrap-5.3.8-dist/js/bootstrap.bundle.min.js`
   - **Do not use CDN links** — the report must work offline without network access.
-- If inline rendering is supported by the UI, render the report directly. Otherwise, write the HTML report to `./run/report/`, using the **input CSV filename** (with a `.html` extension), and open it with the system default browser.
+- If inline rendering is supported by the UI, render the report directly. 
+- Write the HTML report to `./run/report/`, using [`./run/data/temp.json`](./run/data/temp.json) and open it with the system default browser.
 - Prefer Bootstrap layout classes, tables, badges, alerts, and collapsible UI elements for readability and consistency.
 
 #### Summary Section
@@ -504,7 +590,7 @@ The **ISO 3166-2 subdivision code** (for example, `US-CA`).
 - All Bootstrap CSS/JS must be referenced from local `assets/bootstrap-5.3.8-dist/` files.
 - All values must be derived **only from analysis output**, not recomputed heuristically.
 
-### Phase 7: Final Review
+### Phase 5: Final Review
 
 Perform a final pass over the analyzed data and generated outputs to ensure nothing was missed or left inconsistent.
 
