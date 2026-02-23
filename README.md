@@ -2,8 +2,8 @@
 
 [![Download ZIP](https://img.shields.io/badge/Download%20ZIP-8A2BE2)](https://github.com/fastah/ip-geofeed-skills/archive/refs/heads/main.zip)
 
-This package has self-help resources from Siddharth "Sid" Mathur's talk at [NANOG 96](https://nanog.org/events/nanog-96/) San Francisco - [High-quality IP Geofeeds using AI Coding Assistants and MCP](https://nanog.org/events/nanog-96/content/5683/).
-[![Youtube Video](https://github.com/user-attachments/assets/d7987f8a-f2a3-4826-940e-6ff0619c9f3c)](https://www.youtube.com/watch?v=x_vbTj_D91I){height=210}
+This package has self-help resources from Siddharth "Sid" Mathur's talk at [NANOG 96](https://nanog.org/events/nanog-96/) San Francisco - [High-quality IP Geofeeds using AI Coding Assistants and MCP](https://nanog.org/events/nanog-96/content/5683/). [![Youtube Video]()](https://www.youtube.com/watch?v=x_vbTj_D91I){height=210}
+<img width="320" height="180" alt="NANOG 96 San Francisco talk by Sid Mathur of Fastah Inc. on IP Geofeeds" src="https://github.com/user-attachments/assets/77445f47-70f7-4ad5-b623-2ad3c568e65a" />
 
 **Geofeed Tuner** helps you create, refine, and improve IP geolocation feeds. It goes beyond simple RFC 8805 compliance checking to offer opinionated recommendations based on real-world deployment experience.
 
