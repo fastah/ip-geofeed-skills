@@ -2,21 +2,25 @@
 
 [![Download ZIP](https://img.shields.io/badge/Download%20ZIP-8A2BE2)](https://github.com/fastah/ip-geofeed-skills/archive/refs/heads/main.zip)
 
-This package has self-help resources from Siddharth "Sid" Mathur's talk at [NANOG 96](https://nanog.org/events/nanog-96/) San Francisco - [High-quality IP Geofeeds using AI Coding Assistants and MCP](https://nanog.org/events/nanog-96/content/5683/). [![Youtube Video]()](https://www.youtube.com/watch?v=x_vbTj_D91I){height=210}
-<img width="320" height="180" alt="NANOG 96 San Francisco talk by Sid Mathur of Fastah Inc. on IP Geofeeds" src="https://github.com/user-attachments/assets/77445f47-70f7-4ad5-b623-2ad3c568e65a" />
-
 **Geofeed Tuner** helps you create, refine, and improve IP geolocation feeds. It goes beyond simple RFC 8805 compliance checking to offer opinionated recommendations based on real-world deployment experience.
 
 AI coding agents should be asked to read the tuning guidance in [SKILL.md](skills/geofeed-tuner/SKILL.md).
 
+## About 
+This AI skill and associated IP Geofeed were first presented at Siddharth "Sid" Mathur's talk at [NANOG 96](https://nanog.org/events/nanog-96/) San Francisco - [High-quality IP Geofeeds using AI Coding Assistants and MCP](https://nanog.org/events/nanog-96/content/5683/); see it on [YouTube](https://youtu.be/x_vbTj_D91I?si=tTjqHQPthGIt9cnM&t=93).
+
+<a href="https://youtu.be/x_vbTj_D91I?si=tTjqHQPthGIt9cnM&t=93">
+<img width="160" height="90" alt="NANOG 96 San Francisco talk by Sid Mathur of Fastah Inc. on IP Geofeeds" src="https://github.com/user-attachments/assets/77445f47-70f7-4ad5-b623-2ad3c568e65a" />
+</a>
+
 ## Pre-requisites
 
 - IDE - [Visual Studio Code](https://code.visualstudio.com).
-- For [GitHub Copilot](https://marketplace.visualstudio.com/items?itemName=GitHub.copilot-chat), enable the experimental [`chat.useAgentSkills`](vscode://settings/chat.useAgentSkills) feature, see [Agent Skills help](https://code.visualstudio.com/docs/copilot/customization/agent-skills). Related [VS Code config file](.vscode/settings.json).
+- For [GitHub Copilot](https://marketplace.visualstudio.com/items?itemName=GitHub.copilot-chat), [Agent Skills help](https://code.visualstudio.com/docs/copilot/customization/agent-skills) must be enabled.
 
 - For [Claude Code](https://marketplace.visualstudio.com/items?itemName=anthropic.claude-code) - enable [Skills in Settings -> Capabilities](https://support.claude.com/en/articles/12512180-using-skills-in-claude). Then make a `geofeed-tuner.zip` ZIP file from the [`skills/geofeed-tuner`](skills/geofeed-tuner) folder, and upload it as an Agent Skill. Enterprise users must also enable `Code execution and file creation`.
 
-- For [ChatGPT Codex](https://marketplace.visualstudio.com/items?itemName=openai.chatgpt), enable [Skills](https://developers.openai.com/codex/skills/) with the `[[skills.config]]` flag.
+- For [ChatGPT Codex](https://marketplace.visualstudio.com/items?itemName=openai.chatgpt), you may use Codex CLI, IDE extension, or the Codex app.
 
 - *Windows only*: Use the Microsoft Store for self-updating [VS Code](https://apps.microsoft.com/detail/xp9khm4bk9fz7q?hl=en-US&gl=US), [Python](https://apps.microsoft.com/detail/9pnrbtzxmb4z?hl=en-US&gl=US), and [PowerShell](https://apps.microsoft.com/detail/9mz1snwt0n5d?hl=en-US&gl=US).
 
