@@ -1,4 +1,4 @@
-# Geofeed Tuner – AI Skills for Better IP Geolocation Feeds
+# Geofeed Tuner – AI Skill for Better IP Geolocation Feeds
 
 [![Download ZIP](https://img.shields.io/badge/Download%20ZIP-8A2BE2)](https://github.com/fastah/ip-geofeed-skills/archive/refs/heads/main.zip)
 
@@ -7,7 +7,7 @@
 AI coding agents should be asked to read the tuning guidance in [SKILL.md](skills/geofeed-tuner/SKILL.md).
 
 ## About 
-This AI skill and associated IP Geofeed were first presented at Siddharth "Sid" Mathur's talk at [NANOG 96](https://nanog.org/events/nanog-96/) San Francisco - [High-quality IP Geofeeds using AI Coding Assistants and MCP](https://nanog.org/events/nanog-96/content/5683/); see it on [YouTube](https://youtu.be/x_vbTj_D91I?si=tTjqHQPthGIt9cnM&t=93).
+This [Agent Skill](https://agentskills.io/home) and associated IP Geofeed were first presented at Siddharth "Sid" Mathur's talk at [NANOG 96](https://nanog.org/events/nanog-96/) San Francisco - [High-quality IP Geofeeds using AI Coding Assistants and MCP](https://nanog.org/events/nanog-96/content/5683/); see it on [YouTube](https://youtu.be/x_vbTj_D91I?si=tTjqHQPthGIt9cnM&t=93).
 
 <a href="https://youtu.be/x_vbTj_D91I?si=tTjqHQPthGIt9cnM&t=93">
 <img width="160" height="90" alt="NANOG 96 San Francisco talk by Sid Mathur of Fastah Inc. on IP Geofeeds" src="https://github.com/user-attachments/assets/77445f47-70f7-4ad5-b623-2ad3c568e65a" />
@@ -15,13 +15,13 @@ This AI skill and associated IP Geofeed were first presented at Siddharth "Sid" 
 
 ## Pre-requisites
 
-- IDE - [Visual Studio Code](https://code.visualstudio.com).
-- For [GitHub Copilot](https://marketplace.visualstudio.com/items?itemName=GitHub.copilot-chat), [Agent Skills help](https://code.visualstudio.com/docs/copilot/customization/agent-skills) must be enabled.
+- IDE - [Visual Studio Code](https://code.visualstudio.com)
 
-- For [Claude Code](https://marketplace.visualstudio.com/items?itemName=anthropic.claude-code) - enable [Skills in Settings -> Capabilities](https://support.claude.com/en/articles/12512180-using-skills-in-claude). Then make a `geofeed-tuner.zip` ZIP file from the [`skills/geofeed-tuner`](skills/geofeed-tuner) folder, and upload it as an Agent Skill. Enterprise users must also enable `Code execution and file creation`.
-
-- For [ChatGPT Codex](https://marketplace.visualstudio.com/items?itemName=openai.chatgpt), you may use Codex CLI, IDE extension, or the Codex app.
-
+ANY of: 
+- [GitHub Copilot](https://marketplace.visualstudio.com/items?itemName=GitHub.copilot-chat) ([Agent Skills help](https://code.visualstudio.com/docs/copilot/customization/agent-skills))
+- [Claude Code](https://marketplace.visualstudio.com/items?itemName=anthropic.claude-code) (requires [Skills in Settings -> Capabilities](https://support.claude.com/en/articles/12512180-using-skills-in-claude), Enterprise users must also enable `Code execution and file creation`.)
+- [ChatGPT Codex](https://marketplace.visualstudio.com/items?itemName=openai.chatgpt) (Codex CLI, IDE extension, or the Codex app)
+- [Amp Code](https://ampcode.com/news/agent-skills) 
 - *Windows only*: Use the Microsoft Store for self-updating [VS Code](https://apps.microsoft.com/detail/xp9khm4bk9fz7q?hl=en-US&gl=US), [Python](https://apps.microsoft.com/detail/9pnrbtzxmb4z?hl=en-US&gl=US), and [PowerShell](https://apps.microsoft.com/detail/9mz1snwt0n5d?hl=en-US&gl=US).
 
 ## Quick guide
@@ -43,13 +43,6 @@ Hey chat, help me get started with the "Geofeed Tuner" agent skill from the SKIL
 
 AI [Agent Skills](https://agentskills.io/home) is an open standard that works across multiple AI tools to make domain-specific knowledge easier to share - which in this repository's case is IP Geolocation feed tuning and improvement. 
 
-Partial list of AI tools that support Agent Skills:
-
-- [GitHub Copilot](https://code.visualstudio.com/docs/copilot/customization/agent-skills) - VS Code, Copilot CLI, coding agent
-- [Cursor](https://cursor.com/docs/context/skills)
-- [Claude Code](https://code.claude.com/docs/en/skills)
-- [Amp Code](https://ampcode.com/news/agent-skills) - VS Code and Amp CLI
-
 ## Troubleshooting
 
 1. VS Code - turn ON the experimental Agent Skills flag ([config](.vscode/settings.json)).
@@ -63,7 +56,6 @@ These are automatically suggested via the included [extensions hint](.vscode/ext
 | Extension | Publisher | Purpose |
 |-----------|-----------|---------|
 | [Python](https://marketplace.visualstudio.com/items?itemName=ms-python.python) | Microsoft | Python configuration + syntax highlighting |
-| [Go](https://marketplace.visualstudio.com/items?itemName=golang.go) | Go Team at Google | Go (Golang.org) configuration + syntax highlighting |
 | [Rainbow CSV](https://marketplace.visualstudio.com/items?itemName=mechatroner.rainbow-csv) | mechatroner | CSV syntax highlighting |
 | [PowerShell](https://marketplace.visualstudio.com/items?itemName=ms-vscode.PowerShell) | Microsoft | [Windows only] Modern scripting system |
 
