@@ -1,0 +1,35 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug Go Program (with sample input)",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceFolder}/experimental/ip-geofeed",
+            "args": [
+                "${workspaceFolder}/experimental/ip-geofeed/testdata/sample-input.csv"
+            ],
+            "cwd": "${workspaceFolder}/experimental/ip-geofeed"
+        },
+        {
+            "name": "Debug Go Program (custom input)",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceFolder}/experimental/ip-geofeed",
+            "args": [
+                "${input:csvFilePath}"
+            ],
+            "cwd": "${workspaceFolder}/experimental/ip-geofeed"
+        }
+    ],
+    "inputs": [
+        {
+            "id": "csvFilePath",
+            "type": "promptString",
+            "description": "Enter the path to the CSV file or URL",
+            "default": "${workspaceFolder}/experimental/ip-geofeed/testdata/sample_geofeed.csv"
+        }
+    ]
+}
