@@ -1,0 +1,332 @@
+package geofeed_validation
+
+import (
+	"encoding/json"
+	"fmt"
+	"ip-geofeed/internal/parser"
+	"net"
+	"os"
+	"regexp"
+	"strings"
+)
+
+var (
+	placeholderValues = []string{"undefined", "please select", "null", "n/a", "tbd", "unknown"}
+	abbreviatedValues = []string{"la", "frft", "sin01", "lhr", "sin", "maa"}
+)
+
+// Country represents an ISO 3166-1 country
+type Country struct {
+	Alpha2       string `json:"alpha_2"`
+	Alpha3       string `json:"alpha_3"`
+	Flag         string `json:"flag"`
+	Name         string `json:"name"`
+	Numeric      string `json:"numeric"`
+	OfficialName string `json:"official_name,omitempty"`
+}
+
+// Region represents an ISO 3166-2 subdivision
+type Region struct {
+	Code string `json:"code"`
+	Name string `json:"name"`
+	Type string `json:"type"`
+}
+
+// ValidationContext holds all validation data
+type ValidationContext struct {
+	Countries        map[string]Country
+	Regions          map[string]Region
+	SmallTerritories map[string]bool
+}
+
+// Message represents a validation issue
+type Message struct {
+	ID      string
+	Type    string // ERROR, WARNING, SUGGESTION
+	Text    string
+	Checked bool
+}
+
+// Entry represents a single CSV row with validation results
+type Entry struct {
+	parser.Row
+	Status         string // ERROR, WARNING, SUGGESTION, OK
+	Messages       []Message
+	HasError       bool
+	HasWarning     bool
+	HasSuggestion  bool
+	DoNotGeolocate bool
+	GeocodingHint  string
+	DefaultCountry string
+	DefaultRegion  string
+	DefaultCity    string
+}
+
+// LoadValidationData loads ISO and territorial data from JSON files
+func LoadValidationData() (*ValidationContext, error) {
+	ctx := &ValidationContext{
+		Countries:        make(map[string]Country),
+		Regions:          make(map[string]Region),
+		SmallTerritories: make(map[string]bool),
+	}
+
+	// Load ISO 3166-1 countries
+	countriesFile, err := os.ReadFile("internal/geofeed_validation/iso3166-1.json")
+	if err != nil {
+		return nil, fmt.Errorf("reading countries file: %w", err)
+	}
+
+	var countriesData struct {
+		Countries []Country `json:"3166-1"`
+	}
+	if err := json.Unmarshal(countriesFile, &countriesData); err != nil {
+		return nil, fmt.Errorf("parsing countries file: %w", err)
+	}
+
+	for _, country := range countriesData.Countries {
+		ctx.Countries[country.Alpha2] = country
+	}
+
+	// Load ISO 3166-2 regions
+	regionsFile, err := os.ReadFile("internal/geofeed_validation/iso3166-2.json")
+	if err != nil {
+		return nil, fmt.Errorf("reading regions file: %w", err)
+	}
+
+	var regionsData struct {
+		Regions []Region `json:"3166-2"`
+	}
+	if err := json.Unmarshal(regionsFile, &regionsData); err != nil {
+		return nil, fmt.Errorf("parsing regions file: %w", err)
+	}
+
+	for _, region := range regionsData.Regions {
+		ctx.Regions[region.Code] = region
+	}
+
+	// Load small territories
+	territoriesFile, err := os.ReadFile("internal/geofeed_validation/small-territories.json")
+	if err != nil {
+		return nil, fmt.Errorf("reading small territories file: %w", err)
+	}
+
+	var territories []string
+	if err := json.Unmarshal(territoriesFile, &territories); err != nil {
+		return nil, fmt.Errorf("parsing small territories file: %w", err)
+	}
+
+	for _, territory := range territories {
+		ctx.SmallTerritories[territory] = true
+	}
+
+	return ctx, nil
+}
+
+// ValidateEntries validates a list of entries and populates their messages and status
+func ValidateEntries(rows []parser.Row) ([]Entry, error) {
+	// Load validation data
+	ctx, err := LoadValidationData()
+	if err != nil {
+		return nil, fmt.Errorf("error loading validation data: %w", err)
+	}
+
+	entries := make([]Entry, len(rows))
+	for i, row := range rows {
+		entries[i] = Entry{Row: row}
+	}
+
+	// Validate each entry
+	for i := range entries {
+		ValidateEntry(&entries[i], ctx)
+	}
+	return entries, nil
+}
+
+// ValidateEntry validates a single entry and populates its messages
+func ValidateEntry(entry *Entry, ctx *ValidationContext) {
+	// 1. IP Prefix validation
+	ValidateIPPrefix(entry)
+
+	// 2. Country code validation
+	ValidateCountryCode(entry, ctx)
+
+	// 3. Region code validation
+	ValidateRegionCode(entry, ctx)
+
+	// 4. City name validation
+	ValidateCityName(entry, ctx)
+
+	// 5. Postal code check (deprecated)
+	ValidatePostalCode(entry)
+
+	// 6. Tuning recommendations
+	ProvideTuningRecommendations(entry, ctx)
+
+	// Determine overall status
+	if entry.HasError {
+		entry.Status = "ERROR"
+	} else if entry.HasWarning {
+		entry.Status = "WARNING"
+	} else if entry.HasSuggestion {
+		entry.Status = "SUGGESTION"
+	} else {
+		entry.Status = "OK"
+	}
+}
+
+// ValidateIPPrefix validates the IP prefix format and properties
+func ValidateIPPrefix(entry *Entry) {
+	if entry.IPPrefix == "" {
+		entry.AddStatusMessage(ErrIPPrefixEmpty)
+		return
+	}
+
+	// Try to parse as CIDR
+	_, ipNet, err := net.ParseCIDR(entry.IPPrefix)
+	if err != nil {
+		entry.AddStatusMessage(ErrIPPrefixInvalid)
+		return
+	}
+
+	// Normalize to CIDR notation
+	entry.IPPrefix = ipNet.String()
+
+	// Check if it's a public address
+	ip := ipNet.IP
+	if IsPrivateAddress(ip) {
+		entry.AddStatusMessage(ErrIPPrefixNonPublic)
+		return
+	}
+
+	// Check for overly large prefixes
+	if ip.To4() != nil {
+		// IPv4
+		ones, _ := ipNet.Mask.Size()
+		if ones < 24 {
+			entry.AddStatusMessage(WarnIPv4PrefixLarge)
+		}
+	} else {
+		// IPv6
+		ones, _ := ipNet.Mask.Size()
+		if ones < 64 {
+			entry.AddStatusMessage(WarnIPv6PrefixLarge)
+		}
+	}
+}
+
+// IsPrivateAddress checks if an IP is private or reserved
+func IsPrivateAddress(ip net.IP) bool {
+	if ip.IsLoopback() || ip.IsLinkLocalUnicast() || ip.IsLinkLocalMulticast() || ip.IsMulticast() {
+		return true
+	}
+
+	// Check for private IPv4 ranges
+	if ip.To4() != nil {
+		privateRanges := []string{
+			"10.0.0.0/8",
+			"172.16.0.0/12",
+			"192.168.0.0/16",
+			"169.254.0.0/16",
+			"127.0.0.0/8",
+		}
+		for _, cidr := range privateRanges {
+			_, ipNet, _ := net.ParseCIDR(cidr)
+			if ipNet.Contains(ip) {
+				return true
+			}
+		}
+	} else {
+		// Check for private IPv6 ranges
+		privateRanges := []string{
+			"fc00::/7",  // Unique local addresses
+			"fe80::/10", // Link-local
+			"::1/128",   // Loopback
+		}
+		for _, cidr := range privateRanges {
+			_, ipNet, _ := net.ParseCIDR(cidr)
+			if ipNet.Contains(ip) {
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
+// ValidateCountryCode validates the ISO 3166-1 country code
+func ValidateCountryCode(entry *Entry, ctx *ValidationContext) {
+	if entry.CountryCode == "" {
+		return // Empty is allowed
+	}
+
+	if _, exists := ctx.Countries[entry.CountryCode]; !exists {
+		entry.AddStatusMessage(ErrCountryCodeInvalid)
+	}
+}
+
+// ValidateRegionCode validates the ISO 3166-2 region code
+func ValidateRegionCode(entry *Entry, ctx *ValidationContext) {
+	if entry.RegionCode == "" {
+		return // Empty is allowed
+	}
+
+	// Check format: COUNTRY-SUBDIVISION
+	regionPattern := regexp.MustCompile(`^[A-Z]{2}-[A-Z0-9]{1,3}$`)
+	if !regionPattern.MatchString(entry.RegionCode) {
+		entry.AddStatusMessage(ErrRegionCodeFormat)
+		return
+	}
+
+	// Check if region exists in ISO 3166-2
+	if _, exists := ctx.Regions[entry.RegionCode]; !exists {
+		entry.AddStatusMessage(ErrRegionCodeInvalid)
+		return
+	}
+
+	// Check if region's country matches the country code
+	if entry.CountryCode != "" {
+		regionCountry := strings.Split(entry.RegionCode, "-")[0]
+		if regionCountry != entry.CountryCode {
+			entry.AddStatusMessage(ErrRegionCodeMismatch)
+		}
+	}
+}
+
+// ValidateCityName validates the city name for inconsistencies
+func ValidateCityName(entry *Entry, ctx *ValidationContext) {
+	if entry.City == "" {
+		return // Empty is allowed
+	}
+
+	cityLower := strings.ToLower(strings.TrimSpace(entry.City))
+
+	// Check for placeholder values
+	for _, placeholder := range placeholderValues {
+		if cityLower == placeholder {
+			entry.AddStatusMessage(ErrCityPlaceholder)
+			return
+		}
+	}
+
+	// Check for abbreviated values
+	for _, abbrev := range abbreviatedValues {
+		if cityLower == abbrev {
+			entry.AddStatusMessage(ErrCityAbbreviated)
+			return
+		}
+	}
+
+	// Check for inconsistent formatting (very basic heuristic)
+	if strings.Contains(entry.City, "  ") || // Double spaces
+		(strings.ToUpper(entry.City) == entry.City && len(entry.City) > 3) || // ALL CAPS
+		regexp.MustCompile(`[A-Z][a-z]+[A-Z]`).MatchString(entry.City) { // HongKong style
+		entry.AddStatusMessage(WarnCityFormattingBad)
+	}
+}
+
+// ValidatePostalCode checks that postal codes are not included (deprecated by RFC 8805)
+func ValidatePostalCode(entry *Entry) {
+	if entry.PostalCode != "" {
+		entry.AddStatusMessage(ErrPostalCodeDeprecated)
+	}
+}

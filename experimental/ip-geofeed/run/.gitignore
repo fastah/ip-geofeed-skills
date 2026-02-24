@@ -1,0 +1,5 @@
+# Ignore all files in run directory (downloaded data, temporary files)
+*
+
+# Don't ignore this .gitignore file
+!.gitignore
