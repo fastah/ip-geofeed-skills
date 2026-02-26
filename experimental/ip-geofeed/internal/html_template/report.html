@@ -93,6 +93,44 @@
         input[type="checkbox"]:hover {
             transform: scale(1.1);
         }
+        /* Disabled checkbox with X effect */
+        input[type="checkbox"]:disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+            position: relative;
+        }
+        input[type="checkbox"]:disabled:hover {
+            transform: none;
+        }
+        /* Create X overlay on disabled checkbox */
+        .message-line input[type="checkbox"]:disabled {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #dc3545;
+            border-radius: 3px;
+            background-color: #dc3545;
+            position: relative;
+            cursor: not-allowed;
+        }
+        .message-line input[type="checkbox"]:disabled::before,
+        .message-line input[type="checkbox"]:disabled::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 10px;
+            height: 2px;
+            background-color: #ffffff;
+        }
+        .message-line input[type="checkbox"]:disabled::before {
+            transform: translate(-50%, -50%) rotate(45deg);
+        }
+        .message-line input[type="checkbox"]:disabled::after {
+            transform: translate(-50%, -50%) rotate(-45deg);
+        }
         #selectAll {
             width: 17px;
             height: 17px;
@@ -261,14 +299,14 @@
         .accuracy-summary-table .metrics-value {
             width: 35% !important;
         }
-        #filterCountry, #filterRegion, #filterCity, #filterStatus {
+        #filterCountry, #filterRegion, #filterCity, #filterStatus, #filterIpPrefix {
             box-sizing: border-box;
             font-family: 'Raleway', sans-serif;
         }
-        #filterCountry::placeholder, #filterRegion::placeholder, #filterCity::placeholder {
+        #filterCountry::placeholder, #filterRegion::placeholder, #filterCity::placeholder, #filterIpPrefix::placeholder {
             color: #aaa;
         }
-        #resetFilters:hover {
+        #resetFilters:hover, #toggleFilters:hover, #toggleExpandAll:hover, #downloadCSV:hover {
             background-color: #6a6a6a;
             border-color: #aaa;
         }
@@ -649,6 +687,64 @@
             outline: 2px solid #4a9eff;
             outline-offset: 2px;
         }
+        /* Pagination styles */
+        .pagination-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            padding: 15px 20px;
+            background-color: #f5f5f5;
+            border-radius: 8px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .pagination-info {
+            color: #333333;
+            font-size: 0.95em;
+        }
+        .pagination-controls {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+        .pagination-btn {
+            padding: 6px 12px;
+            border: 1px solid #888;
+            border-radius: 4px;
+            background-color: #5a5a5a;
+            color: #ffffff;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9em;
+            transition: background-color 0.2s;
+        }
+        .pagination-btn:hover:not(:disabled) {
+            background-color: #4a4a4a;
+        }
+        .pagination-btn:disabled {
+            background-color: #888;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+        .pagination-btn.active {
+            background-color: #1877ec;
+            border-color: #1877ec;
+        }
+        .page-size-selector {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .page-size-selector select {
+            padding: 5px 10px;
+            border: 1px solid #888;
+            border-radius: 4px;
+            background-color: #5a5a5a;
+            color: #ffffff;
+            font-size: 0.9em;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -769,27 +865,21 @@
                     </tr>
                     <tr>
                         <th colspan="7" style="background-color: #6b6b6b; padding: 8px;">
-                            <div style="display: flex; justify-content: space-between; gap: 10px; font-size: 0.9em;">
-                                <select id="filterStatus" style="padding: 5px 9px; border: 1px solid #888; border-radius: 3px; background-color: #5a5a5a; color: #ffffff; font-size: 1em; flex: 1;">
-                                    <option value="">Status</option>
-                                    <option value="ERROR">ERROR</option>
-                                    <option value="WARNING">WARNING</option>
-                                    <option value="SUGGESTION">SUGGESTION</option>
-                                    <option value="OK">OK</option>
-                                </select>
-                                <input type="text" id="filterCountry" placeholder="Country" style="padding: 5px 9px; border: 1px solid #888; border-radius: 3px; background-color: #5a5a5a; color: #ffffff; font-size: 1em; flex: 1;">
-                                <input type="text" id="filterRegion" placeholder="Region" style="padding: 5px 9px; border: 1px solid #888; border-radius: 3px; background-color: #5a5a5a; color: #ffffff; font-size: 1em; flex: 1;">
-                                <input type="text" id="filterCity" placeholder="City" style="padding: 5px 9px; border: 1px solid #888; border-radius: 3px; background-color: #5a5a5a; color: #ffffff; font-size: 1em; flex: 1;">
-                                <button id="resetFilters" style="padding: 5px 11px; border: 1px solid #888; border-radius: 3px; background-color: #5a5a5a; color: #ffffff; cursor: pointer; font-weight: 600; font-size: 1em;">Reset</button>
-                            </div>
-                        </th>
-                    </tr>
-                    <tr>
-                        <th colspan="7" style="background-color: #6b6b6b; padding: 8px;">
-                            <div style="display: flex; justify-content: flex-end; gap: 5px;">
-                                <button id="tuneAll" class="tune-all-btn" style="padding: 5px 11px; border: 1px solid #888; border-radius: 3px; background-color: #5a5a5a; color: #ffffff; cursor: pointer; font-weight: 600; font-size: 0.9em;">Tune All</button>
-                                <button id="showAll" style="padding: 5px 11px; border: 1px solid #888; border-radius: 3px; background-color: #5a5a5a; color: #ffffff; cursor: pointer; font-weight: 600; font-size: 0.9em;">Show All</button>
-                                <button id="hideAll" style="padding: 5px 11px; border: 1px solid #888; border-radius: 3px; background-color: #5a5a5a; color: #ffffff; cursor: pointer; font-weight: 600; font-size: 0.9em;">Hide All</button>
+                            <div style="display: flex; justify-content: space-between; gap: 5px;">
+                                <div style="display: flex; gap: 5px;">
+                                    <button id="toggleFilters" style="padding: 5px 11px; border: 1px solid #888; border-radius: 3px; background-color: #5a5a5a; color: #ffffff; cursor: pointer; font-weight: 600; font-size: 0.9em; width: 130px;">
+                                        <i class="bi bi-funnel-fill" style="margin-right: 5px;"></i>Show Filters
+                                    </button>
+                                    <button id="toggleExpandAll" style="padding: 5px 11px; border: 1px solid #888; border-radius: 3px; background-color: #5a5a5a; color: #ffffff; cursor: pointer; font-weight: 600; font-size: 0.9em; width: 145px;">
+                                        <i class="bi bi-arrows-expand" style="margin-right: 5px;"></i>Expand Rows
+                                    </button>
+                                    <button id="tuneAll" class="tune-all-btn" style="padding: 5px 11px; border: 1px solid #888; border-radius: 3px; background-color: #5a5a5a; color: #ffffff; cursor: pointer; font-weight: 600; font-size: 0.9em;">
+                                        <i class="bi bi-wrench" style="margin-right: 5px;"></i>Tune All
+                                    </button>
+                                </div>
+                                <button id="downloadCSV" style="padding: 5px 11px; border: 1px solid #888; border-radius: 3px; background-color: #5a5a5a; color: #ffffff; cursor: pointer; font-weight: 600; font-size: 0.9em;">
+                                    <i class="bi bi-filetype-csv" style="margin-right: 5px;"></i>Download
+                                </button>
                             </div>
                         </th>
                     </tr>
@@ -801,6 +891,32 @@
                         <th>Country</th>
                         <th>Region</th>
                         <th>City</th>
+                    </tr>
+                    <tr id="filterRow" style="background-color: #6b6b6b; display: none;">
+                        <th colspan="2" style="padding: 8px;">
+                            <button id="resetFilters" style="padding: 5px 11px; border: 1px solid #888; border-radius: 3px; background-color: #5a5a5a; color: #ffffff; cursor: pointer; font-weight: 600; font-size: 0.9em; width: 100%;">Reset</button>
+                        </th>
+                        <th style="padding: 8px;">
+                            <select id="filterStatus" style="padding: 5px 9px; border: 1px solid #888; border-radius: 3px; background-color: #5a5a5a; color: #ffffff; font-size: 0.9em; width: 100%;">
+                                <option value="">All</option>
+                                <option value="ERROR">ERROR</option>
+                                <option value="WARNING">WARNING</option>
+                                <option value="SUGGESTION">SUGGESTION</option>
+                                <option value="OK">OK</option>
+                            </select>
+                        </th>
+                        <th style="padding: 8px;">
+                            <input type="text" id="filterIpPrefix" placeholder="IP Prefix" style="padding: 5px 9px; border: 1px solid #888; border-radius: 3px; background-color: #5a5a5a; color: #ffffff; font-size: 0.9em; width: 100%; box-sizing: border-box;">
+                        </th>
+                        <th style="padding: 8px;">
+                            <input type="text" id="filterCountry" placeholder="Country" style="padding: 5px 9px; border: 1px solid #888; border-radius: 3px; background-color: #5a5a5a; color: #ffffff; font-size: 0.9em; width: 100%; box-sizing: border-box;">
+                        </th>
+                        <th style="padding: 8px;">
+                            <input type="text" id="filterRegion" placeholder="Region" style="padding: 5px 9px; border: 1px solid #888; border-radius: 3px; background-color: #5a5a5a; color: #ffffff; font-size: 0.9em; width: 100%; box-sizing: border-box;">
+                        </th>
+                        <th style="padding: 8px;">
+                            <input type="text" id="filterCity" placeholder="City" style="padding: 5px 9px; border: 1px solid #888; border-radius: 3px; background-color: #5a5a5a; color: #ffffff; font-size: 0.9em; width: 100%; box-sizing: border-box;">
+                        </th>
                     </tr>
                 </thead>
                 <tbody id="entriesTableBody">
@@ -845,7 +961,7 @@
                     {{range .Messages}}
                     <div class="message-line" data-id="{{.ID}}">
                         <span>{{.Text}}</span>
-                        <input type="checkbox"{{if .Checked}} checked{{end}}>
+                        <input type="checkbox"{{if .Checked}} checked{{else}} disabled{{end}}>
                     </div>
                     {{end}}
                 </td>
@@ -853,6 +969,38 @@
             {{end}}
         </tbody>
             </table>
+ 
+            <!-- Pagination Controls -->
+            <div class="pagination-container">
+                <div class="pagination-info">
+                    <span id="paginationInfo">Showing 0-0 of 0 rows</span>
+                </div>
+                <div class="pagination-controls">
+                    <button class="pagination-btn" id="firstPage" title="First Page">
+                        <i class="bi bi-chevron-bar-left"></i>
+                    </button>
+                    <button class="pagination-btn" id="prevPage" title="Previous Page">
+                        <i class="bi bi-chevron-left"></i>
+                    </button>
+                    <div id="pageNumbers" style="display: flex; gap: 5px;"></div>
+                    <button class="pagination-btn" id="nextPage" title="Next Page">
+                        <i class="bi bi-chevron-right"></i>
+                    </button>
+                    <button class="pagination-btn" id="lastPage" title="Last Page">
+                        <i class="bi bi-chevron-bar-right"></i>
+                    </button>
+                </div>
+                <div class="page-size-selector">
+                    <label for="pageSize" style="color: #333333; font-size: 0.9em;">Rows per page:</label>
+                    <select id="pageSize">
+                        <option value="10">10</option>
+                        <option value="25" selected>25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                        <option value="all">All</option>
+                    </select>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -893,52 +1041,16 @@
         let matchItems = [];
         let isModalOpen = false;
 
+        // Comment map: stores CSV comments by line number (TODO: Should be populated from GO)
+        const commentMap = {
+            1: "# Network geolocation data - Updated 2026",
+            2: "# IP Prefix,Country Code,Region Code,City"
+        };
+
         // Modal elements
         const modal = document.getElementById('locationModal');
         const modalContent = document.querySelector('.modal-content');
         const closeBtn = document.querySelector('.close');
-
-        // Hardcoded JSON data for metadata (Should be fixed)
-        const data = {
-            "input_file": "01-user-input-rfc8805-feed.csv",
-            "tuning_timestamp": "2026-02-05T23:25:36.487178+00:00",
-            "total_entries": 0,
-            "ipv4_entries": 0,
-            "ipv6_entries": 0,
-            "error_count": 0,
-            "warning_count": 0,
-            "ok_count": 0,
-            "city_level_accuracy": 0,
-            "region_level_accuracy": 0,
-            "country_level_accuracy": 0,
-            "do_not_geolocate_entries": 0
-        };
-
-        // Load metadata
-        function loadMetadata() {
-            document.getElementById('inputFileMetrics').textContent = data.input_file;
-            document.getElementById('tuningTimestamp').textContent = data.tuning_timestamp;
-            document.getElementById('totalEntriesMetrics').textContent = data.total_entries;
-            document.getElementById('ipv4EntriesMetrics').textContent = data.ipv4_entries;
-            document.getElementById('ipv6EntriesMetrics').textContent = data.ipv6_entries;
-            
-            // Calculate invalid entries from table
-            const invalidCount = document.querySelectorAll('.expandable-row[data-has-error="true"]').length;
-            document.getElementById('invalidEntriesMetrics').textContent = invalidCount;
-            
-            document.getElementById('errorCountMetrics').textContent = data.error_count;
-            document.getElementById('warningCountMetrics').textContent = data.warning_count;
-            
-            // Count suggestions from table
-            const suggestionCount = document.querySelectorAll('.expandable-row[data-has-suggestion="true"]').length;
-            document.getElementById('suggestionsMetrics').textContent = suggestionCount;
-            document.getElementById('okCountMetrics').textContent = data.ok_count;
-            
-            document.getElementById('cityAccuracy').textContent = data.city_level_accuracy;
-            document.getElementById('regionAccuracy').textContent = data.region_level_accuracy;
-            document.getElementById('countryAccuracy').textContent = data.country_level_accuracy;
-            document.getElementById('doNotGeolocate').textContent = data.do_not_geolocate_entries;
-        }
 
         // Modal functions
         closeBtn.onclick = function() {
@@ -1428,6 +1540,9 @@
                     row.classList.remove('show');
                 });
             }
+            
+            // Refresh pagination after mode change
+            updatePagination();
         }
 
         function toggleMode() {
@@ -1453,53 +1568,47 @@
             const regionFilter = document.getElementById('filterRegion').value.toLowerCase();
             const cityFilter = document.getElementById('filterCity').value.toLowerCase();
             const statusFilter = document.getElementById('filterStatus').value;
+            const ipPrefixFilter = document.getElementById('filterIpPrefix').value.toLowerCase();
             
-            const rows = document.querySelectorAll('.expandable-row');
+            const allExpandableRows = document.querySelectorAll('.expandable-row');
             
-            rows.forEach(row => {
+            // Filter rows and update allRows array
+            allRows = Array.from(allExpandableRows).filter(row => {
                 const cells = row.querySelectorAll('td');
-                if (cells.length <= CELL_INDEX.STATUS) return;
+                if (cells.length <= CELL_INDEX.STATUS) return false;
                 
                 const rowData = {
                     country: cells[CELL_INDEX.COUNTRY].textContent.toLowerCase(),
                     region: cells[CELL_INDEX.REGION].textContent.toLowerCase(),
                     city: cells[CELL_INDEX.CITY].textContent.toLowerCase(),
-                    status: cells[CELL_INDEX.STATUS].textContent
+                    status: cells[CELL_INDEX.STATUS].textContent,
+                    ipPrefix: cells[CELL_INDEX.IP_PREFIX].textContent.toLowerCase()
                 };
 
-                const matches = (
+                return (
                     (!countryFilter || rowData.country.includes(countryFilter)) &&
                     (!regionFilter || rowData.region.includes(regionFilter)) &&
                     (!cityFilter || rowData.city.includes(cityFilter)) &&
-                    (!statusFilter || rowData.status === statusFilter)
+                    (!statusFilter || rowData.status === statusFilter) &&
+                    (!ipPrefixFilter || rowData.ipPrefix.includes(ipPrefixFilter))
                 );
-
-                if (matches) {
-                    row.style.display = '';
-                    // Show all associated detail rows
-                    let nextRow = row.nextElementSibling;
-                    while (nextRow && nextRow.classList.contains('expand-details-row')) {
-                        // Only modify display if the row has the 'show' class (it was expanded)
-                        if (nextRow.classList.contains('show')) {
-                            nextRow.style.display = '';
-                        }
-                        nextRow = nextRow.nextElementSibling;
-                    }
-                } else {
-                    row.style.display = 'none';
-                    // Hide all associated detail rows
-                    let nextRow = row.nextElementSibling;
-                    while (nextRow && nextRow.classList.contains('expand-details-row')) {
-                        nextRow.style.display = 'none';
-                        nextRow = nextRow.nextElementSibling;
-                    }
-                }
             });
+            
+            // Reset to page 1 and update pagination
+            currentPage = 1;
+            updatePagination();
         }
+        
+        // Pagination state
+        let currentPage = 1;
+        let rowsPerPage = 25;
+        let allRows = [];
         
         // Initialize on page load
         window.addEventListener('DOMContentLoaded', function() {
-            loadMetadata();
+            // Initialize pagination
+            allRows = Array.from(document.querySelectorAll('.expandable-row'));
+            initializePagination();
             
             // Setup select all checkbox
             const selectAllCheckbox = document.getElementById('selectAll');
@@ -1548,16 +1657,37 @@
                             return;
                         }
                         let detailRow = this.nextElementSibling;
+                        let expanding = false;
+                        // First pass: check if we are expanding (issues-row will be shown)
+                        while (detailRow && detailRow.classList.contains('expand-details-row')) {
+                            if (detailRow.classList.contains('issues-row')) {
+                                expanding = !detailRow.classList.contains('show');
+                                break;
+                            }
+                            detailRow = detailRow.nextElementSibling;
+                        }
+                        detailRow = this.nextElementSibling;
                         while (detailRow && detailRow.classList.contains('expand-details-row')) {
                             if (detailRow.classList.contains('issues-row')) {
                                 // Always toggle issues-row
                                 detailRow.classList.toggle('show');
-                            } else if (detailRow.classList.contains('previous-values-row') && detailRow.classList.contains('show')) {
-                                // If previous-values-row is visible, collapse it
-                                detailRow.classList.remove('show');
+                            } else if (detailRow.classList.contains('previous-values-row')) {
+                                if (expanding) {
+                                    // Show previous-values-row if this row has original data (was tuned)
+                                    if (row.hasAttribute('data-original-country') || 
+                                        row.hasAttribute('data-original-region') || 
+                                        row.hasAttribute('data-original-city')) {
+                                        detailRow.classList.add('show');
+                                    }
+                                } else {
+                                    // If collapsing, hide previous-values-row
+                                    detailRow.classList.remove('show');
+                                }
                             }
                             detailRow = detailRow.nextElementSibling;
                         }
+                        // Refresh pagination to show/hide the toggled detail rows
+                        updatePagination();
                     });
                     
                     // Keyboard handler
@@ -1569,16 +1699,37 @@
                         if (e.key === 'Enter' || e.key === ' ') {
                             e.preventDefault();
                             let detailRow = this.nextElementSibling;
+                            let expanding = false;
+                            // First pass: check if we are expanding (issues-row will be shown)
+                            while (detailRow && detailRow.classList.contains('expand-details-row')) {
+                                if (detailRow.classList.contains('issues-row')) {
+                                    expanding = !detailRow.classList.contains('show');
+                                    break;
+                                }
+                                detailRow = detailRow.nextElementSibling;
+                            }
+                            detailRow = this.nextElementSibling;
                             while (detailRow && detailRow.classList.contains('expand-details-row')) {
                                 if (detailRow.classList.contains('issues-row')) {
                                     // Always toggle issues-row
                                     detailRow.classList.toggle('show');
-                                } else if (detailRow.classList.contains('previous-values-row') && detailRow.classList.contains('show')) {
-                                    // If previous-values-row is visible, collapse it
-                                    detailRow.classList.remove('show');
+                                } else if (detailRow.classList.contains('previous-values-row')) {
+                                    if (expanding) {
+                                        // Show previous-values-row if this row has original data (was tuned)
+                                        if (row.hasAttribute('data-original-country') || 
+                                            row.hasAttribute('data-original-region') || 
+                                            row.hasAttribute('data-original-city')) {
+                                            detailRow.classList.add('show');
+                                        }
+                                    } else {
+                                        // If collapsing, hide previous-values-row
+                                        detailRow.classList.remove('show');
+                                    }
                                 }
                                 detailRow = detailRow.nextElementSibling;
                             }
+                            // Refresh pagination to show/hide the toggled detail rows
+                            updatePagination();
                         }
                     });
                 } else {
@@ -1586,50 +1737,75 @@
                 }
             });
             
-            // Show All/Hide All buttons
-            document.getElementById('showAll').addEventListener('click', function() {
+            // Toggle Expand All button
+            let isExpanded = false;
+            document.getElementById('toggleExpandAll').addEventListener('click', function() {
                 const expandableRows = document.querySelectorAll('.expandable-row');
-                expandableRows.forEach(row => {
-                    const checkbox = row.querySelector('.row-checkbox');
-                    if (!checkbox || !checkbox.checked) return; // Only work on checked rows
-                    
-                    const hasError = row.getAttribute('data-has-error') === 'true';
-                    const hasWarning = row.getAttribute('data-has-warning') === 'true';
-                    const hasSuggestion = row.getAttribute('data-has-suggestion') === 'true';
-                    
-                    // Only expand rows with issues
-                    if (hasError || hasWarning || hasSuggestion) {
+                const button = document.getElementById('toggleExpandAll');
+                
+                if (!isExpanded) {
+                    // Show all
+                    expandableRows.forEach(row => {
+                        const checkbox = row.querySelector('.row-checkbox');
+                        if (!checkbox || !checkbox.checked) return; // Only work on checked rows
+                        
+                        const hasError = row.getAttribute('data-has-error') === 'true';
+                        const hasWarning = row.getAttribute('data-has-warning') === 'true';
+                        const hasSuggestion = row.getAttribute('data-has-suggestion') === 'true';
+                        
+                        // Only expand rows with issues
+                        if (hasError || hasWarning || hasSuggestion) {
+                            let detailRow = row.nextElementSibling;
+                            while (detailRow && detailRow.classList.contains('expand-details-row')) {
+                                // Show issues-row always
+                                if (detailRow.classList.contains('issues-row')) {
+                                    detailRow.classList.add('show');
+                                } else if (detailRow.classList.contains('previous-values-row')) {
+                                    // Show previous-values-row if this row has original data (was tuned)
+                                    if (row.hasAttribute('data-original-country') || 
+                                        row.hasAttribute('data-original-region') || 
+                                        row.hasAttribute('data-original-city')) {
+                                        detailRow.classList.add('show');
+                                    }
+                                }
+                                detailRow = detailRow.nextElementSibling;
+                            }
+                        }
+                    });
+                    button.innerHTML = '<i class="bi bi-arrows-collapse" style="margin-right: 5px;"></i>Collapse Rows';
+                    isExpanded = true;
+                } else {
+                    // Collapse all
+                    expandableRows.forEach(row => {
+                        const checkbox = row.querySelector('.row-checkbox');
+                        if (!checkbox || !checkbox.checked) return; // Only work on checked rows
+                        
                         let detailRow = row.nextElementSibling;
                         while (detailRow && detailRow.classList.contains('expand-details-row')) {
-                            // Show issues-row always
-                            if (detailRow.classList.contains('issues-row')) {
-                                detailRow.classList.add('show');
-                            } else if (detailRow.classList.contains('previous-values-row')) {
-                                // Show previous-values-row if this row has original data (was tuned)
-                                if (row.hasAttribute('data-original-country') || 
-                                    row.hasAttribute('data-original-region') || 
-                                    row.hasAttribute('data-original-city')) {
-                                    detailRow.classList.add('show');
-                                }
-                            }
+                            detailRow.classList.remove('show');
                             detailRow = detailRow.nextElementSibling;
                         }
-                    }
-                });
+                    });
+                    button.innerHTML = '<i class="bi bi-arrows-expand" style="margin-right: 5px;"></i>Expand Rows';
+                    isExpanded = false;
+                }
+                
+                // Refresh pagination to show expanded rows correctly
+                updatePagination();
             });
             
-            document.getElementById('hideAll').addEventListener('click', function() {
-                const expandableRows = document.querySelectorAll('.expandable-row');
-                expandableRows.forEach(row => {
-                    const checkbox = row.querySelector('.row-checkbox');
-                    if (!checkbox || !checkbox.checked) return; // Only work on checked rows
-                    
-                    let detailRow = row.nextElementSibling;
-                    while (detailRow && detailRow.classList.contains('expand-details-row')) {
-                        detailRow.classList.remove('show');
-                        detailRow = detailRow.nextElementSibling;
-                    }
-                });
+            // Toggle Filters button
+            document.getElementById('toggleFilters').addEventListener('click', function() {
+                const filterRow = document.getElementById('filterRow');
+                const button = document.getElementById('toggleFilters');
+                
+                if (filterRow.style.display === 'none') {
+                    filterRow.style.display = '';
+                    button.innerHTML = '<i class="bi bi-funnel-fill" style="margin-right: 5px;"></i>Hide Filters';
+                } else {
+                    filterRow.style.display = 'none';
+                    button.innerHTML = '<i class="bi bi-funnel-fill" style="margin-right: 5px;"></i>Show Filters';
+                }
             });
             
             // Tune All button
@@ -1697,6 +1873,10 @@
                 });
                 
                 console.log(`Applied tuned values to ${updatedCount} rows, skipped ${skippedCount} rows`);
+                
+                // Refresh pagination to update displayed values
+                updatePagination();
+                
                 alert(`Successfully updated ${updatedCount} rows (${skippedCount} rows skipped - not tunable or no tuned values available)`);
             });
             
@@ -1705,6 +1885,7 @@
             document.getElementById('filterRegion').addEventListener('input', filterTable);
             document.getElementById('filterCity').addEventListener('input', filterTable);
             document.getElementById('filterStatus').addEventListener('change', filterTable);
+            document.getElementById('filterIpPrefix').addEventListener('input', filterTable);
             
             // Reset filters button
             document.getElementById('resetFilters').addEventListener('click', function() {
@@ -1712,9 +1893,238 @@
                 document.getElementById('filterRegion').value = '';
                 document.getElementById('filterCity').value = '';
                 document.getElementById('filterStatus').value = '';
-                filterTable();
+                document.getElementById('filterIpPrefix').value = '';
+                
+                // Reset to all rows and update pagination
+                allRows = Array.from(document.querySelectorAll('.expandable-row'));
+                currentPage = 1;
+                updatePagination();
+            });
+            
+            // Download CSV button
+            document.getElementById('downloadCSV').addEventListener('click', function() {
+                const rows = document.querySelectorAll('.expandable-row');
+                const rowDataMap = {};
+                
+                // Collect all data rows with their line numbers
+                rows.forEach(row => {
+                    const cells = row.querySelectorAll('td');
+                    if (cells.length > CELL_INDEX.CITY) {
+                        const lineNum = parseInt(cells[CELL_INDEX.LINE].textContent.trim());
+                        const ipPrefix = cells[CELL_INDEX.IP_PREFIX].textContent.trim();
+                        const country = cells[CELL_INDEX.COUNTRY].textContent.trim();
+                        const region = cells[CELL_INDEX.REGION].textContent.trim();
+                        const city = cells[CELL_INDEX.CITY].textContent.trim();
+                        
+                        rowDataMap[lineNum] = [ipPrefix, country, region, city];
+                    }
+                });
+                
+                // Build CSV content with comments in the correct positions
+                const csvLines = [];
+                
+                // Find max line number
+                const allLineNumbers = Object.keys(rowDataMap).map(n => parseInt(n));
+                const maxLine = Math.max(...allLineNumbers);
+                
+                // Iterate through all line numbers from 1 to maxLine
+                for (let lineNum = 1; lineNum <= maxLine; lineNum++) {
+                    if (commentMap[lineNum]) {
+                        // This line is a comment
+                        csvLines.push(commentMap[lineNum]);
+                    } else if (rowDataMap[lineNum]) {
+                        // This line is a data row
+                        const row = rowDataMap[lineNum];
+                        const csvRow = row.map(cell => {
+                            // Escape quotes and wrap in quotes if contains comma, quote, or newline
+                            const cellStr = String(cell);
+                            if (cellStr.includes(',') || cellStr.includes('"') || cellStr.includes('\n')) {
+                                return '"' + cellStr.replace(/"/g, '""') + '"';
+                            }
+                            return cellStr;
+                        }).join(',');
+                        csvLines.push(csvRow);
+                    }
+                    // If neither comment nor data, skip the line (maintains original CSV structure)
+                }
+                
+                const csvContent = csvLines.join('\n');
+                
+                // Create download link
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                const url = URL.createObjectURL(blob);
+                
+                // Get filename from inputFileMetrics, ensure it has .csv extension
+                let filename = document.getElementById('inputFileMetrics').textContent.trim() || 'geofeed_report.csv';
+                if (!filename.toLowerCase().endsWith('.csv')) {
+                    filename += '.csv';
+                }
+                
+                link.setAttribute('href', url);
+                link.setAttribute('download', filename);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            });
+            
+            // Pagination event listeners
+            document.getElementById('pageSize').addEventListener('change', function() {
+                const value = this.value;
+                if (value === 'all') {
+                    rowsPerPage = allRows.length;
+                } else {
+                    rowsPerPage = parseInt(value);
+                }
+                currentPage = 1;
+                updatePagination();
+            });
+            
+            document.getElementById('firstPage').addEventListener('click', function() {
+                currentPage = 1;
+                updatePagination();
+            });
+            
+            document.getElementById('prevPage').addEventListener('click', function() {
+                if (currentPage > 1) {
+                    currentPage--;
+                    updatePagination();
+                }
+            });
+            
+            document.getElementById('nextPage').addEventListener('click', function() {
+                const totalPages = Math.ceil(allRows.length / rowsPerPage);
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    updatePagination();
+                }
+            });
+            
+            document.getElementById('lastPage').addEventListener('click', function() {
+                currentPage = Math.ceil(allRows.length / rowsPerPage);
+                updatePagination();
             });
         });
+        
+        // Pagination functions
+        function initializePagination() {
+            updatePagination();
+        }
+        
+        function updatePagination() {
+            const totalPages = Math.max(1, Math.ceil(allRows.length / rowsPerPage));
+            
+            // Ensure currentPage is within valid range
+            if (currentPage > totalPages) {
+                currentPage = totalPages;
+            }
+            if (currentPage < 1) {
+                currentPage = 1;
+            }
+            
+            const startIndex = (currentPage - 1) * rowsPerPage;
+            const endIndex = Math.min(startIndex + rowsPerPage, allRows.length);
+            
+            // Hide ALL expandable rows first (not just filtered ones)
+            const allExpandableRows = document.querySelectorAll('.expandable-row');
+            allExpandableRows.forEach(row => {
+                row.style.display = 'none';
+                // Hide associated detail rows
+                let nextRow = row.nextElementSibling;
+                while (nextRow && nextRow.classList.contains('expand-details-row')) {
+                    nextRow.style.display = 'none';
+                    nextRow = nextRow.nextElementSibling;
+                }
+            });
+            
+            // Show rows for current page
+            for (let i = startIndex; i < endIndex; i++) {
+                const row = allRows[i];
+                row.style.display = '';
+                // Show associated detail rows if they have 'show' class
+                let nextRow = row.nextElementSibling;
+                while (nextRow && nextRow.classList.contains('expand-details-row')) {
+                    if (nextRow.classList.contains('show')) {
+                        nextRow.style.display = '';
+                    }
+                    nextRow = nextRow.nextElementSibling;
+                }
+            }
+            
+            // Update pagination info
+            if (allRows.length === 0) {
+                document.getElementById('paginationInfo').textContent = 'Showing 0 of 0 rows';
+            } else {
+                document.getElementById('paginationInfo').textContent = 
+                    `Showing ${startIndex + 1}-${endIndex} of ${allRows.length} rows`;
+            }
+            
+            // Update button states
+            document.getElementById('firstPage').disabled = currentPage === 1 || allRows.length === 0;
+            document.getElementById('prevPage').disabled = currentPage === 1 || allRows.length === 0;
+            document.getElementById('nextPage').disabled = currentPage === totalPages || allRows.length === 0;
+            document.getElementById('lastPage').disabled = currentPage === totalPages || allRows.length === 0;
+            
+            // Update page numbers
+            updatePageNumbers(totalPages);
+        }
+        
+        function updatePageNumbers(totalPages) {
+            const pageNumbersContainer = document.getElementById('pageNumbers');
+            pageNumbersContainer.innerHTML = '';
+            
+            // Show max 5 page numbers with ellipsis
+            const maxVisible = 5;
+            let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+            let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+            
+            // Adjust if we're near the end
+            if (endPage - startPage < maxVisible - 1) {
+                startPage = Math.max(1, endPage - maxVisible + 1);
+            }
+            
+            // Add first page and ellipsis if needed
+            if (startPage > 1) {
+                addPageButton(1);
+                if (startPage > 2) {
+                    const ellipsis = document.createElement('span');
+                    ellipsis.textContent = '...';
+                    ellipsis.style.padding = '6px 8px';
+                    ellipsis.style.color = '#333';
+                    pageNumbersContainer.appendChild(ellipsis);
+                }
+            }
+            
+            // Add page numbers
+            for (let i = startPage; i <= endPage; i++) {
+                addPageButton(i);
+            }
+            
+            // Add ellipsis and last page if needed
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) {
+                    const ellipsis = document.createElement('span');
+                    ellipsis.textContent = '...';
+                    ellipsis.style.padding = '6px 8px';
+                    ellipsis.style.color = '#333';
+                    pageNumbersContainer.appendChild(ellipsis);
+                }
+                addPageButton(totalPages);
+            }
+        }
+        
+        function addPageButton(pageNum) {
+            const pageNumbersContainer = document.getElementById('pageNumbers');
+            const btn = document.createElement('button');
+            btn.className = 'pagination-btn' + (pageNum === currentPage ? ' active' : '');
+            btn.textContent = pageNum;
+            btn.addEventListener('click', function() {
+                currentPage = pageNum;
+                updatePagination();
+            });
+            pageNumbersContainer.appendChild(btn);
+        }
     </script>
 </body>
 </html>
