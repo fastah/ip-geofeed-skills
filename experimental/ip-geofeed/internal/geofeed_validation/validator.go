@@ -57,9 +57,10 @@ type Entry struct {
 	HasSuggestion  bool
 	DoNotGeolocate bool
 	GeocodingHint  string
-	DefaultCountry string
-	DefaultRegion  string
-	DefaultCity    string
+	TunedCountry   string
+	TunedRegion    string
+	TunedCity      string
+	Tunable        bool
 }
 
 // LoadValidationData loads ISO and territorial data from JSON files
@@ -139,6 +140,19 @@ func ValidateEntries(rows []parser.Row) ([]Entry, error) {
 	for i := range entries {
 		ValidateEntry(&entries[i], ctx)
 	}
+	return entries, nil
+}
+
+// ValidateAndTuneEntries validates entries and then applies tuning recommendations
+func ValidateAndTuneEntries(rows []parser.Row) ([]Entry, error) {
+	entries, err := ValidateEntries(rows)
+	if err != nil {
+		return nil, err
+	}
+
+	// Tune entries based on validation results and geocoding hints
+	TuneEntries(entries)
+
 	return entries, nil
 }
 

@@ -25,7 +25,7 @@ func main() {
 	}
 
 	// Validate entries
-	entries, err := geofeed_validation.ValidateEntries(rows)
+	entries, err := geofeed_validation.ValidateAndTuneEntries(rows)
 	if err != nil {
 		fmt.Printf("Error validating entries: %v\n", err)
 		os.Exit(1)

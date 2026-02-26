@@ -203,7 +203,18 @@
         </thead>
         <tbody id="entriesTableBody">
             {{range .Entries}}
-            <tr id="csv-r-{{.Line}}" class="expandable-row" data-geocoding-hint="{{.GeocodingHint}}" data-do-not-geolocate="{{.DoNotGeolocate}}" data-has-warning="{{.HasWarning}}" data-has-error="{{.HasError}}" data-has-suggestion="{{.HasSuggestion}}">
+            <tr
+             id="csv-r-{{.Line}}" 
+             class="expandable-row" 
+             data-geocoding-hint="{{.GeocodingHint}}" 
+             data-do-not-geolocate="{{.DoNotGeolocate}}" 
+             data-has-warning="{{.HasWarning}}" 
+             data-has-error="{{.HasError}}" 
+             data-has-suggestion="{{.HasSuggestion}}" 
+             data-tunable="{{.Tunable}}" 
+             data-tuned-country="{{.TunedCountry}}" 
+             data-tuned-region="{{.TunedRegion}}" 
+             data-tuned-city="{{.TunedCity}}">
                 <td>{{.Line}}</td>
                 <td>{{.IPPrefix}}</td>
                 <td>{{.CountryCode}}</td>
@@ -214,10 +225,10 @@
             <tr class="expand-details-row">
                 <td colspan="6">
                     <div class="default-values">
-                        <strong>Default values:</strong> 
-                        <span>Country: <span class="default-country">{{.DefaultCountry}}</span></span> | 
-                        <span>Region: <span class="default-region">{{.DefaultRegion}}</span></span> | 
-                        <span>City: <span class="default-city">{{.DefaultCity}}</span></span>
+                        <strong>Previous values:</strong> 
+                        <span>Country: <span class="default-country">{{.CountryCode}}</span></span> | 
+                        <span>Region: <span class="default-region">{{.RegionCode}}</span></span> | 
+                        <span>City: <span class="default-city">{{.City}}</span></span>
                     </div>
                     <div class="issues-header">
                         <strong>Issues:</strong>
@@ -766,53 +777,68 @@
             // Get all expandable rows
             const expandableRows = document.querySelectorAll('.expandable-row');
             
-            // Prepare API requests for all rows
-            const rowsData = [];
-            const rowElements = [];
+            let updatedCount = 0;
+            let skippedCount = 0;
             
             expandableRows.forEach(dataRow => {
-                const cells = dataRow.querySelectorAll('td');
-                if (cells.length <= CELL_INDEX.STATUS) return;
-                
-                const rowData = prepareRowForApi(dataRow);
-                if (rowData) {
-                    rowsData.push(rowData);
-                    rowElements.push(dataRow);
+                // Check if this row is tunable
+                const isTunable = dataRow.getAttribute('data-tunable') === 'true';
+                if (!isTunable) {
+                    skippedCount++;
+                    return;
                 }
-            });
-            
-            if (rowsData.length === 0) {
-                alert('No valid rows to tune');
-                return;
-            }
-            
-            console.log(`Calling API for ${rowsData.length} rows`);
-            
-            // Make API call with batch data
-            const apiResponse = await fetchPlaceMatches(rowsData);
-            
-            if (!apiResponse || !apiResponse.results) {
-                alert('Failed to get results from API');
-                return;
-            }
-            
-            // Apply first match from each result to corresponding row
-            let updatedCount = 0;
-            apiResponse.results.forEach((result, index) => {
-                if (result.matches && result.matches.length > 0) {
-                    const firstMatch = result.matches[0];
-                    const dataRow = rowElements[index];
-                    const detailsRow = dataRow.nextElementSibling;
-                    
-                    if (detailsRow && detailsRow.classList.contains('expand-details-row')) {
-                        updateRowWithMatchData(dataRow, detailsRow, firstMatch);
-                        updatedCount++;
+                
+                // Get tuned values from data attributes
+                const tunedCountry = dataRow.getAttribute('data-tuned-country');
+                const tunedRegion = dataRow.getAttribute('data-tuned-region');
+                const tunedCity = dataRow.getAttribute('data-tuned-city');
+                
+                // Skip if no tuned values available
+                if (!tunedCountry && !tunedRegion && !tunedCity) {
+                    skippedCount++;
+                    return;
+                }
+                
+                const cells = dataRow.querySelectorAll('td');
+                if (cells.length <= CELL_INDEX.STATUS) {
+                    skippedCount++;
+                    return;
+                }
+                
+                // Store original values if not already stored
+                if (!dataRow.hasAttribute('data-original-country')) {
+                    dataRow.setAttribute('data-original-country', cells[CELL_INDEX.COUNTRY].textContent);
+                    dataRow.setAttribute('data-original-region', cells[CELL_INDEX.REGION].textContent);
+                    dataRow.setAttribute('data-original-city', cells[CELL_INDEX.CITY].textContent);
+                }
+                
+                // Update cells with tuned values
+                if (tunedCountry) cells[CELL_INDEX.COUNTRY].textContent = tunedCountry;
+                if (tunedRegion) cells[CELL_INDEX.REGION].textContent = tunedRegion;
+                if (tunedCity) cells[CELL_INDEX.CITY].textContent = tunedCity;
+                
+                // Update default values display in details row
+                const detailsRow = dataRow.nextElementSibling;
+                if (detailsRow && detailsRow.classList.contains('expand-details-row')) {
+                    const defaultValuesDiv = detailsRow.querySelector('.default-values');
+                    if (defaultValuesDiv) {
+                        defaultValuesDiv.classList.add('show');
+                        
+                        const defaultCountry = detailsRow.querySelector('.default-country');
+                        const defaultRegion = detailsRow.querySelector('.default-region');
+                        const defaultCity = detailsRow.querySelector('.default-city');
+                        
+                        if (defaultCountry) defaultCountry.textContent = dataRow.getAttribute('data-original-country');
+                        if (defaultRegion) defaultRegion.textContent = dataRow.getAttribute('data-original-region');
+                        if (defaultCity) defaultCity.textContent = dataRow.getAttribute('data-original-city');
                     }
                 }
+                
+                updatedCount++;
             });
             
-            console.log(`Applied matches to ${updatedCount} rows`);
-            alert(`Successfully updated ${updatedCount} out of ${rowsData.length} rows`);
+            console.log(`Applied tuned values to ${updatedCount} rows, skipped ${skippedCount} rows`);
+            alert(`Successfully updated ${updatedCount} rows (${skippedCount} rows skipped - not tunable or no tuned values available)`);
         });
 
         // Filter functionality

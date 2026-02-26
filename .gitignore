@@ -7,6 +7,7 @@
 *.dll
 *.so
 *.dylib
+geofeed-validator
 
 # Test binary, built with `go test -c`
 *.test
