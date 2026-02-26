@@ -1,0 +1,1720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geofeed Tuner Report</title>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        body {
+            background-color: #adadad;
+            padding: 20px;
+            font-family: 'Raleway', sans-serif;
+        }
+        i[class*="bi"] {
+            font-weight: 700;
+            text-shadow: 0 0 0.3px currentColor;
+        }
+        .report-container {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 30px;
+            margin: 0 auto 20px auto;
+            max-width: 1400px;
+        }
+        .metadata {
+            background-color: #f0f0f0;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 30px;
+        }
+        .metadata h3 {
+            margin-bottom: 15px;
+            color: #333333;
+        }
+        .metadata-item {
+            display: inline-block;
+            margin-right: 40px;
+            margin-bottom: 10px;
+        }
+        .metadata-label {
+            font-weight: bold;
+            color: #696969;
+        }
+        .metadata-value {
+            color: #333333;
+        }
+        .status-badge {
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.75em;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            white-space: nowrap;
+            width: 150px;
+        }
+        .status-error {
+            background-color: #ff707f;
+            color: #ffffff;
+            border: 1px solid #ff707f;
+        }
+        .status-warning {
+            background-color: #ffdc73;
+            color: #000000;
+            border: 1px solid #ffdc73;
+        }
+        .status-suggestion {
+            background-color: #1877ec;
+            color: #ffffff;
+            border: 1px solid #1877ec;
+        }
+        .status-ok {
+            background-color: #28a745;
+            color: #ffffff;
+            border: 1px solid #28a745;
+        }
+        /* Checkbox styling */
+        input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            accent-color: #4a4a4a;
+            display: block;
+            margin: 0 auto;
+        }
+        input[type="checkbox"]:hover {
+            transform: scale(1.1);
+        }
+        #selectAll {
+            width: 17px;
+            height: 17px;
+        }
+        .entries-table td:first-child,
+        .entries-table th:first-child {
+            text-align: center;
+            vertical-align: middle;
+        }
+        .entries-table {
+            width: 100%;
+            border-collapse: collapse;
+            border-radius: 8px;
+            overflow: hidden;
+            table-layout: fixed;
+        }
+        .entries-table thead {
+            background-color: #4a4a4a;
+            color: white;
+        }
+        .entries-table th {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #d3d3d3;
+            font-weight: 600;
+            background-color: #6b6b6b;
+            color: #ffffff;
+        }
+        .entries-table td {
+            padding: 12px;
+            border: 1px solid #d3d3d3;
+            vertical-align: top;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+        .entries-table tbody tr:not(.expand-details-row) td:nth-child(3) {
+            text-align: center;
+            vertical-align: top;
+        }
+        .entries-table tbody tr:nth-child(odd) {
+            background-color: #f9f9f9;
+        }
+        .entries-table tbody tr:hover {
+            background-color: #f0f0f0;
+        }
+        .messages-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .messages-list li {
+            padding: 1px 0;
+            border-left: 3px solid #b0b0b0;
+            padding-left: 10px;
+            color: #696969;
+            font-size: 0.95em;
+        }
+        .region-suggestions {
+            background-color: #f0f0f0;
+            padding: 10px;
+            border-radius: 3px;
+            font-size: 0.95em;
+        }
+        .region-suggestion-item {
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #d3d3d3;
+        }
+        .region-suggestion-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            background-color: #f0f0f0;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #555555;
+            text-align: center;
+        }
+        .stat-card.error {
+            border-left-color: #666666;
+        }
+        .stat-card.warning {
+            border-left-color: #b0b0b0;
+        }
+        .stat-card.suggestion {
+            border-left-color: #808080;
+        }
+        .stat-card .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #333333;
+        }
+        .stat-card .stat-label {
+            font-size: 0.9em;
+            color: #696969;
+            margin-top: 5px;
+        }
+        h1 {
+            color: #ffffff;
+            margin-bottom: 10px;
+            margin-top: -30px;
+            margin-left: -30px;
+            margin-right: -30px;
+            border-bottom: none;
+            padding-bottom: 10px;
+            font-size: 3em;
+            font-weight: 700;
+            font-family: 'Raleway', sans-serif;
+            background: linear-gradient(135deg, #2a2a2a 0%, #4a4a4a 100%);
+            padding: 30px;
+            border-radius: 15px 15px 0 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        .input-file {
+            background-color: #f0f0f0;
+            padding: 10px;
+            border-radius: 3px;
+            word-break: break-all;
+            font-family: monospace;
+            font-size: 0.9em;
+            margin-bottom: 20px;
+        }
+        .metrics-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0 auto 20px auto;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .metrics-table td {
+            padding: 10px 15px;
+            border: 1px solid #d3d3d3;
+        }
+        .metrics-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .metrics-label {
+            font-weight: bold;
+            width: 30%;
+            background-color: #f0f0f0;
+        }
+        .metrics-value {
+            width: 70%;
+            color: #333333;
+        }
+        .metrics-table.feed-metadata .metrics-label {
+            width: 20%;
+        }
+        .metrics-table.feed-metadata .metrics-value {
+            width: 80%;
+        }
+        .accuracy-summary-table td {
+            width: auto !important;
+        }
+        .accuracy-summary-table .metrics-label {
+            width: 15% !important;
+        }
+        .accuracy-summary-table .metrics-value {
+            width: 35% !important;
+        }
+        #filterCountry, #filterRegion, #filterCity, #filterStatus {
+            box-sizing: border-box;
+            font-family: 'Raleway', sans-serif;
+        }
+        #filterCountry::placeholder, #filterRegion::placeholder, #filterCity::placeholder {
+            color: #aaa;
+        }
+        #resetFilters:hover {
+            background-color: #6a6a6a;
+            border-color: #aaa;
+        }
+        .custom-dropdown {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+        .dropdown-button {
+            width: 100%;
+            padding: 4px 5px;
+            border: 1px solid #d3d3d3;
+            border-radius: 3px;
+            background-color: white;
+            color: #333;
+            font-family: Raleway, sans-serif;
+            cursor: pointer;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9em;
+        }
+        .dropdown-button:hover {
+            background-color: #f9f9f9;
+        }
+        .dropdown-button:focus {
+            outline: 2px solid #4a90e2;
+            outline-offset: -1px;
+        }
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            background-color: white;
+            min-width: 100%;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            border: 1px solid #d3d3d3;
+            border-top: none;
+            border-radius: 0 0 3px 3px;
+            top: 100%;
+            left: 0;
+            right: 0;
+            padding: 0;
+            margin: 0;
+        }
+        .dropdown-menu.show {
+            display: block;
+        }
+        .dropdown-option {
+            padding: 6px 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 0.85em;
+        }
+        .dropdown-option:hover {
+            background-color: #f0f0f0;
+        }
+        .dropdown-option.focused {
+            background-color: #d0e8f0;
+            outline: 2px solid #4a90e2;
+            outline-offset: -2px;
+        }
+        .dropdown-option.selected {
+            background-color: #e8f4f8;
+            font-weight: 500;
+        }
+        .dropdown-option i {
+            margin-right: 8px;
+            color: #666;
+            width: 16px;
+            text-align: center;
+        }
+        .dropdown-option-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .dropdown-option-code {
+            font-weight: 600;
+            color: #333;
+            white-space: nowrap;
+        }
+        .dropdown-option-name {
+            color: #666;
+            font-size: 0.85em;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .dropdown-option-relevance {
+            margin-left: 8px;
+            color: #999;
+            font-size: 0.85em;
+            white-space: nowrap;
+        }
+        .expand-details-row {
+            display: none;
+        }
+        .expand-details-row.show {
+            display: table-row;
+        }
+        .expand-details-row td {
+            border-left: none;
+            border-right: none;
+        }
+        .expand-details-row td:first-child {
+            border-left: 1px solid #d3d3d3;
+            padding: 0;
+        }
+        .expand-details-row td:nth-child(2) {
+            padding: 0;
+        }
+        .expand-details-row td:last-child {
+            border-right: 1px solid #d3d3d3;
+        }
+        .previous-values-row td {
+            background-color: #f0f0f0;
+            font-style: italic;
+            color: #555;
+            padding: 8px 12px;
+            border-top: 1px solid #d3d3d3;
+            border-bottom: 1px solid #d3d3d3;
+        }
+        .previous-values-row td:first-child {
+            border-left: 1px solid #d3d3d3;
+        }
+        .previous-values-row td:last-child {
+            border-right: 1px solid #d3d3d3;
+        }
+        .issues-row td {
+            border-top: 1px solid #d3d3d3;
+            border-bottom: 1px solid #d3d3d3;
+        }
+        .expandable-row {
+            cursor: pointer;
+        }
+        .expandable-row:focus {
+            outline: 2px solid #4a9eff;
+            outline-offset: -2px;
+        }
+        .tune-all-btn {
+            display: none;
+            padding: 3px 8px;
+            border: 1px solid #888;
+            border-radius: 3px;
+            background-color: #5a5a5a;
+            color: #ffffff;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.8em;
+        }
+        body.tuning-mode .tune-all-btn {
+            display: inline;
+        }
+        .issues-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .message-line {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 5px 0;
+        }
+        .message-line input[type="checkbox"] {
+            display: none;
+        }
+        body.tuning-mode .message-line input[type="checkbox"] {
+            display: inline-block;
+        }
+        .message-line span {
+            flex: 1;
+            font-size: 0.98em;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+        }
+        .modal-content {
+            background-color: #ffffff;
+            margin: 50px auto;
+            padding: 0;
+            border: none;
+            width: 90%;
+            max-width: 1200px;
+            border-radius: 15px;
+            max-height: 90vh;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+        }
+        .modal-content h2 {
+            background-color: #4a4a4a;
+            color: #ffffff;
+            padding: 20px 25px;
+            margin: 0;
+            font-size: 1.3em;
+            font-weight: bold;
+            font-family: 'Raleway', sans-serif;
+            border-radius: 15px 15px 0 0;
+            position: relative;
+        }
+        .close {
+            color: #ffffff;
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 32px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 1;
+            transition: color 0.2s;
+        }
+        .close:hover,
+        .close:focus {
+            color: #ddd;
+        }
+        .matches-container {
+            margin-top: 0;
+            padding: 25px;
+            display: flex;
+            flex-wrap: nowrap;
+            gap: 15px;
+            justify-content: center;
+            overflow-x: auto;
+            background-color: #f5f5f5;
+            flex: 1;
+            overflow-y: auto;
+        }
+        .match-item {
+            flex: 1 1 0;
+            max-width: 350px;
+            min-width: 280px;
+            border: 2px solid #c0c0c0;
+            border-radius: 8px;
+            padding: 0;
+            background-color: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            cursor: pointer;
+            transition: all 0.2s;
+            overflow: hidden;
+        }
+        .match-item:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+            border-color: #4a9eff;
+            transform: translateY(-2px);
+        }
+        .match-item:active {
+            transform: translateY(0);
+        }
+        .match-item.selected {
+            border-color: #4a9eff;
+            border-width: 3px;
+            box-shadow: 0 0 15px rgba(74, 158, 255, 0.6);
+        }
+        .match-map {
+            height: 180px;
+            width: 100%;
+            margin: 0;
+            border: none;
+            border-radius: 0;
+        }
+        .match-info-container {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding: 12px;
+            background-color: #f0f0f0;
+        }
+        .match-header {
+            font-size: 22px;
+            font-weight: bold;
+            color: #333;
+            text-align: left;
+            font-family: 'Raleway', sans-serif;
+            line-height: 1.2;
+        }
+        .location-details {
+            font-size: 15px;
+            color: #666;
+        }
+        .location-details {
+            display: inline;
+        }
+        .location-details span {
+            margin-right: 15px;
+        }
+        .default-values {
+            display: none;
+            padding: 5px 0;
+            font-size: 13px;
+            margin-bottom: 10px;
+        }
+        .default-values.show {
+            display: block;
+        }
+        .mode-toggle-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.72em;
+        }
+        .mode-toggle {
+            position: relative;
+            width: 240px;
+            height: 32px;
+            background-color: #888;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 8px;
+        }
+        .mode-toggle:focus {
+            outline: 2px solid #4a9eff;
+            outline-offset: 2px;
+        }
+        .mode-toggle-text {
+            font-size: 0.85em;
+            font-weight: 600;
+            color: #cccccc;
+            z-index: 1;
+            transition: color 0.3s;
+            flex: 1;
+            text-align: center;
+        }
+        .mode-toggle-text.active {
+            color: #333333;
+        }
+        .mode-toggle-slider {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 116px;
+            height: 26px;
+            background-color: #ffffff;
+            border-radius: 13px;
+            transition: transform 0.3s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .mode-toggle.tuning .mode-toggle-slider {
+            transform: translateX(118px);
+        }
+        .mode-toggle-label {
+            font-weight: 600;
+            color: #ffffff;
+            font-size: 0.9em;
+        }
+        
+        /* Keyboard accessibility focus styles */
+        button:focus {
+            outline: 2px solid #4a9eff;
+            outline-offset: 2px;
+        }
+        input[type="text"]:focus,
+        select:focus {
+            outline: 2px solid #4a9eff;
+            outline-offset: 1px;
+        }
+        input[type="checkbox"]:focus {
+            outline: 2px solid #4a9eff;
+            outline-offset: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="report-container">
+        <h1>Geofeed Tuner Report<br><span style="font-size: 0.4em; font-weight: 700; display: block; margin-top: 10px;">RFC 8805 Validation & Recommendations</span></h1>
+        
+        <table class="metrics-table feed-metadata" style="margin-top: 30px; margin-bottom: 30px;">
+            <tr style="background-color: #6b6b6b;">
+                <td colspan="2" style="padding: 12px 15px; font-weight: bold; color: #ffffff; font-size: 1.1em; font-family: 'Raleway', sans-serif;">Feed Metadata</td>
+            </tr>
+            <tr>
+                <td class="metrics-label"><i class="bi bi-filetype-csv" style="margin-right: 8px;"></i>Input file</td>
+                <td class="metrics-value"><span id="inputFileMetrics">geolocation.csv</span></td>
+            </tr>
+            <tr>
+                <td class="metrics-label"><i class="bi bi-calendar-event-fill" style="margin-right: 8px;"></i>Tuning timestamp</td>
+                <td class="metrics-value"><span id="tuningTimestamp">2026-01-31T12:00:00.000000+00:00</span></td>
+            </tr>
+        </table>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+            <table class="metrics-table">
+                <tr style="background-color: #6b6b6b;">
+                    <td colspan="2" style="padding: 12px 15px; font-weight: bold; color: #ffffff; font-size: 1.1em; font-family: 'Raleway', sans-serif;">Entries</td>
+                </tr>
+                <tr>
+                    <td class="metrics-label"><i class="bi bi-list-ul" style="margin-right: 8px;"></i>Total entries</td>
+                    <td class="metrics-value"><span id="totalEntriesMetrics">0</span></td>
+                </tr>
+                <tr>
+                    <td class="metrics-label"><i class="bi bi-diagram-3-fill" style="margin-right: 8px;"></i>IPv4 entries</td>
+                    <td class="metrics-value"><span id="ipv4EntriesMetrics">0</span></td>
+                </tr>
+                <tr>
+                    <td class="metrics-label"><i class="bi bi-diagram-3-fill" style="margin-right: 8px;"></i>IPv6 entries</td>
+                    <td class="metrics-value"><span id="ipv6EntriesMetrics">0</span></td>
+                </tr>
+                <tr>
+                    <td class="metrics-label"><i class="bi bi-exclamation-circle-fill" style="margin-right: 8px;"></i>Invalid entries</td>
+                    <td class="metrics-value"><span id="invalidEntriesMetrics">0</span></td>
+                </tr>
+            </table>
+            
+            <table class="metrics-table">
+                <tr style="background-color: #6b6b6b;">
+                    <td colspan="2" style="padding: 12px 15px; font-weight: bold; color: #ffffff; font-size: 1.1em; font-family: 'Raleway', sans-serif;">Analysis Summary</td>
+                </tr>
+                <tr>
+                    <td class="metrics-label"><i class="bi bi-x-circle-fill" style="margin-right: 8px;"></i>Errors</td>
+                    <td class="metrics-value"><span id="errorCountMetrics">0</span></td>
+                </tr>
+                <tr>
+                    <td class="metrics-label"><i class="bi bi-exclamation-triangle-fill" style="margin-right: 8px;"></i>Warnings</td>
+                    <td class="metrics-value"><span id="warningCountMetrics">0</span></td>
+                </tr>
+                <tr>
+                    <td class="metrics-label"><i class="bi bi-lightbulb-fill" style="margin-right: 8px;"></i>Suggestions</td>
+                    <td class="metrics-value"><span id="suggestionsMetrics">0</span></td>
+                </tr>
+                <tr>
+                    <td class="metrics-label"><i class="bi bi-check-circle-fill" style="margin-right: 8px;"></i>OK </td>
+                    <td class="metrics-value"><span id="okCountMetrics">0</span></td>
+                </tr>
+            </table>
+        </div>
+        
+        <div style="margin-bottom: 40px;">
+            <table class="metrics-table accuracy-summary-table" style="margin-top: 0; margin-bottom: 0; table-layout: fixed; width: 100%;">
+                <colgroup>
+                    <col style="width: 20%;">
+                    <col style="width: 30%;">
+                    <col style="width: 20%;">
+                    <col style="width: 30%;">
+                </colgroup>
+                <tr style="background-color: #6b6b6b;">
+                    <td colspan="4" style="padding: 12px 15px; font-weight: bold; color: #ffffff; font-size: 1.1em; font-family: 'Raleway', sans-serif;">Accuracy Summary</td>
+                </tr>
+                <tr>
+                    <td class="metrics-label"><i class="bi bi-building-fill" style="margin-right: 8px;"></i>City-level accuracy</td>
+                    <td class="metrics-value"><span id="cityAccuracy">0</span></td>
+                    <td class="metrics-label"><i class="bi bi-map-fill" style="margin-right: 8px;"></i>Region-level accuracy</td>
+                    <td class="metrics-value"><span id="regionAccuracy">0</span></td>
+                </tr>
+                <tr>
+                    <td class="metrics-label"><i class="bi bi-globe-americas" style="margin-right: 8px;"></i>Country-level accuracy</td>
+                    <td class="metrics-value"><span id="countryAccuracy">0</span></td>
+                    <td class="metrics-label"><i class="bi bi-ban-fill" style="margin-right: 8px;"></i>Do-not-geolocate entries</td>
+                    <td class="metrics-value"><span id="doNotGeolocate">0</span></td>
+                </tr>
+            </table>
+        </div>
+
+        <div style="overflow-x: auto;">
+            <table class="entries-table">
+                <colgroup>
+                    <col style="width: 3%;">
+                    <col style="width: 5%;">
+                    <col style="width: 20%;">
+                    <col style="width: 24%;">
+                    <col style="width: 10%;">
+                    <col style="width: 19%;">
+                    <col style="width: 19%;">
+                </colgroup>
+                <thead>
+                    <tr style="background-color: #4a4a4a;">
+                        <th colspan="7" style="padding: 12px; font-weight: bold; color: #ffffff; font-size: 1.3em; font-family: 'Raleway', sans-serif;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span><i class="bi bi-list-ul" style="margin-right: 10px;"></i>Entries</span>
+                                <div class="mode-toggle-container">
+                                    <div class="mode-toggle" id="modeToggle" onclick="toggleMode()" tabindex="0" onkeydown="if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); toggleMode(); }">
+                                        <span class="mode-toggle-text active" id="viewingText">Viewing Mode</span>
+                                        <div class="mode-toggle-slider"></div>
+                                        <span class="mode-toggle-text" id="tuningText">Tuning Mode</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th colspan="7" style="background-color: #6b6b6b; padding: 8px;">
+                            <div style="display: flex; justify-content: space-between; gap: 10px; font-size: 0.9em;">
+                                <select id="filterStatus" style="padding: 5px 9px; border: 1px solid #888; border-radius: 3px; background-color: #5a5a5a; color: #ffffff; font-size: 1em; flex: 1;">
+                                    <option value="">Status</option>
+                                    <option value="ERROR">ERROR</option>
+                                    <option value="WARNING">WARNING</option>
+                                    <option value="SUGGESTION">SUGGESTION</option>
+                                    <option value="OK">OK</option>
+                                </select>
+                                <input type="text" id="filterCountry" placeholder="Country" style="padding: 5px 9px; border: 1px solid #888; border-radius: 3px; background-color: #5a5a5a; color: #ffffff; font-size: 1em; flex: 1;">
+                                <input type="text" id="filterRegion" placeholder="Region" style="padding: 5px 9px; border: 1px solid #888; border-radius: 3px; background-color: #5a5a5a; color: #ffffff; font-size: 1em; flex: 1;">
+                                <input type="text" id="filterCity" placeholder="City" style="padding: 5px 9px; border: 1px solid #888; border-radius: 3px; background-color: #5a5a5a; color: #ffffff; font-size: 1em; flex: 1;">
+                                <button id="resetFilters" style="padding: 5px 11px; border: 1px solid #888; border-radius: 3px; background-color: #5a5a5a; color: #ffffff; cursor: pointer; font-weight: 600; font-size: 1em;">Reset</button>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th colspan="7" style="background-color: #6b6b6b; padding: 8px;">
+                            <div style="display: flex; justify-content: flex-end; gap: 5px;">
+                                <button id="tuneAll" class="tune-all-btn" style="padding: 5px 11px; border: 1px solid #888; border-radius: 3px; background-color: #5a5a5a; color: #ffffff; cursor: pointer; font-weight: 600; font-size: 0.9em;">Tune All</button>
+                                <button id="showAll" style="padding: 5px 11px; border: 1px solid #888; border-radius: 3px; background-color: #5a5a5a; color: #ffffff; cursor: pointer; font-weight: 600; font-size: 0.9em;">Show All</button>
+                                <button id="hideAll" style="padding: 5px 11px; border: 1px solid #888; border-radius: 3px; background-color: #5a5a5a; color: #ffffff; cursor: pointer; font-weight: 600; font-size: 0.9em;">Hide All</button>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th><input type="checkbox" id="selectAll" checked></th>
+                        <th>Line</th>
+                        <th>Status</th>
+                        <th>IP Prefix</th>
+                        <th>Country</th>
+                        <th>Region</th>
+                        <th>City</th>
+                    </tr>
+                </thead>
+                <tbody id="entriesTableBody">
+            {{range .Entries}}
+            <tr
+             id="csv-r-{{.Line}}" 
+             class="expandable-row" 
+             data-geocoding-hint="{{.GeocodingHint}}" 
+             data-do-not-geolocate="{{.DoNotGeolocate}}" 
+             data-has-warning="{{.HasWarning}}" 
+             data-has-error="{{.HasError}}" 
+             data-has-suggestion="{{.HasSuggestion}}" 
+             data-tunable="{{.Tunable}}" 
+             data-tuned-country="{{.TunedCountry}}" 
+             data-tuned-region="{{.TunedRegion}}" 
+             data-tuned-city="{{.TunedCity}}">
+                <td><input type="checkbox" class="row-checkbox" checked></td>
+                <td>{{.Line}}</td>
+                <td><span class="status-badge status-{{if eq .Status "ERROR"}}error{{else if eq .Status "WARNING"}}warning{{else if eq .Status "SUGGESTION"}}suggestion{{else}}ok{{end}}"><i class="bi {{if eq .Status "ERROR"}}bi-x-circle-fill{{else if eq .Status "WARNING"}}bi-exclamation-triangle-fill{{else if eq .Status "SUGGESTION"}}bi-lightbulb-fill{{else}}bi-check-circle-fill{{end}}"></i>{{.Status}}</span></td>
+                <td><strong>{{.IPPrefix}}</strong></td>
+                <td>{{.CountryCode}}</td>
+                <td>{{.RegionCode}}</td>
+                <td>{{.City}}</td>
+            </tr>
+            <tr class="expand-details-row previous-values-row">
+                <td></td>
+                <td></td>
+                <td></td>
+                <td><strong>Previous values:</strong></td>
+                <td class="previous-value"><span class="default-country">{{.CountryCode}}</span></td>
+                <td class="previous-value"><span class="default-region">{{.RegionCode}}</span></td>
+                <td class="previous-value"><span class="default-city">{{.City}}</span></td>
+            </tr>
+            <tr class="expand-details-row issues-row">
+                <td></td>
+                <td></td>
+                <td colspan="5">
+                    <div class="issues-header">
+                        <strong>Issues:</strong>
+                        <button class="tune-all-btn" onclick="handleTuneButtonClick(this)">Tune</button>
+                    </div>
+                    {{range .Messages}}
+                    <div class="message-line" data-id="{{.ID}}">
+                        <span>{{.Text}}</span>
+                        <input type="checkbox"{{if .Checked}} checked{{end}}>
+                    </div>
+                    {{end}}
+                </td>
+            </tr>
+            {{end}}
+        </tbody>
+            </table>
+        </div>
+    </div>
+
+    
+    <div id="locationModal" class="modal" tabindex="-1">
+        <div class="modal-content" tabindex="0">
+            <h2>
+                <i class="bi bi-geo-alt" style="margin-right: 10px;"></i>Location Matches
+                <span class="close" tabindex="0">&times;</span>
+            </h2>
+            <div id="matchesList" class="matches-container"></div>
+        </div>
+    </div>
+
+    <script>
+        // Constants
+        const CELL_INDEX = {
+            CHECKBOX: 0,
+            LINE: 1,
+            STATUS: 2,
+            IP_PREFIX: 3,
+            COUNTRY: 4,
+            REGION: 5,
+            CITY: 6,
+            MESSAGES: 7
+        };
+        
+        const TIMING = {
+            MAP_INIT_DELAY: 100,
+            MODAL_FOCUS_DELAY: 150,
+            MAP_RESIZE_DELAY: 200
+        };
+
+        // Global state
+        let maps = {};
+        let currentTuningButton = null;
+        let selectedMatchIndex = 0;
+        let matchItems = [];
+        let isModalOpen = false;
+
+        // Modal elements
+        const modal = document.getElementById('locationModal');
+        const modalContent = document.querySelector('.modal-content');
+        const closeBtn = document.querySelector('.close');
+
+        // Hardcoded JSON data for metadata (Should be fixed)
+        const data = {
+            "input_file": "01-user-input-rfc8805-feed.csv",
+            "tuning_timestamp": "2026-02-05T23:25:36.487178+00:00",
+            "total_entries": 0,
+            "ipv4_entries": 0,
+            "ipv6_entries": 0,
+            "error_count": 0,
+            "warning_count": 0,
+            "ok_count": 0,
+            "city_level_accuracy": 0,
+            "region_level_accuracy": 0,
+            "country_level_accuracy": 0,
+            "do_not_geolocate_entries": 0
+        };
+
+        // Load metadata
+        function loadMetadata() {
+            document.getElementById('inputFileMetrics').textContent = data.input_file;
+            document.getElementById('tuningTimestamp').textContent = data.tuning_timestamp;
+            document.getElementById('totalEntriesMetrics').textContent = data.total_entries;
+            document.getElementById('ipv4EntriesMetrics').textContent = data.ipv4_entries;
+            document.getElementById('ipv6EntriesMetrics').textContent = data.ipv6_entries;
+            
+            // Calculate invalid entries from table
+            const invalidCount = document.querySelectorAll('.expandable-row[data-has-error="true"]').length;
+            document.getElementById('invalidEntriesMetrics').textContent = invalidCount;
+            
+            document.getElementById('errorCountMetrics').textContent = data.error_count;
+            document.getElementById('warningCountMetrics').textContent = data.warning_count;
+            
+            // Count suggestions from table
+            const suggestionCount = document.querySelectorAll('.expandable-row[data-has-suggestion="true"]').length;
+            document.getElementById('suggestionsMetrics').textContent = suggestionCount;
+            document.getElementById('okCountMetrics').textContent = data.ok_count;
+            
+            document.getElementById('cityAccuracy').textContent = data.city_level_accuracy;
+            document.getElementById('regionAccuracy').textContent = data.region_level_accuracy;
+            document.getElementById('countryAccuracy').textContent = data.country_level_accuracy;
+            document.getElementById('doNotGeolocate').textContent = data.do_not_geolocate_entries;
+        }
+
+        // Modal functions
+        closeBtn.onclick = function() {
+            closeModal();
+        };
+        
+        closeBtn.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                closeModal();
+            }
+        });
+
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                closeModal();
+            }
+        };
+
+        function closeModal() {
+            if (!isModalOpen) return;
+            
+            modal.style.display = 'none';
+            isModalOpen = false;
+            currentTuningButton = null;
+            document.body.style.overflow = '';
+            
+            Object.values(maps).forEach(map => {
+                if (map && map.remove) {
+                    map.remove();
+                }
+            });
+            maps = {};
+            matchItems = [];
+        }
+
+        // Modal keyboard navigation
+        modal.addEventListener('keydown', function(event) {
+            if (!isModalOpen) return;
+            
+            if (event.key === 'Escape' || event.key === 'Esc') {
+                event.preventDefault();
+                closeModal();
+                return;
+            }
+            
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                if (matchItems[selectedMatchIndex]) {
+                    matchItems[selectedMatchIndex].click();
+                }
+                return;
+            }
+            
+            if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+                event.preventDefault();
+                navigateMatches(-1);
+                return;
+            }
+            
+            if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+                event.preventDefault();
+                navigateMatches(1);
+                return;
+            }
+            
+            if (event.key === '+' || event.key === '=') {
+                event.preventDefault();
+                zoomCurrentMap(1);
+                return;
+            }
+            
+            if (event.key === '-' || event.key === '_') {
+                event.preventDefault();
+                zoomCurrentMap(-1);
+                return;
+            }
+        });
+
+        document.addEventListener('keydown', function(event) {
+            if ((event.key === 'Escape' || event.key === 'Esc') && isModalOpen) {
+                event.preventDefault();
+                closeModal();
+            }
+        });
+
+        function navigateMatches(direction) {
+            if (matchItems.length === 0) return;
+            
+            if (matchItems[selectedMatchIndex]) {
+                matchItems[selectedMatchIndex].classList.remove('selected');
+            }
+            
+            selectedMatchIndex = (selectedMatchIndex + direction + matchItems.length) % matchItems.length;
+            
+            if (matchItems[selectedMatchIndex]) {
+                matchItems[selectedMatchIndex].classList.add('selected');
+                matchItems[selectedMatchIndex].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            }
+        }
+
+        function zoomCurrentMap(direction) {
+            const mapId = `map-${selectedMatchIndex}`;
+            const map = maps[mapId];
+            if (map) {
+                const currentZoom = map.getZoom();
+                map.setZoom(currentZoom + direction);
+            }
+        }
+
+        // API functions
+        const API_ENDPOINT = 'https://mcp.fastah.ai/rest/geofeeds/place-search';
+
+        async function fetchPlaceMatches(rows) {
+            const MAX_BATCH_SIZE = 1000;
+            let allResults = [];
+            let batchCount = Math.ceil(rows.length / MAX_BATCH_SIZE);
+            let lastError = null;
+            
+            for (let i = 0; i < batchCount; i++) {
+                const batchRows = rows.slice(i * MAX_BATCH_SIZE, (i + 1) * MAX_BATCH_SIZE);
+                try {
+                    const response = await fetch(API_ENDPOINT, {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ rows: batchRows })
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`API request failed: ${response.status} ${response.statusText}`);
+                    }
+                    
+                    const data = await response.json();
+                    if (data && data.results) {
+                        allResults = allResults.concat(data.results);
+                    } else {
+                        lastError = 'No results in API response';
+                    }
+                } catch (error) {
+                    console.error('Error calling place search API:', error);
+                    lastError = error.message;
+                }
+            }
+            
+            if (allResults.length === 0 && lastError) {
+                alert(`Failed to fetch location data: ${lastError}`);
+                return null;
+            }
+            
+            return { results: allResults };
+        }
+
+        function prepareRowForApi(dataRow) {
+            const cells = dataRow.querySelectorAll('td');
+            if (cells.length <= CELL_INDEX.STATUS) return null;
+
+            const countryCode = cells[CELL_INDEX.COUNTRY].textContent.trim();
+            const regionCode = cells[CELL_INDEX.REGION].textContent.trim();
+            const cityName = cells[CELL_INDEX.CITY].textContent.trim();
+
+            if (!countryCode || !cityName) {
+                console.warn('Missing required data for API call', { countryCode, cityName });
+                return null;
+            }
+
+            return {
+                countryCode: countryCode,
+                regionCode: regionCode || '',
+                cityName: cityName,
+                maxResults: 10,
+                searchMode: 'auto'
+            };
+        }
+
+        async function handleTuneButtonClick(button) {
+            console.log('Tune button clicked for individual row');
+            
+            currentTuningButton = button;
+            
+            const issuesContainer = button.closest('td');
+            const checkedBoxes = issuesContainer.querySelectorAll('.message-line input[type="checkbox"]:checked');
+            
+            const selectedIssues = Array.from(checkedBoxes).map(cb => {
+                const messageLine = cb.closest('.message-line');
+                return {
+                    id: messageLine.getAttribute('data-id'),
+                    message: messageLine.querySelector('span').textContent
+                };
+            });
+            
+            console.log('Selected issues:', selectedIssues);
+            
+            if (selectedIssues.length === 0) {
+                alert('Please select at least one issue to tune.');
+                return;
+            }
+            
+            const detailsRow = button.closest('tr');
+            
+            // Find the data row - it's before the expand-details-rows
+            let dataRow = detailsRow.previousElementSibling;
+            while (dataRow && dataRow.classList.contains('expand-details-row')) {
+                dataRow = dataRow.previousElementSibling;
+            }
+            
+            if (!dataRow || !dataRow.classList.contains('expandable-row')) {
+                console.error('Could not find data row');
+                return;
+            }
+            
+            const rowData = prepareRowForApi(dataRow);
+            if (!rowData) {
+                alert('Missing required location data for API call');
+                return;
+            }
+            
+            console.log('Calling API with:', rowData);
+            
+            const apiResponse = await fetchPlaceMatches([rowData]);
+            
+            if (!apiResponse || !apiResponse.results || apiResponse.results.length === 0) {
+                alert('No results returned from API');
+                return;
+            }
+            
+            const result = apiResponse.results[0];
+            
+            if (result.message) {
+                console.warn('API message:', result.message);
+            }
+            
+            if (result.matches && result.matches.length > 0) {
+                showLocationPopup(result.matches, selectedIssues);
+            } else {
+                alert('No location matches found for this entry');
+            }
+        }
+
+        function showLocationPopup(matches, selectedIssues = []) {
+            if (!matches || matches.length === 0) {
+                console.warn('No matches to display');
+                return;
+            }
+            
+            console.log('Showing location popup with', matches.length, 'matches');
+            console.log('For issues:', selectedIssues);
+            
+            const matchesList = document.getElementById('matchesList');
+            matchesList.innerHTML = '';
+            
+            maps = {};
+            matchItems = [];
+            selectedMatchIndex = 0;
+
+            matches.forEach((match, index) => {
+                const matchItem = document.createElement('div');
+                matchItem.className = 'match-item';
+                if (index === 0) {
+                    matchItem.classList.add('selected');
+                }
+                const mapId = `map-${index}`;
+                
+                // Determine primary location text: city > region > country
+                let primaryLocation = match.name;
+                let locationType = 'City';
+                
+                if (!primaryLocation || primaryLocation.trim() === '') {
+                    primaryLocation = match.regionCode;
+                    locationType = 'Region';
+                }
+                
+                if (!primaryLocation || primaryLocation.trim() === '') {
+                    primaryLocation = match.countryCode;
+                    locationType = 'Country';
+                }
+                
+                // Build secondary info (show what's available)
+                let secondaryInfo = [];
+                if (match.name && locationType !== 'City') {
+                    secondaryInfo.push(`City: ${match.name}`);
+                }
+                if (match.regionCode && locationType !== 'Region') {
+                    secondaryInfo.push(`Region: ${match.regionCode}`);
+                }
+                if (match.countryCode && locationType !== 'Country') {
+                    secondaryInfo.push(`Country: ${match.countryCode}`);
+                }
+                    
+                matchItem.innerHTML = `
+                    <div id="${mapId}" class="match-map"></div>
+                    <div class="match-info-container">
+                        <div class="match-header">${primaryLocation}</div>
+                        ${secondaryInfo.length > 0 ? `<div class="location-details">${secondaryInfo.join(' • ')}</div>` : ''}
+                    </div>
+                `;
+                
+                matchItem.addEventListener('click', function() {
+                    selectLocationMatch(match);
+                });
+                
+                matchesList.appendChild(matchItem);
+                matchItems.push(matchItem);
+                
+                setTimeout(() => {
+                    initializeMapForMatch(mapId, match);
+                }, TIMING.MAP_INIT_DELAY);
+            });
+
+            modal.style.display = 'block';
+            isModalOpen = true;
+            document.body.style.overflow = 'hidden';
+            
+            setTimeout(() => {
+                if (modalContent) {
+                    modalContent.focus();
+                }
+            }, TIMING.MODAL_FOCUS_DELAY);
+        }
+
+        function selectLocationMatch(match) {
+            console.log('Selected match:', match);
+            
+            if (!currentTuningButton) {
+                console.error('No tuning button reference found');
+                return;
+            }
+            
+            const detailsRow = currentTuningButton.closest('tr');
+            
+            // Find the data row - it's before the expand-details-rows
+            let dataRow = detailsRow.previousElementSibling;
+            while (dataRow && dataRow.classList.contains('expand-details-row')) {
+                dataRow = dataRow.previousElementSibling;
+            }
+            
+            if (!dataRow || !dataRow.classList.contains('expandable-row')) {
+                console.error('Could not find data row');
+                return;
+            }
+            
+            updateRowWithMatchData(dataRow, match);
+            closeModal();
+        }
+        
+        function updateRowWithMatchData(dataRow, match) {
+            const cells = dataRow.querySelectorAll('td');
+            const currentCountry = cells[CELL_INDEX.COUNTRY].textContent;
+            const currentRegion = cells[CELL_INDEX.REGION].textContent;
+            const currentCity = cells[CELL_INDEX.CITY].textContent;
+            
+            if (!dataRow.hasAttribute('data-original-country')) {
+                dataRow.setAttribute('data-original-country', currentCountry);
+                dataRow.setAttribute('data-original-region', currentRegion);
+                dataRow.setAttribute('data-original-city', currentCity);
+            }
+            
+            cells[CELL_INDEX.COUNTRY].textContent = match.countryCode;
+            cells[CELL_INDEX.REGION].textContent = match.regionCode;
+            cells[CELL_INDEX.CITY].textContent = match.name;
+            
+            // Find the previous values row (it's the first expand-details-row after the data row)
+            const previousValuesRow = dataRow.nextElementSibling;
+            if (previousValuesRow && previousValuesRow.classList.contains('previous-values-row')) {
+                previousValuesRow.classList.add('show');
+                
+                const defaultCountry = previousValuesRow.querySelector('.default-country');
+                const defaultRegion = previousValuesRow.querySelector('.default-region');
+                const defaultCity = previousValuesRow.querySelector('.default-city');
+                
+                if (defaultCountry) defaultCountry.textContent = dataRow.getAttribute('data-original-country');
+                if (defaultRegion) defaultRegion.textContent = dataRow.getAttribute('data-original-region');
+                if (defaultCity) defaultCity.textContent = dataRow.getAttribute('data-original-city');
+            }
+        }
+
+        function initializeMapForMatch(mapId, match) {
+            console.log('Initializing map for:', mapId, match.name);
+            
+            try {
+                const mapInstance = L.map(mapId, {
+                    scrollWheelZoom: false,
+                    dragging: true,
+                    zoomControl: true
+                });
+                
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap',
+                    maxZoom: 19
+                }).addTo(mapInstance);
+
+                const bbox = match.boundingBox;
+                
+                if (bbox && bbox.length === 4) {
+                    const centerLat = (bbox[0] + bbox[2]) / 2;
+                    const centerLng = (bbox[1] + bbox[3]) / 2;
+                    
+                    const isPoint = (bbox[0] === bbox[2] && bbox[1] === bbox[3]);
+                    
+                    if (isPoint) {
+                        const offset = 0.05;
+                        const bounds = [
+                            [bbox[0] - offset, bbox[1] - offset], 
+                            [bbox[2] + offset, bbox[3] + offset]  
+                        ];
+                        
+                        L.rectangle(bounds, {
+                            color: '#dc3545',
+                            weight: 3,
+                            opacity: 1,
+                            fillColor: '#dc3545',
+                            fillOpacity: 0.2
+                        }).addTo(mapInstance);
+                        
+                        mapInstance.fitBounds(bounds, { padding: [30, 30] });
+                    } else {
+                        const bounds = [
+                            [bbox[0], bbox[1]], 
+                            [bbox[2], bbox[3]]  
+                        ];
+
+                        L.rectangle(bounds, {
+                            color: '#dc3545',
+                            weight: 3,
+                            opacity: 1,
+                            fillColor: '#dc3545',
+                            fillOpacity: 0.2
+                        }).addTo(mapInstance);
+                        
+                        mapInstance.fitBounds(bounds, { padding: [20, 20] });
+                    }
+
+                    L.marker([centerLat, centerLng]).addTo(mapInstance)
+                        .bindPopup(`<b>${match.name}</b><br>${match.regionCode}`);
+                    
+                    maps[mapId] = mapInstance;
+                    
+                    setTimeout(() => {
+                        mapInstance.invalidateSize();
+                    }, TIMING.MAP_RESIZE_DELAY);
+                } else {
+                    console.warn('Invalid or missing bounding box for match:', match.name);
+                }
+            } catch (error) {
+                console.error('Error initializing map:', error);
+            }
+        }
+
+        function setMode(mode) {
+            console.log('Mode set to:', mode);
+            const toggle = document.getElementById('modeToggle');
+            const viewingText = document.getElementById('viewingText');
+            const tuningText = document.getElementById('tuningText');
+            
+            if (mode === 'tuning') {
+                document.body.classList.add('tuning-mode');
+                toggle.classList.add('tuning');
+                viewingText.classList.remove('active');
+                tuningText.classList.add('active');
+                
+                // Only expand rows with issues
+                const expandableRows = document.querySelectorAll('.expandable-row');
+                expandableRows.forEach(row => {
+                    const hasError = row.getAttribute('data-has-error') === 'true';
+                    const hasWarning = row.getAttribute('data-has-warning') === 'true';
+                    const hasSuggestion = row.getAttribute('data-has-suggestion') === 'true';
+                    
+                    if (hasError || hasWarning || hasSuggestion) {
+                        let detailRow = row.nextElementSibling;
+                        while (detailRow && detailRow.classList.contains('expand-details-row')) {
+                            // Only show issues-row, not previous-values-row
+                            if (detailRow.classList.contains('issues-row')) {
+                                detailRow.classList.add('show');
+                            }
+                            detailRow = detailRow.nextElementSibling;
+                        }
+                    }
+                });
+            } else {
+                document.body.classList.remove('tuning-mode');
+                toggle.classList.remove('tuning');
+                viewingText.classList.add('active');
+                tuningText.classList.remove('active');
+                document.querySelectorAll('.expand-details-row').forEach(row => {
+                    row.classList.remove('show');
+                });
+            }
+        }
+
+        function toggleMode() {
+            const isTuning = document.body.classList.contains('tuning-mode');
+            setMode(isTuning ? 'viewing' : 'tuning');
+        }
+
+        // Helper function
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+        
+        // Filter functionality
+        function filterTable() {
+            const countryFilter = document.getElementById('filterCountry').value.toLowerCase();
+            const regionFilter = document.getElementById('filterRegion').value.toLowerCase();
+            const cityFilter = document.getElementById('filterCity').value.toLowerCase();
+            const statusFilter = document.getElementById('filterStatus').value;
+            
+            const rows = document.querySelectorAll('.expandable-row');
+            
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                if (cells.length <= CELL_INDEX.STATUS) return;
+                
+                const rowData = {
+                    country: cells[CELL_INDEX.COUNTRY].textContent.toLowerCase(),
+                    region: cells[CELL_INDEX.REGION].textContent.toLowerCase(),
+                    city: cells[CELL_INDEX.CITY].textContent.toLowerCase(),
+                    status: cells[CELL_INDEX.STATUS].textContent
+                };
+
+                const matches = (
+                    (!countryFilter || rowData.country.includes(countryFilter)) &&
+                    (!regionFilter || rowData.region.includes(regionFilter)) &&
+                    (!cityFilter || rowData.city.includes(cityFilter)) &&
+                    (!statusFilter || rowData.status === statusFilter)
+                );
+
+                if (matches) {
+                    row.style.display = '';
+                    // Show all associated detail rows
+                    let nextRow = row.nextElementSibling;
+                    while (nextRow && nextRow.classList.contains('expand-details-row')) {
+                        // Only modify display if the row has the 'show' class (it was expanded)
+                        if (nextRow.classList.contains('show')) {
+                            nextRow.style.display = '';
+                        }
+                        nextRow = nextRow.nextElementSibling;
+                    }
+                } else {
+                    row.style.display = 'none';
+                    // Hide all associated detail rows
+                    let nextRow = row.nextElementSibling;
+                    while (nextRow && nextRow.classList.contains('expand-details-row')) {
+                        nextRow.style.display = 'none';
+                        nextRow = nextRow.nextElementSibling;
+                    }
+                }
+            });
+        }
+        
+        // Initialize on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            loadMetadata();
+            
+            // Setup select all checkbox
+            const selectAllCheckbox = document.getElementById('selectAll');
+            const rowCheckboxes = document.querySelectorAll('.row-checkbox');
+            
+            selectAllCheckbox.addEventListener('change', function() {
+                rowCheckboxes.forEach(checkbox => {
+                    checkbox.checked = selectAllCheckbox.checked;
+                });
+            });
+            
+            // Update select all checkbox when individual checkboxes change
+            rowCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('click', function(e) {
+                    e.stopPropagation(); // Prevent row expansion when clicking checkbox
+                });
+                checkbox.addEventListener('keydown', function(e) {
+                    if (e.key === ' ' || e.key === 'Enter') {
+                        e.stopPropagation(); // Prevent row expansion when using keyboard on checkbox
+                    }
+                });
+                checkbox.addEventListener('change', function(e) {
+                    e.stopPropagation(); // Prevent row expansion when clicking checkbox
+                    const allChecked = Array.from(rowCheckboxes).every(cb => cb.checked);
+                    const noneChecked = Array.from(rowCheckboxes).every(cb => !cb.checked);
+                    selectAllCheckbox.checked = allChecked;
+                    selectAllCheckbox.indeterminate = !allChecked && !noneChecked;
+                });
+            });
+            
+            // Setup expandable rows
+            const expandableRows = document.querySelectorAll('.expandable-row');
+            expandableRows.forEach(row => {
+                const hasError = row.getAttribute('data-has-error') === 'true';
+                const hasWarning = row.getAttribute('data-has-warning') === 'true';
+                const hasSuggestion = row.getAttribute('data-has-suggestion') === 'true';
+                
+                // Only make rows with issues focusable
+                if (hasError || hasWarning || hasSuggestion) {
+                    row.setAttribute('tabindex', '0');
+                    
+                    // Click handler
+                    row.addEventListener('click', function(e) {
+                        // Don't expand if clicking on checkbox
+                        if (e.target.classList.contains('row-checkbox')) {
+                            return;
+                        }
+                        let detailRow = this.nextElementSibling;
+                        while (detailRow && detailRow.classList.contains('expand-details-row')) {
+                            if (detailRow.classList.contains('issues-row')) {
+                                // Always toggle issues-row
+                                detailRow.classList.toggle('show');
+                            } else if (detailRow.classList.contains('previous-values-row') && detailRow.classList.contains('show')) {
+                                // If previous-values-row is visible, collapse it
+                                detailRow.classList.remove('show');
+                            }
+                            detailRow = detailRow.nextElementSibling;
+                        }
+                    });
+                    
+                    // Keyboard handler
+                    row.addEventListener('keydown', function(e) {
+                        // Don't handle if focus is on checkbox
+                        if (document.activeElement.classList.contains('row-checkbox')) {
+                            return;
+                        }
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            let detailRow = this.nextElementSibling;
+                            while (detailRow && detailRow.classList.contains('expand-details-row')) {
+                                if (detailRow.classList.contains('issues-row')) {
+                                    // Always toggle issues-row
+                                    detailRow.classList.toggle('show');
+                                } else if (detailRow.classList.contains('previous-values-row') && detailRow.classList.contains('show')) {
+                                    // If previous-values-row is visible, collapse it
+                                    detailRow.classList.remove('show');
+                                }
+                                detailRow = detailRow.nextElementSibling;
+                            }
+                        }
+                    });
+                } else {
+                    row.style.cursor = 'default';
+                }
+            });
+            
+            // Show All/Hide All buttons
+            document.getElementById('showAll').addEventListener('click', function() {
+                const expandableRows = document.querySelectorAll('.expandable-row');
+                expandableRows.forEach(row => {
+                    const checkbox = row.querySelector('.row-checkbox');
+                    if (!checkbox || !checkbox.checked) return; // Only work on checked rows
+                    
+                    const hasError = row.getAttribute('data-has-error') === 'true';
+                    const hasWarning = row.getAttribute('data-has-warning') === 'true';
+                    const hasSuggestion = row.getAttribute('data-has-suggestion') === 'true';
+                    
+                    // Only expand rows with issues
+                    if (hasError || hasWarning || hasSuggestion) {
+                        let detailRow = row.nextElementSibling;
+                        while (detailRow && detailRow.classList.contains('expand-details-row')) {
+                            // Show issues-row always
+                            if (detailRow.classList.contains('issues-row')) {
+                                detailRow.classList.add('show');
+                            } else if (detailRow.classList.contains('previous-values-row')) {
+                                // Show previous-values-row if this row has original data (was tuned)
+                                if (row.hasAttribute('data-original-country') || 
+                                    row.hasAttribute('data-original-region') || 
+                                    row.hasAttribute('data-original-city')) {
+                                    detailRow.classList.add('show');
+                                }
+                            }
+                            detailRow = detailRow.nextElementSibling;
+                        }
+                    }
+                });
+            });
+            
+            document.getElementById('hideAll').addEventListener('click', function() {
+                const expandableRows = document.querySelectorAll('.expandable-row');
+                expandableRows.forEach(row => {
+                    const checkbox = row.querySelector('.row-checkbox');
+                    if (!checkbox || !checkbox.checked) return; // Only work on checked rows
+                    
+                    let detailRow = row.nextElementSibling;
+                    while (detailRow && detailRow.classList.contains('expand-details-row')) {
+                        detailRow.classList.remove('show');
+                        detailRow = detailRow.nextElementSibling;
+                    }
+                });
+            });
+            
+            // Tune All button
+            document.getElementById('tuneAll').addEventListener('click', async function() {
+                console.log('Global Tune All button clicked');
+                
+                const expandableRows = document.querySelectorAll('.expandable-row');
+                
+                let updatedCount = 0;
+                let skippedCount = 0;
+                
+                expandableRows.forEach(dataRow => {
+                    const checkbox = dataRow.querySelector('.row-checkbox');
+                    if (!checkbox || !checkbox.checked) {
+                        skippedCount++;
+                        return; // Only work on checked rows
+                    }
+                    
+                    const isTunable = dataRow.getAttribute('data-tunable') === 'true';
+                    if (!isTunable) {
+                        skippedCount++;
+                        return;
+                    }
+                    
+                    const tunedCountry = dataRow.getAttribute('data-tuned-country');
+                    const tunedRegion = dataRow.getAttribute('data-tuned-region');
+                    const tunedCity = dataRow.getAttribute('data-tuned-city');
+                    
+                    if (!tunedCountry && !tunedRegion && !tunedCity) {
+                        skippedCount++;
+                        return;
+                    }
+                    
+                    const cells = dataRow.querySelectorAll('td');
+                    if (cells.length <= CELL_INDEX.STATUS) {
+                        skippedCount++;
+                        return;
+                    }
+                    
+                    if (!dataRow.hasAttribute('data-original-country')) {
+                        dataRow.setAttribute('data-original-country', cells[CELL_INDEX.COUNTRY].textContent);
+                        dataRow.setAttribute('data-original-region', cells[CELL_INDEX.REGION].textContent);
+                        dataRow.setAttribute('data-original-city', cells[CELL_INDEX.CITY].textContent);
+                    }
+                    
+                    if (tunedCountry) cells[CELL_INDEX.COUNTRY].textContent = tunedCountry;
+                    if (tunedRegion) cells[CELL_INDEX.REGION].textContent = tunedRegion;
+                    if (tunedCity) cells[CELL_INDEX.CITY].textContent = tunedCity;
+                    
+                    // Find the previous values row
+                    const previousValuesRow = dataRow.nextElementSibling;
+                    if (previousValuesRow && previousValuesRow.classList.contains('previous-values-row')) {
+                        previousValuesRow.classList.add('show');
+                        
+                        const defaultCountry = previousValuesRow.querySelector('.default-country');
+                        const defaultRegion = previousValuesRow.querySelector('.default-region');
+                        const defaultCity = previousValuesRow.querySelector('.default-city');
+                        
+                        if (defaultCountry) defaultCountry.textContent = dataRow.getAttribute('data-original-country');
+                        if (defaultRegion) defaultRegion.textContent = dataRow.getAttribute('data-original-region');
+                        if (defaultCity) defaultCity.textContent = dataRow.getAttribute('data-original-city');
+                    }
+                    
+                    updatedCount++;
+                });
+                
+                console.log(`Applied tuned values to ${updatedCount} rows, skipped ${skippedCount} rows`);
+                alert(`Successfully updated ${updatedCount} rows (${skippedCount} rows skipped - not tunable or no tuned values available)`);
+            });
+            
+            // Add filter event listeners
+            document.getElementById('filterCountry').addEventListener('input', filterTable);
+            document.getElementById('filterRegion').addEventListener('input', filterTable);
+            document.getElementById('filterCity').addEventListener('input', filterTable);
+            document.getElementById('filterStatus').addEventListener('change', filterTable);
+            
+            // Reset filters button
+            document.getElementById('resetFilters').addEventListener('click', function() {
+                document.getElementById('filterCountry').value = '';
+                document.getElementById('filterRegion').value = '';
+                document.getElementById('filterCity').value = '';
+                document.getElementById('filterStatus').value = '';
+                filterTable();
+            });
+        });
+    </script>
+</body>
+</html>

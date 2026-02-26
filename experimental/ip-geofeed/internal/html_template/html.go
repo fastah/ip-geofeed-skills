@@ -11,7 +11,7 @@ import (
 // GenerateHTMLReport generates an HTML validation report from entries
 func GenerateHTMLReport(entries []geofeed_validation.Entry) error {
 	// Parse the template file
-	tmpl, err := template.ParseFiles("internal/html_template/entries.html")
+	tmpl, err := template.ParseFiles("internal/html_template/report.html")
 	if err != nil {
 		return fmt.Errorf("parsing template file: %w", err)
 	}
