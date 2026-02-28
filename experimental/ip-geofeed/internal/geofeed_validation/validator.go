@@ -176,10 +176,11 @@ func ValidateAndTuneEntries(rows []parser.Row) ([]Entry, error) {
 	return entries, nil
 }
 
-func GetMetadataFromEntries(entries []Entry, inputFile string) Metadata {
+func GetMetadataFromEntries(entries []Entry, inputFile string, invalidEntries int) Metadata {
 	metadata := Metadata{
-		InputFile: inputFile,
-		Timestamp: fmt.Sprintf("%s", time.Now().Format(time.RFC3339)),
+		InputFile:      inputFile,
+		Timestamp:      fmt.Sprintf("%s", time.Now().Format(time.RFC3339)),
+		InvalidEntries: invalidEntries,
 	}
 
 	for _, entry := range entries {
@@ -192,7 +193,6 @@ func GetMetadataFromEntries(entries []Entry, inputFile string) Metadata {
 		}
 
 		if entry.HasError {
-			metadata.InvalidEntries++
 			metadata.Errors++
 		} else if entry.HasWarning {
 			metadata.Warnings++

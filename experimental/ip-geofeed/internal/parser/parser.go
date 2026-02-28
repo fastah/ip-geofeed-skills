@@ -86,16 +86,16 @@ func resolveFilePath(fileSource string) (string, error) {
 }
 
 // ParseCSV reads and parses a CSV geofeed file from local path or URL
-func ParseCSV(fileSource string) ([]Row, map[int]string, error) {
+func ParseCSV(fileSource string) ([]Row, map[int]string, int, error) {
 	// Resolve file path (download from URL if necessary)
 	filepath, err := resolveFilePath(fileSource)
 	if err != nil {
-		return nil, nil, fmt.Errorf("resolving file path: %w", err)
+		return nil, nil, 0, fmt.Errorf("resolving file path: %w", err)
 	}
 
 	file, err := os.Open(filepath)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, 0, err
 	}
 	defer file.Close()
 
@@ -104,6 +104,7 @@ func ParseCSV(fileSource string) ([]Row, map[int]string, error) {
 	var rows []Row
 	comments := make(map[int]string)
 	lineNum := 0
+	invalidEntries := 0
 
 	for scanner.Scan() {
 		line := scanner.Text()
@@ -130,6 +131,7 @@ func ParseCSV(fileSource string) ([]Row, map[int]string, error) {
 
 		// Only accept rows with 4 or 5 columns
 		if len(record) < 4 || len(record) > 5 {
+			invalidEntries++
 			continue
 		}
 
@@ -147,7 +149,7 @@ func ParseCSV(fileSource string) ([]Row, map[int]string, error) {
 	}
 
 	if err := scanner.Err(); err != nil {
-		return nil, nil, err
+		return nil, nil, 0, err
 	}
-	return rows, comments, nil
+	return rows, comments, invalidEntries, nil
 }

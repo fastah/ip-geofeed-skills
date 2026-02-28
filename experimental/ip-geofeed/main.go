@@ -18,7 +18,7 @@ func main() {
 	csvFileSource := os.Args[1]
 
 	// Parse CSV
-	rows, comments, err := parser.ParseCSV(csvFileSource)
+	rows, comments, invalidEntries, err := parser.ParseCSV(csvFileSource)
 	if err != nil {
 		fmt.Printf("Error parsing CSV: %v\n", err)
 		os.Exit(1)
@@ -32,7 +32,7 @@ func main() {
 	}
 
 	// Meatadata summary
-	metadata := geofeed_validation.GetMetadataFromEntries(entries, csvFileSource)
+	metadata := geofeed_validation.GetMetadataFromEntries(entries, csvFileSource, invalidEntries)
 
 	// Generate HTML report
 	err = output.GenerateHTMLReport(entries, comments, metadata)
