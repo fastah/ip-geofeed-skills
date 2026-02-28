@@ -31,8 +31,11 @@ func main() {
 		os.Exit(1)
 	}
 
+	// Meatadata summary
+	metadata := geofeed_validation.GetMetadataFromEntries(entries, csvFileSource)
+
 	// Generate HTML report
-	err = output.GenerateHTMLReport(entries, comments)
+	err = output.GenerateHTMLReport(entries, comments, metadata)
 	if err != nil {
 		fmt.Printf("Error generating HTML report: %v\n", err)
 		os.Exit(1)

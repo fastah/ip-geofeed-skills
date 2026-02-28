@@ -10,7 +10,7 @@ import (
 )
 
 // GenerateHTMLReport generates an HTML validation report from entries
-func GenerateHTMLReport(entries []geofeed_validation.Entry, comments map[int]string) error {
+func GenerateHTMLReport(entries []geofeed_validation.Entry, comments map[int]string, metadata geofeed_validation.Metadata) error {
 	// Parse the template file
 	tmpl, err := template.ParseFiles("internal/html_template/report.html")
 	if err != nil {
@@ -25,9 +25,11 @@ func GenerateHTMLReport(entries []geofeed_validation.Entry, comments map[int]str
 	data := struct {
 		Entries  []geofeed_validation.Entry
 		Comments template.JS
+		Metadata geofeed_validation.Metadata
 	}{
 		Entries:  entries,
 		Comments: template.JS(commentsJson),
+		Metadata: metadata,
 	}
 
 	// Create output file

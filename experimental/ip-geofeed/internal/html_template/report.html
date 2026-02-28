@@ -757,11 +757,11 @@
             </tr>
             <tr>
                 <td class="metrics-label"><i class="bi bi-filetype-csv" style="margin-right: 8px;"></i>Input file</td>
-                <td class="metrics-value"><span id="inputFileMetrics">geolocation.csv</span></td>
+                <td class="metrics-value"><span id="inputFileMetrics">{{.Metadata.InputFile}}</span></td>
             </tr>
             <tr>
                 <td class="metrics-label"><i class="bi bi-calendar-event-fill" style="margin-right: 8px;"></i>Tuning timestamp</td>
-                <td class="metrics-value"><span id="tuningTimestamp">2026-01-31T12:00:00.000000+00:00</span></td>
+                <td class="metrics-value"><span id="tuningTimestamp">{{.Metadata.Timestamp}}</span></td>
             </tr>
         </table>
         
@@ -772,19 +772,19 @@
                 </tr>
                 <tr>
                     <td class="metrics-label"><i class="bi bi-list-ul" style="margin-right: 8px;"></i>Total entries</td>
-                    <td class="metrics-value"><span id="totalEntriesMetrics">0</span></td>
+                    <td class="metrics-value"><span id="totalEntriesMetrics">{{.Metadata.TotalEntries}}</span></td>
                 </tr>
                 <tr>
                     <td class="metrics-label"><i class="bi bi-diagram-3-fill" style="margin-right: 8px;"></i>IPv4 entries</td>
-                    <td class="metrics-value"><span id="ipv4EntriesMetrics">0</span></td>
+                    <td class="metrics-value"><span id="ipv4EntriesMetrics">{{.Metadata.IpV4Entries}}</span></td>
                 </tr>
                 <tr>
                     <td class="metrics-label"><i class="bi bi-diagram-3-fill" style="margin-right: 8px;"></i>IPv6 entries</td>
-                    <td class="metrics-value"><span id="ipv6EntriesMetrics">0</span></td>
+                    <td class="metrics-value"><span id="ipv6EntriesMetrics">{{.Metadata.IpV6Entries}}</span></td>
                 </tr>
                 <tr>
                     <td class="metrics-label"><i class="bi bi-exclamation-circle-fill" style="margin-right: 8px;"></i>Invalid entries</td>
-                    <td class="metrics-value"><span id="invalidEntriesMetrics">0</span></td>
+                    <td class="metrics-value"><span id="invalidEntriesMetrics">{{.Metadata.InvalidEntries}}</span></td>
                 </tr>
             </table>
             
@@ -794,19 +794,19 @@
                 </tr>
                 <tr>
                     <td class="metrics-label"><i class="bi bi-x-circle-fill" style="margin-right: 8px;"></i>Errors</td>
-                    <td class="metrics-value"><span id="errorCountMetrics">0</span></td>
+                    <td class="metrics-value"><span id="errorCountMetrics">{{.Metadata.Errors}}</span></td>
                 </tr>
                 <tr>
                     <td class="metrics-label"><i class="bi bi-exclamation-triangle-fill" style="margin-right: 8px;"></i>Warnings</td>
-                    <td class="metrics-value"><span id="warningCountMetrics">0</span></td>
+                    <td class="metrics-value"><span id="warningCountMetrics">{{.Metadata.Warnings}}</span></td>
                 </tr>
                 <tr>
                     <td class="metrics-label"><i class="bi bi-lightbulb-fill" style="margin-right: 8px;"></i>Suggestions</td>
-                    <td class="metrics-value"><span id="suggestionsMetrics">0</span></td>
+                    <td class="metrics-value"><span id="suggestionsMetrics">{{.Metadata.Suggestions}}</span></td>
                 </tr>
                 <tr>
                     <td class="metrics-label"><i class="bi bi-check-circle-fill" style="margin-right: 8px;"></i>OK </td>
-                    <td class="metrics-value"><span id="okCountMetrics">0</span></td>
+                    <td class="metrics-value"><span id="okCountMetrics">{{.Metadata.OK}}</span></td>
                 </tr>
             </table>
         </div>
@@ -824,15 +824,15 @@
                 </tr>
                 <tr>
                     <td class="metrics-label"><i class="bi bi-building-fill" style="margin-right: 8px;"></i>City-level accuracy</td>
-                    <td class="metrics-value"><span id="cityAccuracy">0</span></td>
+                    <td class="metrics-value"><span id="cityAccuracy">{{.Metadata.CityLevelAccuracy}}</span></td>
                     <td class="metrics-label"><i class="bi bi-map-fill" style="margin-right: 8px;"></i>Region-level accuracy</td>
-                    <td class="metrics-value"><span id="regionAccuracy">0</span></td>
+                    <td class="metrics-value"><span id="regionAccuracy">{{.Metadata.RegionLevelAccuracy}}</span></td>
                 </tr>
                 <tr>
                     <td class="metrics-label"><i class="bi bi-globe-americas" style="margin-right: 8px;"></i>Country-level accuracy</td>
-                    <td class="metrics-value"><span id="countryAccuracy">0</span></td>
+                    <td class="metrics-value"><span id="countryAccuracy">{{.Metadata.CountryLevelAccuracy}}</span></td>
                     <td class="metrics-label"><i class="bi bi-ban-fill" style="margin-right: 8px;"></i>Do-not-geolocate entries</td>
-                    <td class="metrics-value"><span id="doNotGeolocate">0</span></td>
+                    <td class="metrics-value"><span id="doNotGeolocate">{{.Metadata.DoNotGeolocate}}</span></td>
                 </tr>
             </table>
         </div>

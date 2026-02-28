@@ -8,6 +8,7 @@ import (
 	"os"
 	"regexp"
 	"strings"
+	"time"
 )
 
 var (
@@ -55,12 +56,31 @@ type Entry struct {
 	HasError       bool
 	HasWarning     bool
 	HasSuggestion  bool
+	IPVersion      string
 	DoNotGeolocate bool
 	GeocodingHint  string
 	TunedCountry   string
 	TunedRegion    string
 	TunedCity      string
 	Tunable        bool
+}
+
+// Metadata represents summary information
+type Metadata struct {
+	InputFile            string
+	Timestamp            string
+	TotalEntries         int
+	IpV4Entries          int
+	IpV6Entries          int
+	InvalidEntries       int
+	Errors               int
+	Warnings             int
+	Suggestions          int
+	OK                   int
+	CityLevelAccuracy    int
+	RegionLevelAccuracy  int
+	CountryLevelAccuracy int
+	DoNotGeolocate       int
 }
 
 // LoadValidationData loads ISO and territorial data from JSON files
@@ -156,6 +176,48 @@ func ValidateAndTuneEntries(rows []parser.Row) ([]Entry, error) {
 	return entries, nil
 }
 
+func GetMetadataFromEntries(entries []Entry, inputFile string) Metadata {
+	metadata := Metadata{
+		InputFile: inputFile,
+		Timestamp: fmt.Sprintf("%s", time.Now().Format(time.RFC3339)),
+	}
+
+	for _, entry := range entries {
+		metadata.TotalEntries++
+		switch entry.IPVersion {
+		case "IPv4":
+			metadata.IpV4Entries++
+		case "IPv6":
+			metadata.IpV6Entries++
+		}
+
+		if entry.HasError {
+			metadata.InvalidEntries++
+			metadata.Errors++
+		} else if entry.HasWarning {
+			metadata.Warnings++
+		} else if entry.HasSuggestion {
+			metadata.Suggestions++
+		} else {
+			metadata.OK++
+		}
+
+		if entry.City != "" {
+			metadata.CityLevelAccuracy++
+		} else if entry.RegionCode != "" {
+			metadata.RegionLevelAccuracy++
+		} else if entry.CountryCode != "" {
+			metadata.CountryLevelAccuracy++
+		}
+
+		if entry.DoNotGeolocate {
+			metadata.DoNotGeolocate++
+		}
+	}
+
+	return metadata
+}
+
 // ValidateEntry validates a single entry and populates its messages
 func ValidateEntry(entry *Entry, ctx *ValidationContext) {
 	// 1. IP Prefix validation
@@ -204,23 +266,25 @@ func ValidateIPPrefix(entry *Entry) {
 
 	// Normalize to CIDR notation
 	entry.IPPrefix = ipNet.String()
+	if ipNet.IP.To4() != nil {
+		entry.IPVersion = "IPv4"
+	} else {
+		entry.IPVersion = "IPv6"
+	}
 
 	// Check if it's a public address
-	ip := ipNet.IP
-	if IsPrivateAddress(ip) {
+	if IsPrivateAddress(ipNet.IP) {
 		entry.AddStatusMessage(ErrIPPrefixNonPublic)
 		return
 	}
 
 	// Check for overly large prefixes
-	if ip.To4() != nil {
-		// IPv4
+	if entry.IPVersion == "IPv4" {
 		ones, _ := ipNet.Mask.Size()
 		if ones < 24 {
 			entry.AddStatusMessage(WarnIPv4PrefixLarge)
 		}
-	} else {
-		// IPv6
+	} else { // IPv6
 		ones, _ := ipNet.Mask.Size()
 		if ones < 64 {
 			entry.AddStatusMessage(WarnIPv6PrefixLarge)
