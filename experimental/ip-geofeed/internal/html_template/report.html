@@ -1041,11 +1041,8 @@
         let matchItems = [];
         let isModalOpen = false;
 
-        // Comment map: stores CSV comments by line number (TODO: Should be populated from GO)
-        const commentMap = {
-            1: "# Network geolocation data - Updated 2026",
-            2: "# IP Prefix,Country Code,Region Code,City"
-        };
+        // Comment map: stores CSV comments by line number 
+        const commentMap = JSON.parse('{{.Comments}}');
 
         // Modal elements
         const modal = document.getElementById('locationModal');
@@ -1929,7 +1926,7 @@
                 
                 // Iterate through all line numbers from 1 to maxLine
                 for (let lineNum = 1; lineNum <= maxLine; lineNum++) {
-                    if (commentMap[lineNum]) {
+                    if (lineNum in commentMap) {
                         // This line is a comment
                         csvLines.push(commentMap[lineNum]);
                     } else if (rowDataMap[lineNum]) {
@@ -1956,7 +1953,12 @@
                 const url = URL.createObjectURL(blob);
                 
                 // Get filename from inputFileMetrics, ensure it has .csv extension
-                let filename = document.getElementById('inputFileMetrics').textContent.trim() || 'geofeed_report.csv';
+                let filename =
+                    document.getElementById('inputFileMetrics')
+                        .textContent
+                        .trim()
+                        .split(/[/\\]/)
+                        .pop() || 'geofeed_report.csv';
                 if (!filename.toLowerCase().endsWith('.csv')) {
                     filename += '.csv';
                 }

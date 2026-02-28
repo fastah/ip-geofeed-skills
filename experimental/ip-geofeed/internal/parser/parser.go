@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"bufio"
 	"encoding/csv"
 	"fmt"
 	"io"
@@ -85,41 +86,45 @@ func resolveFilePath(fileSource string) (string, error) {
 }
 
 // ParseCSV reads and parses a CSV geofeed file from local path or URL
-func ParseCSV(fileSource string) ([]Row, error) {
+func ParseCSV(fileSource string) ([]Row, map[int]string, error) {
 	// Resolve file path (download from URL if necessary)
 	filepath, err := resolveFilePath(fileSource)
 	if err != nil {
-		return nil, fmt.Errorf("resolving file path: %w", err)
+		return nil, nil, fmt.Errorf("resolving file path: %w", err)
 	}
 
 	file, err := os.Open(filepath)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	defer file.Close()
 
-	reader := csv.NewReader(file)
-	reader.TrimLeadingSpace = true
-	reader.FieldsPerRecord = -1
+	scanner := bufio.NewScanner(file)
 
 	var rows []Row
+	comments := make(map[int]string)
 	lineNum := 0
 
-	for {
-		record, err := reader.Read()
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			return nil, err
-		}
+	for scanner.Scan() {
+		line := scanner.Text()
+		trimmed := strings.TrimSpace(line)
 		lineNum++
 
-		// Skip empty lines and comments
-		if len(record) == 0 || (len(record) == 1 && strings.TrimSpace(record[0]) == "") {
+		// Store empty lines and comments
+		if trimmed == "" {
+			comments[lineNum] = line
 			continue
 		}
-		if len(record) > 0 && strings.HasPrefix(strings.TrimSpace(record[0]), "#") {
+		if strings.HasPrefix(trimmed, "#") {
+			comments[lineNum] = line
+			continue
+		}
+
+		// Parse CSV row from raw line
+		reader := csv.NewReader(strings.NewReader(line))
+		reader.TrimLeadingSpace = true
+		record, err := reader.Read()
+		if err != nil {
 			continue
 		}
 
@@ -140,5 +145,9 @@ func ParseCSV(fileSource string) ([]Row, error) {
 		}
 		rows = append(rows, row)
 	}
-	return rows, nil
+
+	if err := scanner.Err(); err != nil {
+		return nil, nil, err
+	}
+	return rows, comments, nil
 }

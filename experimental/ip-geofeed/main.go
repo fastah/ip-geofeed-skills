@@ -18,7 +18,7 @@ func main() {
 	csvFileSource := os.Args[1]
 
 	// Parse CSV
-	rows, err := parser.ParseCSV(csvFileSource)
+	rows, comments, err := parser.ParseCSV(csvFileSource)
 	if err != nil {
 		fmt.Printf("Error parsing CSV: %v\n", err)
 		os.Exit(1)
@@ -32,7 +32,7 @@ func main() {
 	}
 
 	// Generate HTML report
-	err = output.GenerateHTMLReport(entries)
+	err = output.GenerateHTMLReport(entries, comments)
 	if err != nil {
 		fmt.Printf("Error generating HTML report: %v\n", err)
 		os.Exit(1)
