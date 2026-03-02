@@ -1,6 +1,7 @@
 package html_template
 
 import (
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"os"
@@ -9,18 +10,26 @@ import (
 )
 
 // GenerateHTMLReport generates an HTML validation report from entries
-func GenerateHTMLReport(entries []geofeed_validation.Entry) error {
+func GenerateHTMLReport(entries []geofeed_validation.Entry, comments map[int]string, metadata geofeed_validation.Metadata) error {
 	// Parse the template file
-	tmpl, err := template.ParseFiles("internal/html_template/entries.html")
+	tmpl, err := template.ParseFiles("internal/html_template/report.html")
 	if err != nil {
 		return fmt.Errorf("parsing template file: %w", err)
+	}
+	commentsJson, err := json.Marshal(comments)
+	if err != nil {
+		return fmt.Errorf("marshaling comments to JSON: %w", err)
 	}
 
 	// Create the data structure to pass to the template
 	data := struct {
-		Entries []geofeed_validation.Entry
+		Entries  []geofeed_validation.Entry
+		Comments template.JS
+		Metadata geofeed_validation.Metadata
 	}{
-		Entries: entries,
+		Entries:  entries,
+		Comments: template.JS(commentsJson),
+		Metadata: metadata,
 	}
 
 	// Create output file

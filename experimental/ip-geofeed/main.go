@@ -18,21 +18,24 @@ func main() {
 	csvFileSource := os.Args[1]
 
 	// Parse CSV
-	rows, err := parser.ParseCSV(csvFileSource)
+	rows, comments, invalidEntries, err := parser.ParseCSV(csvFileSource)
 	if err != nil {
 		fmt.Printf("Error parsing CSV: %v\n", err)
 		os.Exit(1)
 	}
 
 	// Validate entries
-	entries, err := geofeed_validation.ValidateEntries(rows)
+	entries, err := geofeed_validation.ValidateAndTuneEntries(rows)
 	if err != nil {
 		fmt.Printf("Error validating entries: %v\n", err)
 		os.Exit(1)
 	}
 
+	// Meatadata summary
+	metadata := geofeed_validation.GetMetadataFromEntries(entries, csvFileSource, invalidEntries)
+
 	// Generate HTML report
-	err = output.GenerateHTMLReport(entries)
+	err = output.GenerateHTMLReport(entries, comments, metadata)
 	if err != nil {
 		fmt.Printf("Error generating HTML report: %v\n", err)
 		os.Exit(1)
