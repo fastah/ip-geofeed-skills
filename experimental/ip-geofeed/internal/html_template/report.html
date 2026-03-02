@@ -188,54 +188,6 @@
             color: #696969;
             font-size: 0.95em;
         }
-        .region-suggestions {
-            background-color: #f0f0f0;
-            padding: 10px;
-            border-radius: 3px;
-            font-size: 0.95em;
-        }
-        .region-suggestion-item {
-            margin-bottom: 8px;
-            padding-bottom: 8px;
-            border-bottom: 1px solid #d3d3d3;
-        }
-        .region-suggestion-item:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-            padding-bottom: 0;
-        }
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        .stat-card {
-            background-color: #f0f0f0;
-            padding: 15px;
-            border-radius: 5px;
-            border-left: 4px solid #555555;
-            text-align: center;
-        }
-        .stat-card.error {
-            border-left-color: #666666;
-        }
-        .stat-card.warning {
-            border-left-color: #b0b0b0;
-        }
-        .stat-card.suggestion {
-            border-left-color: #808080;
-        }
-        .stat-card .stat-value {
-            font-size: 2em;
-            font-weight: bold;
-            color: #333333;
-        }
-        .stat-card .stat-label {
-            font-size: 0.9em;
-            color: #696969;
-            margin-top: 5px;
-        }
         h1 {
             color: #ffffff;
             margin-bottom: 10px;
@@ -251,15 +203,6 @@
             padding: 30px;
             border-radius: 15px 15px 0 0;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-        }
-        .input-file {
-            background-color: #f0f0f0;
-            padding: 10px;
-            border-radius: 3px;
-            word-break: break-all;
-            font-family: monospace;
-            font-size: 0.9em;
-            margin-bottom: 20px;
         }
         .metrics-table {
             width: 100%;
@@ -309,104 +252,6 @@
         #resetFilters:hover, #toggleFilters:hover, #toggleExpandAll:hover, #downloadCSV:hover {
             background-color: #6a6a6a;
             border-color: #aaa;
-        }
-        .custom-dropdown {
-            position: relative;
-            display: inline-block;
-            width: 100%;
-        }
-        .dropdown-button {
-            width: 100%;
-            padding: 4px 5px;
-            border: 1px solid #d3d3d3;
-            border-radius: 3px;
-            background-color: white;
-            color: #333;
-            font-family: Raleway, sans-serif;
-            cursor: pointer;
-            text-align: left;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.9em;
-        }
-        .dropdown-button:hover {
-            background-color: #f9f9f9;
-        }
-        .dropdown-button:focus {
-            outline: 2px solid #4a90e2;
-            outline-offset: -1px;
-        }
-        .dropdown-menu {
-            display: none;
-            position: absolute;
-            background-color: white;
-            min-width: 100%;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-            max-height: 200px;
-            overflow-y: auto;
-            z-index: 1000;
-            border: 1px solid #d3d3d3;
-            border-top: none;
-            border-radius: 0 0 3px 3px;
-            top: 100%;
-            left: 0;
-            right: 0;
-            padding: 0;
-            margin: 0;
-        }
-        .dropdown-menu.show {
-            display: block;
-        }
-        .dropdown-option {
-            padding: 6px 8px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            border-bottom: 1px solid #f0f0f0;
-            font-size: 0.85em;
-        }
-        .dropdown-option:hover {
-            background-color: #f0f0f0;
-        }
-        .dropdown-option.focused {
-            background-color: #d0e8f0;
-            outline: 2px solid #4a90e2;
-            outline-offset: -2px;
-        }
-        .dropdown-option.selected {
-            background-color: #e8f4f8;
-            font-weight: 500;
-        }
-        .dropdown-option i {
-            margin-right: 8px;
-            color: #666;
-            width: 16px;
-            text-align: center;
-        }
-        .dropdown-option-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-        .dropdown-option-code {
-            font-weight: 600;
-            color: #333;
-            white-space: nowrap;
-        }
-        .dropdown-option-name {
-            color: #666;
-            font-size: 0.85em;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .dropdown-option-relevance {
-            margin-left: 8px;
-            color: #999;
-            font-size: 0.85em;
-            white-space: nowrap;
         }
         .expand-details-row {
             display: none;
@@ -602,8 +447,6 @@
         .location-details {
             font-size: 15px;
             color: #666;
-        }
-        .location-details {
             display: inline;
         }
         .location-details span {
@@ -744,6 +587,42 @@
             color: #ffffff;
             font-size: 0.9em;
             cursor: pointer;
+        }
+        /* Helper classes for common inline styles */
+        .table-header {
+            background-color: #6b6b6b;
+            padding: 12px 15px;
+            font-weight: bold;
+            color: #ffffff;
+            font-size: 1.1em;
+            font-family: 'Raleway', sans-serif;
+        }
+        .icon-spacer {
+            margin-right: 8px;
+        }
+        .flex-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .action-button {
+            padding: 5px 11px;
+            border: 1px solid #888;
+            border-radius: 3px;
+            background-color: #5a5a5a;
+            color: #ffffff;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+        .action-button:hover {
+            background-color: #6a6a6a;
+        }
+        .subtitle-span {
+            font-size: 0.4em;
+            font-weight: 700;
+            display: block;
+            margin-top: 10px;
         }
     </style>
 </head>
@@ -1212,7 +1091,6 @@
             const cityName = cells[CELL_INDEX.CITY].textContent.trim();
 
             if (!countryCode || !cityName) {
-                console.warn('Missing required data for API call', { countryCode, cityName });
                 return null;
             }
 
@@ -1226,8 +1104,6 @@
         }
 
         async function handleTuneButtonClick(button) {
-            console.log('Tune button clicked for individual row');
-            
             currentTuningButton = button;
             
             const issuesContainer = button.closest('td');
@@ -1240,8 +1116,6 @@
                     message: messageLine.querySelector('span').textContent
                 };
             });
-            
-            console.log('Selected issues:', selectedIssues);
             
             if (selectedIssues.length === 0) {
                 alert('Please select at least one issue to tune.');
@@ -1267,8 +1141,6 @@
                 return;
             }
             
-            console.log('Calling API with:', rowData);
-            
             const apiResponse = await fetchPlaceMatches([rowData]);
             
             if (!apiResponse || !apiResponse.results || apiResponse.results.length === 0) {
@@ -1277,10 +1149,6 @@
             }
             
             const result = apiResponse.results[0];
-            
-            if (result.message) {
-                console.warn('API message:', result.message);
-            }
             
             if (result.matches && result.matches.length > 0) {
                 showLocationPopup(result.matches, selectedIssues);
@@ -1291,12 +1159,8 @@
 
         function showLocationPopup(matches, selectedIssues = []) {
             if (!matches || matches.length === 0) {
-                console.warn('No matches to display');
                 return;
             }
-            
-            console.log('Showing location popup with', matches.length, 'matches');
-            console.log('For issues:', selectedIssues);
             
             const matchesList = document.getElementById('matchesList');
             matchesList.innerHTML = '';
@@ -1371,8 +1235,6 @@
         }
 
         function selectLocationMatch(match) {
-            console.log('Selected match:', match);
-            
             if (!currentTuningButton) {
                 console.error('No tuning button reference found');
                 return;
@@ -1427,8 +1289,6 @@
         }
 
         function initializeMapForMatch(mapId, match) {
-            console.log('Initializing map for:', mapId, match.name);
-            
             try {
                 const mapInstance = L.map(mapId, {
                     scrollWheelZoom: false,
@@ -1490,8 +1350,6 @@
                     setTimeout(() => {
                         mapInstance.invalidateSize();
                     }, TIMING.MAP_RESIZE_DELAY);
-                } else {
-                    console.warn('Invalid or missing bounding box for match:', match.name);
                 }
             } catch (error) {
                 console.error('Error initializing map:', error);
@@ -1499,7 +1357,6 @@
         }
 
         function setMode(mode) {
-            console.log('Mode set to:', mode);
             const toggle = document.getElementById('modeToggle');
             const viewingText = document.getElementById('viewingText');
             const tuningText = document.getElementById('tuningText');
@@ -1807,8 +1664,6 @@
             
             // Tune All button
             document.getElementById('tuneAll').addEventListener('click', async function() {
-                console.log('Global Tune All button clicked');
-                
                 const expandableRows = document.querySelectorAll('.expandable-row');
                 
                 let updatedCount = 0;
@@ -1868,8 +1723,6 @@
                     
                     updatedCount++;
                 });
-                
-                console.log(`Applied tuned values to ${updatedCount} rows, skipped ${skippedCount} rows`);
                 
                 // Refresh pagination to update displayed values
                 updatePagination();
