@@ -1,0 +1,333 @@
+[
+  {
+    "geofeed": "https://www.vernet.lv/geofeed.csv",
+    "inetnum": "185.118.76.0 - 185.118.79.255",
+    "source": "RIPE",
+    "netname": "LV-VERNET-20150921",
+    "country": "LV",
+    "org": "ORG-VL1-RIPE",
+    "admin-c": "DUMY-RIPE",
+    "tech-c": "DUMY-RIPE",
+    "mnt-by": "RIPE-NCC-HM-MNT; LV-VERNET-HM-MNT"
+  },
+  {
+    "geofeed": "https://www.in-berlin.de/geofeed.csv",
+    "inetnum": "2a0a:4580::/29",
+    "source": "RIPE",
+    "netname": "DE-IN-BERLIN-20161115",
+    "country": "DE",
+    "org": "ORG-INBE3-RIPE",
+    "admin-c": "DUMY-RIPE",
+    "tech-c": "DUMY-RIPE",
+    "mnt-by": "RIPE-NCC-HM-MNT; IN-BERLIN-MNT"
+  },
+  {
+    "geofeed": "https://geofeed.bahnhof.net/geofeed.csv",
+    "inetnum": "2001:9b2:c000::/34",
+    "source": "RIPE",
+    "netname": "BAHNHOF-DE",
+    "country": "DE",
+    "admin-c": "DUMY-RIPE",
+    "tech-c": "DUMY-RIPE",
+    "mnt-by": "BAHNHOF-NCC"
+  },
+  {
+    "geofeed": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTM1c5r-jwdMI7yktnR0V_0EbCbfuCPqdOdUTDXe30DE_W28r07zH0kBJbnwRMhtRJGeR7VGRQQwhc3/pub?output=csv",
+    "inetnum": "65.110.160.0 - 65.110.191.255"
+  },
+  {
+    "geofeed": "https://www.forcepoint.com/geofeed/rfc-8805.csv",
+    "inetnum": "85.115.38.0 - 85.115.38.255",
+    "source": "RIPE",
+    "netname": "Forcepoint-Cloud",
+    "country": "SE",
+    "admin-c": "DUMY-RIPE",
+    "tech-c": "DUMY-RIPE",
+    "mnt-by": "BST-NOC"
+  },
+  {
+    "geofeed": "https://resource.net.strath.ac.uk/geo/unistrath.csv",
+    "inetnum": "2001:630:41::/48",
+    "source": "RIPE",
+    "netname": "UNI-STRATHCLYDE",
+    "country": "GB",
+    "admin-c": "DUMY-RIPE",
+    "tech-c": "DUMY-RIPE",
+    "mnt-by": "JANET-HOSTMASTER"
+  },
+  {
+    "geofeed": "https://geolocation.gtt.net/gtt_geolocation.csv",
+    "inetnum": "2a00:1750::/32",
+    "source": "RIPE",
+    "netname": "US-GTTCOMMUNICATIONS-20091127",
+    "country": "DE",
+    "org": "ORG-GCI2-RIPE",
+    "admin-c": "DUMY-RIPE",
+    "tech-c": "DUMY-RIPE",
+    "mnt-by": "AS3257-ROOT-MNT; RIPE-NCC-HM-MNT"
+  },
+  {
+    "geofeed": "https://noc.ilan.net.il/GGC/iucc-geo-feed-for-google.csv",
+    "inetnum": "2001:bf8::/32",
+    "source": "RIPE",
+    "netname": "IL-IUCC-20030508",
+    "country": "IL",
+    "org": "ORG-IIIC1-RIPE",
+    "admin-c": "DUMY-RIPE",
+    "tech-c": "DUMY-RIPE",
+    "mnt-by": "RIPE-NCC-HM-MNT; AS378-MNT"
+  },
+  {
+    "geofeed": "https://media.bezeqint.net/geofeed.csv",
+    "inetnum": "84.111.144.0 - 84.111.207.255",
+    "source": "RIPE",
+    "netname": "IL-BEZEQ-INTERNATIONAL-20040510",
+    "country": "IL",
+    "org": "ORG-IL9-RIPE",
+    "admin-c": "DUMY-RIPE",
+    "tech-c": "DUMY-RIPE",
+    "mnt-by": "RIPE-NCC-HM-MNT; AS8551-MNT"
+  },
+  {
+    "geofeed": "http://geofeed.dk.telia.net/geofeed.csv",
+    "inetnum": "2001:2092::/32",
+    "source": "RIPE",
+    "netname": "DK-TELIANET",
+    "country": "DK",
+    "org": "ORG-TCA24-RIPE",
+    "admin-c": "DUMY-RIPE",
+    "tech-c": "DUMY-RIPE",
+    "mnt-by": "TELIANET-LIR"
+  },
+  {
+    "geofeed": "https://redcom.ru/geo/redcom-geo.csv",
+    "inetnum": "91.235.148.0 - 91.235.148.255",
+    "source": "RIPE",
+    "netname": "RU-REDCOM-20191111",
+    "country": "RU",
+    "org": "ORG-RA23-RIPE",
+    "admin-c": "DUMY-RIPE",
+    "tech-c": "DUMY-RIPE",
+    "mnt-by": "REDCOM-MNT; RIPE-NCC-HM-MNT"
+  },
+  {
+    "geofeed": "https://assets.ip-only.net/documents/geoipfeed/AS12552.csv",
+    "inetnum": "146.247.177.182 - 146.247.177.182",
+    "source": "RIPE",
+    "netname": "NO-FASTHOST-20100218",
+    "country": "DK",
+    "org": "ORG-FA9-RIPE",
+    "admin-c": "DUMY-RIPE",
+    "tech-c": "DUMY-RIPE",
+    "mnt-by": "IP-ONLY-MNT"
+  },
+  {
+    "geofeed": "https://geofeed.telstraglobal.net/geofeed.csv",
+    "inetnum": "2403:e800:f00::/40",
+    "source": "APNIC",
+    "netname": "TELSTRAGLOBAL",
+    "country": "TW",
+    "admin-c": "TI55-AP",
+    "tech-c": "TI54-AP",
+    "mnt-by": "MAINT-HK-TI"
+  },
+  {
+    "geofeed": "https://lg.telia.net/ripe/AS25400_geofeed.csv",
+    "inetnum": "2a00:a240::/29",
+    "source": "RIPE",
+    "netname": "NO-TELE1-20120221",
+    "country": "NO",
+    "org": "ORG-TEN1-RIPE",
+    "admin-c": "DUMY-RIPE",
+    "tech-c": "DUMY-RIPE",
+    "mnt-by": "TELE1-NO-MNT; RIPE-NCC-HM-MNT"
+  },
+  {
+    "geofeed": "https://www.teledata.de/as21263_geofeed.csv",
+    "inetnum": "2a0d:9600::/29",
+    "source": "RIPE",
+    "netname": "DE-MCONNECT-20230509",
+    "country": "DE",
+    "org": "ORG-MCG13-RIPE",
+    "admin-c": "DUMY-RIPE",
+    "tech-c": "DUMY-RIPE",
+    "mnt-by": "RIPE-NCC-HM-MNT; MCONNECT-MNT"
+  },
+  {
+    "geofeed": "https://stats.uninett.no/geoip/as224.csv",
+    "inetnum": "158.36.0.0 - 158.39.255.255",
+    "source": "RIPE",
+    "netname": "UNINETT4",
+    "country": "NO",
+    "org": "ORG-UA17-RIPE",
+    "admin-c": "DUMY-RIPE",
+    "tech-c": "DUMY-RIPE",
+    "mnt-by": "RIPE-NCC-LEGACY-MNT; UNINETT-MNT"
+  },
+  {
+    "geofeed": "https://internext.cz/geo/geofeed.csv",
+    "inetnum": "2a00:e580::/29",
+    "source": "RIPE",
+    "netname": "CZ-CEZNET21-20110530",
+    "country": "CZ",
+    "org": "ORG-TBS13-RIPE",
+    "admin-c": "DUMY-RIPE",
+    "tech-c": "DUMY-RIPE",
+    "mnt-by": "RIPE-NCC-HM-MNT; INEXT-CZ-MNT; CEZNET-MNT"
+  },
+  {
+    "geofeed": "https://geofeed.vsenet.de/",
+    "inetnum": "2a02:5a0::/29",
+    "source": "RIPE",
+    "netname": "DE-SAARGATE-20080707",
+    "country": "DE",
+    "org": "ORG-SGfM1-RIPE",
+    "admin-c": "DUMY-RIPE",
+    "tech-c": "DUMY-RIPE",
+    "mnt-by": "RIPE-NCC-HM-MNT; SAARGATE-DE-MNT"
+  },
+  {
+    "geofeed": "https://geofeed.wnet.global/geofeed.csv",
+    "inetnum": "2a13:8800::/29",
+    "source": "RIPE",
+    "netname": "PL-WNET-20230117",
+    "country": "PL",
+    "org": "ORG-LSZO44-RIPE",
+    "admin-c": "DUMY-RIPE",
+    "tech-c": "DUMY-RIPE",
+    "mnt-by": "RIPE-NCC-HM-MNT; WNET-MNT"
+  },
+  {
+    "geofeed": "https://www.comspace.de/geofeed.csv",
+    "inetnum": "2001:67c:2104::/48",
+    "source": "RIPE",
+    "netname": "COMSPACE-V6",
+    "country": "DE",
+    "org": "ORG-CGCK1-RIPE",
+    "admin-c": "DUMY-RIPE",
+    "tech-c": "DUMY-RIPE",
+    "mnt-by": "RIPE-NCC-END-MNT; COMSPACE-MNT"
+  },
+  {
+    "geofeed": "https://geofeeds.packetvis.com/158f7_212.csv",
+    "inetnum": "212.166.0.0 - 212.166.63.255",
+    "source": "RIPE",
+    "netname": "BE-WIN-990223",
+    "country": "BE",
+    "org": "ORG-WS1-RIPE",
+    "admin-c": "DUMY-RIPE",
+    "tech-c": "DUMY-RIPE",
+    "mnt-by": "RIPE-NCC-HM-MNT; AS9208-MNT"
+  },
+  {
+    "geofeed": "https://lg.telia.net/ripe/AS3301_geofeed.csv",
+    "inetnum": "2001:2000::/48",
+    "source": "RIPE",
+    "netname": "SE-TELIANET",
+    "country": "SE",
+    "admin-c": "DUMY-RIPE",
+    "tech-c": "DUMY-RIPE",
+    "mnt-by": "TELIANET-LIR"
+  },
+  {
+    "geofeed": "https://geofeed.netz.mwn.de/rfc8805.csv",
+    "inetnum": "2001:4ca0::/29",
+    "source": "RIPE",
+    "netname": "DE-LRZ-20050524",
+    "country": "DE",
+    "org": "ORG-LA54-RIPE",
+    "admin-c": "DUMY-RIPE",
+    "tech-c": "DUMY-RIPE",
+    "mnt-by": "RIPE-NCC-HM-MNT; LRZ-MNT"
+  },
+  {
+    "geofeed": "https://www.aland.net/geoip.csv",
+    "inetnum": "79.133.0.0 - 79.133.31.255",
+    "source": "RIPE",
+    "netname": "FI-AMT-20071003",
+    "country": "FI",
+    "org": "ORG-AM1-RIPE",
+    "admin-c": "DUMY-RIPE",
+    "tech-c": "DUMY-RIPE",
+    "mnt-by": "RIPE-NCC-HM-MNT; AS3238-MNT"
+  },
+  {
+    "geofeed": "https://geofeed.infopact.nl",
+    "inetnum": "2001:15b0::/32",
+    "source": "RIPE",
+    "netname": "NL-INFOPACT-20030922",
+    "country": "NL",
+    "org": "ORG-INB2-RIPE",
+    "admin-c": "DUMY-RIPE",
+    "tech-c": "DUMY-RIPE",
+    "mnt-by": "RIPE-NCC-HM-MNT; INFOPACT-MNT"
+  },
+  {
+    "geofeed": "https://geofeed.network.thg.com/geofeed.csv",
+    "inetnum": "46.23.78.0 - 46.23.79.255",
+    "source": "RIPE",
+    "netname": "UK2-VPSNET",
+    "country": "NL",
+    "admin-c": "DUMY-RIPE",
+    "tech-c": "DUMY-RIPE",
+    "mnt-by": "AS13213-MNT"
+  },
+  {
+    "geofeed": "https://www.as207592.net/geofeed.csv",
+    "inetnum": "2a06:93c0::/29",
+    "source": "RIPE",
+    "netname": "DE-GWDG-20200108",
+    "country": "DE",
+    "org": "ORG-GFWD1-RIPE",
+    "admin-c": "DUMY-RIPE",
+    "tech-c": "DUMY-RIPE",
+    "mnt-by": "RIPE-NCC-HM-MNT; mnt-de-gwdg-1"
+  },
+  {
+    "geofeed": "https://geofeed.forsakringskassan.se/geofeed.csv",
+    "inetnum": "2a14:1480::/32",
+    "source": "RIPE",
+    "netname": "SE-FORSAKRINGSKASSAN-20231205",
+    "country": "SE",
+    "org": "ORG-FA1253-RIPE",
+    "admin-c": "DUMY-RIPE",
+    "tech-c": "DUMY-RIPE",
+    "mnt-by": "RIPE-NCC-HM-MNT; FSK-MNT"
+  },
+  {
+    "geofeed": "https://gf.data.ee/geofeed.csv",
+    "inetnum": "2a01:6e0::/32",
+    "source": "RIPE",
+    "netname": "RU-CITICTELECOM-20071218",
+    "country": "RU",
+    "org": "ORG-LL250-RIPE",
+    "admin-c": "DUMY-RIPE",
+    "tech-c": "DUMY-RIPE",
+    "mnt-by": "RIPE-NCC-HM-MNT; AS3327-MNT"
+  },
+  {
+    "geofeed": "https://redestel.com/geofeed_environ.txt",
+    "inetnum": "185.212.207.0 - 185.212.207.255",
+    "source": "RIPE",
+    "netname": "ENVIRON-F04-202501215",
+    "country": "ES",
+    "admin-c": "DUMY-RIPE",
+    "tech-c": "DUMY-RIPE",
+    "mnt-by": "es-digitalrm-1-mnt"
+  },
+  {
+    "geofeed": "https://www.eso.org/geofeed_eso.csv",
+    "inetnum": "134.171.0.0 - 134.171.255.255",
+    "source": "RIPE",
+    "netname": "ESO-NET",
+    "country": "DE",
+    "org": "ORG-ESO5-RIPE",
+    "admin-c": "DUMY-RIPE",
+    "tech-c": "DUMY-RIPE",
+    "mnt-by": "RIPE-NCC-LEGACY-MNT; DFN-LIR-MNT"
+  },
+  {
+    "geofeed": "https://geofeed.cogentco.com/geofeed.csv",
+    "inetnum": "154.3.0.0 - 154.3.255.255"
+  }
+]
