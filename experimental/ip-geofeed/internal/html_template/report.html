@@ -895,6 +895,10 @@
     </div>
 
     <script>
+        /**
+         * Table cell indices for accessing column data
+         * @type {Object<string, number>}
+         */
         // Constants
         const CELL_INDEX = {
             CHECKBOX: 0,
@@ -907,19 +911,40 @@
             MESSAGES: 7
         };
         
+        /**
+         * Timing delays for UI interactions (in milliseconds)
+         * @type {Object<string, number>}
+         */
         const TIMING = {
             MAP_INIT_DELAY: 100,
             MODAL_FOCUS_DELAY: 150,
             MAP_RESIZE_DELAY: 200
         };
 
+        /**
+         * Global state variables for modal and map management
+         * @type {Object}
+         */
         // Global state
+        /** @type {Object<string, L.Map>} Maps indexed by mapId */
         let maps = {};
+        
+        /** @type {HTMLButtonElement|null} Currently active tune button reference */
         let currentTuningButton = null;
+        
+        /** @type {number} Currently selected match index in modal */
         let selectedMatchIndex = 0;
+        
+        /** @type {Array<HTMLElement>} Array of match item elements in modal */
         let matchItems = [];
+        
+        /** @type {boolean} Flag indicating if modal is currently open */
         let isModalOpen = false;
 
+        /**
+         * Stores CSV comment lines by line number for download functionality
+         * @type {Object<number, string>}
+         */
         // Comment map: stores CSV comments by line number 
         const commentMap = JSON.parse('{{.Comments}}');
 
@@ -946,6 +971,10 @@
             }
         };
 
+        /**
+         * Closes the location matches modal and cleans up resources
+         * @returns {void}
+         */
         function closeModal() {
             if (!isModalOpen) return;
             
@@ -1013,6 +1042,11 @@
             }
         });
 
+        /**
+         * Navigates between location match items with arrow keys
+         * @param {number} direction - Navigate direction: positive (right/down) or negative (left/up)
+         * @returns {void}
+         */
         function navigateMatches(direction) {
             if (matchItems.length === 0) return;
             
@@ -1028,6 +1062,11 @@
             }
         }
 
+        /**
+         * Zooms the currently selected map in or out
+         * @param {number} direction - Zoom direction: positive to zoom in, negative to zoom out
+         * @returns {void}
+         */
         function zoomCurrentMap(direction) {
             const mapId = `map-${selectedMatchIndex}`;
             const map = maps[mapId];
@@ -1037,9 +1076,18 @@
             }
         }
 
-        // API functions
+        /**
+         * API endpoint for place search functionality
+         * @type {string}
+         */
         const API_ENDPOINT = 'https://mcp.fastah.ai/rest/geofeeds/place-search';
 
+        /**
+         * Fetches geolocation matches from the API for given location data
+         * @async
+         * @param {Array<Object>} rows - Array of row objects with location data (countryCode, regionCode, cityName)
+         * @returns {Promise<{results: Array<Object>}|null>} API response with matches or null on error
+         */
         async function fetchPlaceMatches(rows) {
             const MAX_BATCH_SIZE = 1000;
             let allResults = [];
@@ -1082,6 +1130,11 @@
             return { results: allResults };
         }
 
+        /**
+         * Prepares geofeed row data for API request
+         * @param {HTMLTableRowElement} dataRow - The table row element to extract data from
+         * @returns {Object|null} Object with countryCode, regionCode, cityName, maxResults and searchMode, or null if required data missing
+         */
         function prepareRowForApi(dataRow) {
             const cells = dataRow.querySelectorAll('td');
             if (cells.length <= CELL_INDEX.STATUS) return null;
@@ -1103,6 +1156,12 @@
             };
         }
 
+        /**
+         * Handles tune button click - fetches location matches for selected issues
+         * @async
+         * @param {HTMLButtonElement} button - The tune button that was clicked
+         * @returns {Promise<void>}
+         */
         async function handleTuneButtonClick(button) {
             currentTuningButton = button;
             
@@ -1157,6 +1216,12 @@
             }
         }
 
+        /**
+         * Displays the location matches popup modal with maps and selectable options
+         * @param {Array<Object>} matches - Array of location match objects from API
+         * @param {Array<Object>} [selectedIssues=[]] - Array of selected issues for tracking
+         * @returns {void}
+         */
         function showLocationPopup(matches, selectedIssues = []) {
             if (!matches || matches.length === 0) {
                 return;
@@ -1234,6 +1299,11 @@
             }, TIMING.MODAL_FOCUS_DELAY);
         }
 
+        /**
+         * Selects a location match and updates the corresponding table row
+         * @param {Object} match - Match object with countryCode, regionCode, name, and boundingBox
+         * @returns {void}
+         */
         function selectLocationMatch(match) {
             if (!currentTuningButton) {
                 console.error('No tuning button reference found');
@@ -1257,6 +1327,12 @@
             closeModal();
         }
         
+        /**
+         * Updates a table row with selected match data and stores original values
+         * @param {HTMLTableRowElement} dataRow - The table row to update
+         * @param {Object} match - Match object with countryCode, regionCode, and name
+         * @returns {void}
+         */
         function updateRowWithMatchData(dataRow, match) {
             const cells = dataRow.querySelectorAll('td');
             const currentCountry = cells[CELL_INDEX.COUNTRY].textContent;
@@ -1288,6 +1364,12 @@
             }
         }
 
+        /**
+         * Initializes a Leaflet map with location boundary and marker for a match
+         * @param {string} mapId - The DOM element ID where map will render
+         * @param {Object} match - Match object with name, boundingBox, regionCode, countryCode
+         * @returns {void}
+         */
         function initializeMapForMatch(mapId, match) {
             try {
                 const mapInstance = L.map(mapId, {
@@ -1356,6 +1438,12 @@
             }
         }
 
+        /**
+         * Sets the report mode between 'viewing' and 'tuning'
+         * Tuning mode shows checkboxes and expands rows with issues
+         * @param {string} mode - 'viewing' or 'tuning'
+         * @returns {void}
+         */
         function setMode(mode) {
             const toggle = document.getElementById('modeToggle');
             const viewingText = document.getElementById('viewingText');
@@ -1399,12 +1487,20 @@
             updatePagination();
         }
 
+        /**
+         * Toggles between viewing and tuning modes
+         * @returns {void}
+         */
         function toggleMode() {
             const isTuning = document.body.classList.contains('tuning-mode');
             setMode(isTuning ? 'viewing' : 'tuning');
         }
 
-        // Helper function
+        /**
+         * Escapes HTML special characters to prevent XSS attacks
+         * @param {string} text - Text to escape
+         * @returns {string} Escaped HTML text
+         */
         function escapeHtml(text) {
             const map = {
                 '&': '&amp;',
@@ -1416,7 +1512,11 @@
             return text.replace(/[&<>"']/g, m => map[m]);
         }
         
-        // Filter functionality
+        /**
+         * Filters the entries table based on current filter input values
+         * Resets to page 1 and updates pagination
+         * @returns {void}
+         */
         function filterTable() {
             const countryFilter = document.getElementById('filterCountry').value.toLowerCase();
             const regionFilter = document.getElementById('filterRegion').value.toLowerCase();
@@ -1453,9 +1553,18 @@
             updatePagination();
         }
         
+        /**
+         * Pagination state and configuration
+         * @type {Object}
+         */
         // Pagination state
+        /** @type {number} Current page number (1-indexed) */
         let currentPage = 1;
+        
+        /** @type {number} Number of rows to display per page */
         let rowsPerPage = 25;
+        
+        /** @type {Array<HTMLTableRowElement>} Array of expandable rows after filtering */
         let allRows = [];
         
         // Initialize on page load
@@ -1862,11 +1971,19 @@
             });
         });
         
-        // Pagination functions
+        /**
+         * Initializes pagination on page load
+         * @returns {void}
+         */
         function initializePagination() {
             updatePagination();
         }
         
+        /**
+         * Updates pagination display for current page
+         * Shows/hides rows based on current page and rowsPerPage
+         * @returns {void}
+         */
         function updatePagination() {
             const totalPages = Math.max(1, Math.ceil(allRows.length / rowsPerPage));
             
@@ -1925,6 +2042,11 @@
             updatePageNumbers(totalPages);
         }
         
+        /**
+         * Updates page number buttons display with ellipsis for large page counts
+         * @param {number} totalPages - Total number of pages available
+         * @returns {void}
+         */
         function updatePageNumbers(totalPages) {
             const pageNumbersContainer = document.getElementById('pageNumbers');
             pageNumbersContainer.innerHTML = '';
@@ -1969,6 +2091,11 @@
             }
         }
         
+        /**
+         * Creates and adds a page number button to pagination controls
+         * @param {number} pageNum - Page number for the button
+         * @returns {void}
+         */
         function addPageButton(pageNum) {
             const pageNumbersContainer = document.getElementById('pageNumbers');
             const btn = document.createElement('button');
