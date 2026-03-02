@@ -3,12 +3,14 @@ package parser
 import (
 	"bufio"
 	"encoding/csv"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"net/url"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 )
 
@@ -20,6 +22,84 @@ type Row struct {
 	RegionCode  string
 	City        string
 	PostalCode  string
+}
+
+// Publisher represents a single publisher entry
+type Publisher struct {
+	Geofeed string `json:"geofeed"`
+	Inetnum string `json:"inetnum"`
+	Source  string `json:"source,omitempty"`
+	Netname string `json:"netname,omitempty"`
+	Country string `json:"country,omitempty"`
+	Org     string `json:"org,omitempty"`
+	AdminC  string `json:"admin-c,omitempty"`
+	TechC   string `json:"tech-c,omitempty"`
+	MntBy   string `json:"mnt-by,omitempty"`
+	City    string `json:"city,omitempty"`
+}
+
+// Publishers is a collection of Publisher entries
+type Publishers []Publisher
+
+// EncodeInetnum encodes the inetnum field into a filesystem-friendly string
+func (p *Publisher) EncodeInetnum() string {
+	s := strings.TrimSpace(p.Inetnum)
+
+	// Convert range separator first
+	s = strings.ReplaceAll(s, " - ", "_to_")
+
+	// Replace characters with hyphen
+	s = strings.ReplaceAll(s, ".", "-")
+	s = strings.ReplaceAll(s, ":", "-")
+	s = strings.ReplaceAll(s, "/", "-")
+
+	// Remove unwanted characters (but keep - and _)
+	reg := regexp.MustCompile(`[^a-zA-Z0-9\-_]+`)
+	s = reg.ReplaceAllString(s, "")
+
+	return s
+}
+
+// sanitizeFolder removes unsafe filesystem characters
+func sanitizeFolder(s string) string {
+	s = strings.TrimSpace(s)
+	reg := regexp.MustCompile(`[^a-zA-Z0-9\-_]+`)
+	return reg.ReplaceAllString(s, "")
+}
+
+func (p *Publisher) OutputPath() string {
+	var parts []string
+
+	if p.Source != "" {
+		parts = append(parts, sanitizeFolder(p.Source))
+	}
+
+	if p.Org != "" {
+		parts = append(parts, sanitizeFolder(p.Org))
+	}
+
+	if p.Netname != "" {
+		parts = append(parts, sanitizeFolder(p.Netname))
+	}
+
+	parts = append(parts, p.EncodeInetnum())
+
+	return filepath.Join(parts...)
+}
+
+// LoadPublishers reads and unmarshals a publishers.json file
+func LoadPublishers(filePath string) (Publishers, error) {
+	data, err := os.ReadFile(filePath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read file: %w", err)
+	}
+
+	var publishers Publishers
+	if err := json.Unmarshal(data, &publishers); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal JSON: %w", err)
+	}
+
+	return publishers, nil
 }
 
 // isURL checks if the given string is a valid HTTP/HTTPS URL

@@ -5,12 +5,13 @@ import (
 	"fmt"
 	"html/template"
 	"os"
+	"path/filepath"
 
 	"ip-geofeed/internal/geofeed_validation"
 )
 
 // GenerateHTMLReport generates an HTML validation report from entries
-func GenerateHTMLReport(entries []geofeed_validation.Entry, comments map[int]string, metadata geofeed_validation.Metadata) error {
+func GenerateHTMLReport(entries []geofeed_validation.Entry, comments map[int]string, metadata geofeed_validation.Metadata, path string) error {
 	// Parse the template file
 	tmpl, err := template.ParseFiles("internal/html_template/report.html")
 	if err != nil {
@@ -33,7 +34,14 @@ func GenerateHTMLReport(entries []geofeed_validation.Entry, comments map[int]str
 	}
 
 	// Create output file
-	outputFile, err := os.Create("run/output/report.html")
+	dirPath := filepath.Join("run", "output", path)
+	err = os.MkdirAll(dirPath, 0755)
+	if err != nil {
+		return fmt.Errorf("creating output directory: %w", err)
+	}
+
+	filePath := filepath.Join(dirPath, "index.html")
+	outputFile, err := os.Create(filePath)
 	if err != nil {
 		return fmt.Errorf("creating output file: %w", err)
 	}
