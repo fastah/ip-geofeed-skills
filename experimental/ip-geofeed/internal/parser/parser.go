@@ -12,6 +12,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+	"time"
 )
 
 // Row represents a single CSV row
@@ -122,17 +123,29 @@ func downloadFile(urlStr string) (string, error) {
 		return "", fmt.Errorf("parsing URL: %w", err)
 	}
 	filename := filepath.Base(u.Path)
-	if filename == "" || filename == "/" {
+	if filename == "" || filename == "/" || filename == "." {
 		filename = "geofeed.csv"
 	}
 
 	// Full path where file will be saved
-	filepath := filepath.Join(runDataDir, filename)
+	outputPath := filepath.Join(runDataDir, filename)
 
-	// Download the file
-	resp, err := http.Get(urlStr)
+	// Create request with headers
+	req, err := http.NewRequest("GET", urlStr, nil)
 	if err != nil {
-		return "", fmt.Errorf("downloading file from %s: %w", urlStr, err)
+		return "", fmt.Errorf("creating request: %w", err)
+	}
+
+	req.Header.Set("User-Agent", "Mozilla/5.0")
+	req.Header.Set("Accept", "*/*")
+
+	client := &http.Client{
+		Timeout: 30 * time.Second,
+	}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", fmt.Errorf("downloading file: %w", err)
 	}
 	defer resp.Body.Close()
 
@@ -140,19 +153,19 @@ func downloadFile(urlStr string) (string, error) {
 		return "", fmt.Errorf("download failed with status %d: %s", resp.StatusCode, urlStr)
 	}
 
-	// Create the file
-	out, err := os.Create(filepath)
+	// Create file
+	out, err := os.Create(outputPath)
 	if err != nil {
-		return "", fmt.Errorf("creating file %s: %w", filepath, err)
+		return "", fmt.Errorf("creating file %s: %w", outputPath, err)
 	}
 	defer out.Close()
 
-	// Write the response body to file
+	// Copy content
 	if _, err := io.Copy(out, resp.Body); err != nil {
 		return "", fmt.Errorf("writing file: %w", err)
 	}
 
-	return filepath, nil
+	return outputPath, nil
 }
 
 // resolveFilePath resolves the actual file path, downloading from URL if necessary
