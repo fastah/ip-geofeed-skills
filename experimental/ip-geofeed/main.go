@@ -1,45 +1,39 @@
 package main
 
 import (
+	"flag"
 	"fmt"
+	geofeed "ip-geofeed/internal"
 	"os"
-
-	"ip-geofeed/internal/geofeed_validation"
-	output "ip-geofeed/internal/html_template"
-	"ip-geofeed/internal/parser"
 )
 
 func main() {
-	if len(os.Args) < 2 {
-		fmt.Println("Usage: geofeed-validator <csv-file-or-url>")
+
+	bulk := flag.Bool("bulk", false, "Enable bulk validation mode")
+	flag.Parse()
+
+	if flag.NArg() < 1 {
+		fmt.Println("Usage:")
+		fmt.Println("  geofeed-validator <csv-file-or-url>")
+		fmt.Println("  geofeed-validator --bulk <file-with-urls>")
 		os.Exit(1)
 	}
 
-	csvFileSource := os.Args[1]
+	input := flag.Arg(0)
 
-	// Parse CSV
-	rows, comments, invalidEntries, err := parser.ParseCSV(csvFileSource)
-	if err != nil {
-		fmt.Printf("Error parsing CSV: %v\n", err)
-		os.Exit(1)
+	if *bulk {
+		err := geofeed.GeofeedsValidation(input)
+		if err != nil {
+			fmt.Printf("Error validating geofeeds: %v\n", err)
+			os.Exit(1)
+		}
+	} else {
+		err := geofeed.GeofeedValidation(input)
+		if err != nil {
+			fmt.Printf("Error validating geofeed: %v\n", err)
+			os.Exit(1)
+		}
 	}
 
-	// Validate entries
-	entries, err := geofeed_validation.ValidateAndTuneEntries(rows)
-	if err != nil {
-		fmt.Printf("Error validating entries: %v\n", err)
-		os.Exit(1)
-	}
-
-	// Meatadata summary
-	metadata := geofeed_validation.GetMetadataFromEntries(entries, csvFileSource, invalidEntries)
-
-	// Generate HTML report
-	err = output.GenerateHTMLReport(entries, comments, metadata)
-	if err != nil {
-		fmt.Printf("Error generating HTML report: %v\n", err)
-		os.Exit(1)
-	}
-
-	fmt.Println("Validation complete! Report generated: output.html")
+	fmt.Println("Validation complete!")
 }
