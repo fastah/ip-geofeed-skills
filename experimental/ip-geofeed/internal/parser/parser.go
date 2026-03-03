@@ -2,6 +2,7 @@ package parser
 
 import (
 	"bufio"
+	"context"
 	"encoding/csv"
 	"encoding/json"
 	"fmt"
@@ -131,17 +132,19 @@ func downloadFile(urlStr string) (string, error) {
 	outputPath := filepath.Join(runDataDir, filename)
 
 	// Create request with headers
-	req, err := http.NewRequest("GET", urlStr, nil)
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
+	defer cancel()
+
+	req, err := http.NewRequestWithContext(ctx, "GET", urlStr, nil)
 	if err != nil {
 		return "", fmt.Errorf("creating request: %w", err)
 	}
 
-	req.Header.Set("User-Agent", "Mozilla/5.0")
+	// req.Header.Set("User-Agent", "curl/8.0.0")
+	req.Header.Set("User-Agent", "Mozilla/5.0 (compatible; IPGeofeed/1.0)")
 	req.Header.Set("Accept", "*/*")
 
-	client := &http.Client{
-		Timeout: 30 * time.Second,
-	}
+	client := &http.Client{}
 
 	resp, err := client.Do(req)
 	if err != nil {
