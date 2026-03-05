@@ -182,7 +182,7 @@ func resolveFilePath(fileSource string) (string, error) {
 }
 
 // ParseCSV reads and parses a CSV geofeed file from local path or URL
-func ParseCSV(fileSource string) ([]Row, map[int]string, int, error) {
+func ParseCSV(fileSource string, limit int) ([]Row, map[int]string, int, error) {
 	// Resolve file path (download from URL if necessary)
 	filepath, err := resolveFilePath(fileSource)
 	if err != nil {
@@ -201,6 +201,7 @@ func ParseCSV(fileSource string) ([]Row, map[int]string, int, error) {
 	comments := make(map[int]string)
 	lineNum := 0
 	invalidEntries := 0
+	validEntries := 0
 
 	for scanner.Scan() {
 		line := scanner.Text()
@@ -215,6 +216,11 @@ func ParseCSV(fileSource string) ([]Row, map[int]string, int, error) {
 		if strings.HasPrefix(trimmed, "#") {
 			comments[lineNum] = line
 			continue
+		}
+
+		// Check if we've reached the limit
+		if limit > 0 && validEntries >= limit {
+			break
 		}
 
 		// Parse CSV row from raw line
@@ -242,6 +248,7 @@ func ParseCSV(fileSource string) ([]Row, map[int]string, int, error) {
 			row.PostalCode = strings.TrimSpace(record[4])
 		}
 		rows = append(rows, row)
+		validEntries++
 	}
 
 	if err := scanner.Err(); err != nil {

@@ -7,7 +7,7 @@ import (
 	"ip-geofeed/internal/parser"
 )
 
-func GeofeedsValidation(path string) error {
+func GeofeedsValidation(path string, limitEntries int) error {
 	publishers, err := parser.LoadPublishers(path)
 	if err != nil {
 		return fmt.Errorf("error loading publishers: %w", err)
@@ -17,7 +17,7 @@ func GeofeedsValidation(path string) error {
 		fmt.Println("Processing publisher:", publisher.Geofeed)
 
 		// Parse CSV
-		rows, comments, invalidEntries, err := parser.ParseCSV(publisher.Geofeed)
+		rows, comments, invalidEntries, err := parser.ParseCSV(publisher.Geofeed, limitEntries)
 		if err != nil {
 			fmt.Printf("error parsing CSV: %v\n", err)
 			continue
@@ -43,11 +43,11 @@ func GeofeedsValidation(path string) error {
 	return nil
 }
 
-func GeofeedValidation(path string) error {
+func GeofeedValidation(path string, limitEntries int) error {
 	fmt.Println("Processing publisher:", path)
 
 	// Parse CSV
-	rows, comments, invalidEntries, err := parser.ParseCSV(path)
+	rows, comments, invalidEntries, err := parser.ParseCSV(path, limitEntries)
 	if err != nil {
 		return fmt.Errorf("error parsing CSV: %w", err)
 	}
