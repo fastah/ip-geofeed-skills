@@ -68,7 +68,7 @@ type Entry struct {
 // Metadata represents summary information
 type Metadata struct {
 	InputFile            string
-	Timestamp            string
+	Timestamp            int64
 	TotalEntries         int
 	IpV4Entries          int
 	IpV6Entries          int
@@ -179,7 +179,7 @@ func ValidateAndTuneEntries(rows []parser.Row) ([]Entry, error) {
 func GetMetadataFromEntries(entries []Entry, inputFile string, invalidEntries int) Metadata {
 	metadata := Metadata{
 		InputFile:      inputFile,
-		Timestamp:      fmt.Sprintf("%s", time.Now().Format(time.RFC3339)),
+		Timestamp:      time.Now().UnixMilli(),
 		InvalidEntries: invalidEntries,
 	}
 
@@ -281,7 +281,7 @@ func ValidateIPPrefix(entry *Entry) {
 	// Check for overly large prefixes
 	if entry.IPVersion == "IPv4" {
 		ones, _ := ipNet.Mask.Size()
-		if ones < 24 {
+		if ones < 22 {
 			entry.AddStatusMessage(WarnIPv4PrefixLarge)
 		}
 	} else { // IPv6
