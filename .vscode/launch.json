@@ -2,7 +2,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Debug Go Program (single geofeed)",
+            "name": "Single Entry: Test Data (no limit)",
             "type": "go",
             "request": "launch",
             "mode": "debug",
@@ -13,7 +13,20 @@
             "cwd": "${workspaceFolder}/experimental/ip-geofeed"
         },
         {
-            "name": "Debug Go Program (custom input)",
+            "name": "Single Entry: Test Data (with limit)",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceFolder}/experimental/ip-geofeed",
+            "args": [
+                "--limit-entries",
+                "${input:entryLimit}",
+                "${workspaceFolder}/experimental/ip-geofeed/testdata/sample_geofeed.csv"
+            ],
+            "cwd": "${workspaceFolder}/experimental/ip-geofeed"
+        },
+        {
+            "name": "Single Entry: Custom File (no limit)",
             "type": "go",
             "request": "launch",
             "mode": "debug",
@@ -24,7 +37,20 @@
             "cwd": "${workspaceFolder}/experimental/ip-geofeed"
         },
         {
-            "name": "Debug Go Program (bulk mode)",
+            "name": "Single Entry: Custom File (with limit)",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceFolder}/experimental/ip-geofeed",
+            "args": [
+                "--limit-entries",
+                "${input:entryLimit}",
+                "${input:csvFilePath}"
+            ],
+            "cwd": "${workspaceFolder}/experimental/ip-geofeed"
+        },
+        {
+            "name": "Bulk Mode: Test Data (no limit)",
             "type": "go",
             "request": "launch",
             "mode": "debug",
@@ -36,7 +62,21 @@
             "cwd": "${workspaceFolder}/experimental/ip-geofeed"
         },
         {
-            "name": "Debug Go Program (bulk mode - custom)",
+            "name": "Bulk Mode: Test Data (with limit)",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceFolder}/experimental/ip-geofeed",
+            "args": [
+                "--bulk",
+                "--limit-entries",
+                "${input:entryLimit}",
+                "${workspaceFolder}/experimental/ip-geofeed/testdata/publishers.json"
+            ],
+            "cwd": "${workspaceFolder}/experimental/ip-geofeed"
+        },
+        {
+            "name": "Bulk Mode: Custom File (no limit)",
             "type": "go",
             "request": "launch",
             "mode": "debug",
@@ -46,9 +86,29 @@
                 "${input:bulkFilePath}"
             ],
             "cwd": "${workspaceFolder}/experimental/ip-geofeed"
+        },
+        {
+            "name": "Bulk Mode: Custom File (with limit)",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceFolder}/experimental/ip-geofeed",
+            "args": [
+                "--bulk",
+                "--limit-entries",
+                "${input:entryLimit}",
+                "${input:bulkFilePath}"
+            ],
+            "cwd": "${workspaceFolder}/experimental/ip-geofeed"
         }
     ],
     "inputs": [
+        {
+            "id": "entryLimit",
+            "type": "promptString",
+            "description": "Enter the limit for number of entries to validate",
+            "default": "100"
+        },
         {
             "id": "csvFilePath",
             "type": "promptString",
