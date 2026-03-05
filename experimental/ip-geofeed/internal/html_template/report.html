@@ -640,7 +640,7 @@
             </tr>
             <tr>
                 <td class="metrics-label"><i class="bi bi-calendar-event-fill" style="margin-right: 8px;"></i>Tuning timestamp</td>
-                <td class="metrics-value"><span id="tuningTimestamp">{{.Metadata.Timestamp}}</span></td>
+                <td class="metrics-value"><script>document.write(new Intl.DateTimeFormat("en", {dateStyle: "full", timeStyle: "long",}).format(new Date({{.Metadata.Timestamp}})))</script></td>
             </tr>
         </table>
         
@@ -872,10 +872,7 @@
                 <div class="page-size-selector">
                     <label for="pageSize" style="color: #333333; font-size: 0.9em;">Rows per page:</label>
                     <select id="pageSize">
-                        <option value="10">10</option>
-                        <option value="25" selected>25</option>
-                        <option value="50">50</option>
-                        <option value="100">100</option>
+                        <option value="100" selected>100</option>
                         <option value="all">All</option>
                     </select>
                 </div>
@@ -1562,7 +1559,7 @@
         let currentPage = 1;
         
         /** @type {number} Number of rows to display per page */
-        let rowsPerPage = 25;
+        let rowsPerPage = 100;
         
         /** @type {Array<HTMLTableRowElement>} Array of expandable rows after filtering */
         let allRows = [];
