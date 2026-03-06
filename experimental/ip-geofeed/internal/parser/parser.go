@@ -26,8 +26,8 @@ type Row struct {
 	PostalCode  string
 }
 
-// Publisher represents a single publisher entry
-type Publisher struct {
+// Record represents a single geofeed entry
+type Record struct {
 	Geofeed string `json:"geofeed"`
 	Inetnum string `json:"inetnum"`
 	Source  string `json:"source,omitempty"`
@@ -40,11 +40,11 @@ type Publisher struct {
 	City    string `json:"city,omitempty"`
 }
 
-// Publishers is a collection of Publisher entries
-type Publishers []Publisher
+// Records is a collection of Record entries
+type Records []Record
 
 // EncodeInetnum encodes the inetnum field into a filesystem-friendly string
-func (p *Publisher) EncodeInetnum() string {
+func (p *Record) EncodeInetnum() string {
 	s := strings.TrimSpace(p.Inetnum)
 
 	// Convert range separator first
@@ -62,41 +62,14 @@ func (p *Publisher) EncodeInetnum() string {
 	return s
 }
 
-// sanitizeFolder removes unsafe filesystem characters
-func sanitizeFolder(s string) string {
-	s = strings.TrimSpace(s)
-	reg := regexp.MustCompile(`[^a-zA-Z0-9\-_]+`)
-	return reg.ReplaceAllString(s, "")
-}
-
-func (p *Publisher) OutputPath() string {
-	var parts []string
-
-	if p.Source != "" {
-		parts = append(parts, sanitizeFolder(p.Source))
-	}
-
-	if p.Org != "" {
-		parts = append(parts, sanitizeFolder(p.Org))
-	}
-
-	if p.Netname != "" {
-		parts = append(parts, sanitizeFolder(p.Netname))
-	}
-
-	parts = append(parts, p.EncodeInetnum())
-
-	return filepath.Join(parts...)
-}
-
 // LoadPublishers reads and unmarshals a publishers.json file
-func LoadPublishers(filePath string) (Publishers, error) {
+func LoadPublishers(filePath string) (Records, error) {
 	data, err := os.ReadFile(filePath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read file: %w", err)
 	}
 
-	var publishers Publishers
+	var publishers Records
 	if err := json.Unmarshal(data, &publishers); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal JSON: %w", err)
 	}

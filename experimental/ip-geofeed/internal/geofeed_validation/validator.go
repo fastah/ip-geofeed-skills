@@ -6,6 +6,7 @@ import (
 	"ip-geofeed/internal/parser"
 	"net"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
 	"time"
@@ -81,6 +82,28 @@ type Metadata struct {
 	RegionLevelAccuracy  int
 	CountryLevelAccuracy int
 	DoNotGeolocate       int
+}
+
+type Record struct {
+	parser.Record
+	ReportURL string
+}
+
+// Netname represents a grouping of geofeeds by netname
+type Netname struct {
+	Name    string
+	Records []Record
+}
+
+// RIR represents a Regional Internet Registry with its associated netnames
+type RIR struct {
+	Name     string
+	Netnames map[string]*Netname
+}
+
+// RIRCollection represents all Regional Internet Registries
+type RIRCollection struct {
+	RIRs map[string]*RIR
 }
 
 // LoadValidationData loads ISO and territorial data from JSON files
@@ -248,6 +271,78 @@ func ValidateEntry(entry *Entry, ctx *ValidationContext) {
 	} else {
 		entry.Status = "OK"
 	}
+}
+
+// LoadRIRData organizes Records into a RIRCollection structure
+// by grouping geofeeds by their RIR (Source) and then by netname
+func LoadRIRData(publishers parser.Records) *RIRCollection {
+	// Create a map to group geofeeds by RIR (Source)
+	rirMap := make(map[string]*RIR)
+
+	// Group geofeeds by RIR and then by netname
+	for _, record := range publishers {
+
+		if record.Source == "" || record.Netname == "" {
+			continue // Skip entries without a source/RIR or netname
+		}
+
+		rirName := record.Source
+
+		// Create RIR if it doesn't exist
+		if _, exists := rirMap[rirName]; !exists {
+			rirMap[rirName] = &RIR{
+				Name:     rirName,
+				Netnames: make(map[string]*Netname),
+			}
+		}
+
+		rir := rirMap[rirName]
+		netnameKey := record.Netname
+
+		// Create Netname if it doesn't exist
+		if _, exists := rir.Netnames[netnameKey]; !exists {
+			rir.Netnames[netnameKey] = &Netname{
+				Name:    netnameKey,
+				Records: []Record{},
+			}
+		}
+
+		// Add record to the netname
+		rir.Netnames[netnameKey].Records = append(rir.Netnames[netnameKey].Records, Record{
+			Record:    record,
+			ReportURL: "", // This can be populated later with the actual report URL after validation
+		})
+	}
+
+	return &RIRCollection{
+		RIRs: rirMap,
+	}
+}
+
+// sanitize removes unsafe filesystem characters
+func sanitize(s string) string {
+	s = strings.TrimSpace(s)
+	reg := regexp.MustCompile(`[^a-zA-Z0-9\-_]+`)
+	return reg.ReplaceAllString(s, "")
+}
+
+func OutputPath(source string, netname string) string {
+	var parts []string
+
+	if source != "" {
+		parts = append(parts, strings.ToLower(sanitize(source)))
+	}
+
+	if netname != "" {
+		parts = append(parts, sanitize(netname))
+	}
+
+	// if filename == "" {
+	// 	filename = "index.html"
+	// }
+	// parts = append(parts, sanitize(filename))
+
+	return filepath.Join(parts...)
 }
 
 // ValidateIPPrefix validates the IP prefix format and properties
