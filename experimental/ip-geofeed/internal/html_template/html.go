@@ -33,14 +33,55 @@ func GenerateHTMLReport(entries []geofeed_validation.Entry, comments map[int]str
 		Metadata: metadata,
 	}
 
-	// Create output file
-	dirPath := filepath.Join("run", "output", path)
+	// Extract directory
+	filePath := filepath.Join("run", "output", path)
+	dirPath := filepath.Dir(filePath)
+
+	// Create directories if they don't exist
 	err = os.MkdirAll(dirPath, 0755)
 	if err != nil {
 		return fmt.Errorf("creating output directory: %w", err)
 	}
 
-	filePath := filepath.Join(dirPath, "index.html")
+	outputFile, err := os.Create(filePath)
+	if err != nil {
+		return fmt.Errorf("creating output file: %w", err)
+	}
+	defer outputFile.Close()
+
+	// Execute the template with the data
+	err = tmpl.Execute(outputFile, data)
+	if err != nil {
+		return fmt.Errorf("executing template: %w", err)
+	}
+
+	return nil
+}
+
+func GenerateNetnameHTMLTable(records geofeed_validation.Netname, path string) error {
+	// Parse the template file
+	tmpl, err := template.ParseFiles("internal/html_template/netname_table.html")
+	if err != nil {
+		return fmt.Errorf("parsing template file: %w", err)
+	}
+
+	// Create the data structure to pass to the template
+	data := struct {
+		Records []geofeed_validation.Record
+	}{
+		Records: records.Records,
+	}
+
+	// Extract directory
+	filePath := filepath.Join("run", "output", path)
+	dirPath := filepath.Dir(filePath)
+
+	// Create directories if they don't exist
+	err = os.MkdirAll(dirPath, 0755)
+	if err != nil {
+		return fmt.Errorf("creating output directory: %w", err)
+	}
+
 	outputFile, err := os.Create(filePath)
 	if err != nil {
 		return fmt.Errorf("creating output file: %w", err)

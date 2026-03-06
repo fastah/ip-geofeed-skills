@@ -30,7 +30,7 @@ func main() {
 			os.Exit(1)
 		}
 	} else {
-		err := geofeed.GeofeedValidation(input, *limitEntries)
+		err := geofeed.GeofeedValidation(input, "index.html", *limitEntries)
 		if err != nil {
 			fmt.Printf("Error validating geofeed: %v\n", err)
 			os.Exit(1)
