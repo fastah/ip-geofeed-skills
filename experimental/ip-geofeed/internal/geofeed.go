@@ -5,6 +5,7 @@ import (
 	"ip-geofeed/internal/geofeed_validation"
 	"ip-geofeed/internal/html_template"
 	"ip-geofeed/internal/parser"
+	"path/filepath"
 )
 
 func GeofeedsValidation(path string, limitEntries int) error {
@@ -13,38 +14,43 @@ func GeofeedsValidation(path string, limitEntries int) error {
 		return fmt.Errorf("error loading publishers: %w", err)
 	}
 
-	for _, publisher := range publishers {
-		fmt.Println("Processing publisher:", publisher.Geofeed)
+	RIRCollection := geofeed_validation.LoadRIRData(publishers)
 
-		// Parse CSV
-		rows, comments, invalidEntries, err := parser.ParseCSV(publisher.Geofeed, limitEntries)
-		if err != nil {
-			fmt.Printf("error parsing CSV: %v\n", err)
-			continue
-		}
+	for _, rir := range RIRCollection.RIRs {
+		fmt.Println("Processing RIR:", rir.Name)
 
-		// Validate entries
-		entries, err := geofeed_validation.ValidateAndTuneEntries(rows)
-		if err != nil {
-			fmt.Printf("error validating entries: %v\n", err)
-			continue
-		}
+		for _, netname := range rir.Netnames {
+			fmt.Println("Processing Netname:", netname.Name)
+			outPath := geofeed_validation.OutputPath(rir.Name, netname.Name)
 
-		// Metadata summary
-		metadata := geofeed_validation.GetMetadataFromEntries(entries, publisher.Geofeed, invalidEntries)
+			for index, record := range netname.Records {
+				filename := fmt.Sprintf("%d.html", index+1)
 
-		// Generate HTML report
-		err = html_template.GenerateHTMLReport(entries, comments, metadata, publisher.OutputPath())
-		if err != nil {
-			fmt.Printf("error generating HTML report: %v\n", err)
-			continue
+				err := GeofeedValidation(record.Geofeed, filepath.Join(outPath, filename), limitEntries)
+				if err != nil {
+					fmt.Printf("Error processing Geofeed: %v\n", err)
+					continue
+				} else {
+					fmt.Printf("Successfully processed Geofeed: %s\n", record.Geofeed)
+				}
+
+				netname.Records[index].ReportURL = filename
+			}
+
+			err := html_template.GenerateNetnameHTMLTable(*netname, filepath.Join(outPath, "index.html"))
+			if err != nil {
+				fmt.Printf("Error generating Netname HTML table: %v\n", err)
+				continue
+			} else {
+				fmt.Printf("Successfully generated Netname HTML table for: %s\n", netname.Name)
+			}
 		}
 	}
 	return nil
 }
 
-func GeofeedValidation(path string, limitEntries int) error {
-	fmt.Println("Processing publisher:", path)
+func GeofeedValidation(path, outputPath string, limitEntries int) error {
+	fmt.Println("Processing Geofeed:", path)
 
 	// Parse CSV
 	rows, comments, invalidEntries, err := parser.ParseCSV(path, limitEntries)
@@ -62,9 +68,10 @@ func GeofeedValidation(path string, limitEntries int) error {
 	metadata := geofeed_validation.GetMetadataFromEntries(entries, path, invalidEntries)
 
 	// Generate HTML report
-	err = html_template.GenerateHTMLReport(entries, comments, metadata, "")
+	err = html_template.GenerateHTMLReport(entries, comments, metadata, outputPath)
 	if err != nil {
 		return fmt.Errorf("error generating HTML report: %w", err)
 	}
+
 	return nil
 }
