@@ -58,7 +58,7 @@ func GenerateHTMLReport(entries []geofeed_validation.Entry, comments map[int]str
 	return nil
 }
 
-func GenerateNetnameHTMLTable(records geofeed_validation.Netname, path string) error {
+func GenerateNetnameHTMLTable(records []geofeed_validation.Record, path string) error {
 	// Parse the template file
 	tmpl, err := template.ParseFiles("internal/html_template/netname_table.html")
 	if err != nil {
@@ -69,7 +69,7 @@ func GenerateNetnameHTMLTable(records geofeed_validation.Netname, path string) e
 	data := struct {
 		Records []geofeed_validation.Record
 	}{
-		Records: records.Records,
+		Records: records,
 	}
 
 	// Extract directory
