@@ -22,6 +22,7 @@ func GeofeedsValidation(path string, limitEntries int) error {
 		for _, netname := range rir.Netnames {
 			fmt.Println("Processing Netname:", netname.Name)
 			outPath := geofeed_validation.OutputPath(rir.Name, netname.Name)
+			netname_table_data := []geofeed_validation.Record{}
 
 			for index, record := range netname.Records {
 				filename := fmt.Sprintf("%d.html", index+1)
@@ -34,10 +35,15 @@ func GeofeedsValidation(path string, limitEntries int) error {
 					fmt.Printf("Successfully processed Geofeed: %s\n", record.Geofeed)
 				}
 
-				netname.Records[index].ReportURL = filename
+				record.ReportURL = filename
+				netname_table_data = append(netname_table_data, record)
 			}
 
-			err := html_template.GenerateNetnameHTMLTable(*netname, filepath.Join(outPath, "index.html"))
+			if len(netname_table_data) == 0 {
+				fmt.Printf("No valid records found for Netname: %s\n", netname.Name)
+				continue
+			}
+			err := html_template.GenerateNetnameHTMLTable(netname_table_data, filepath.Join(outPath, "index.html"))
 			if err != nil {
 				fmt.Printf("Error generating Netname HTML table: %v\n", err)
 				continue
