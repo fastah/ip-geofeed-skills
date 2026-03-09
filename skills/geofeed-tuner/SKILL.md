@@ -141,7 +141,7 @@ The JSON structure below is **IMMUTABLE**.
 ```json
 {
   "input_file": "",          // Filename or URL
-  "tuning_timestamp": "",   // ISO 8601 format recommended
+  "tuning_timestamp": "",   // Milliseconds since epoch 
 
   "total_entries": 0,
   "ipv4_entries": 0,
@@ -186,7 +186,7 @@ The JSON structure below is **IMMUTABLE**.
 }
 ```
 - `input_file`: The original input source, either a local filename or a remote URL.
-- `tuning_timestamp`: The timestamp when the tuning was performed, in ISO 8601 format.
+- `tuning_timestamp`: The timestamp when the tuning was performed, in Milliseconds since epoch.
 - `total_entries`: The total number of entries processed from the input CSV.
 - `ipv4_entries`: The count of entries that are IPv4 subnets.
 - `ipv6_entries`: The count of entries that are IPv6 subnets.
@@ -296,7 +296,7 @@ The goal is to ensure the file can be parsed reliably and normalized into a **co
       - Message: `IPv6 prefix is unusually large and may indicate a typo`
 
     - **Overly large IPv4 subnets**
-      - Prefixes shorter than `/24`
+      - Prefixes shorter than `/22`
       - Message: `IPv4 prefix is unusually large and may indicate a typo`
 
 
@@ -550,7 +550,7 @@ Each table must use a **two-column key–value layout**:
 ###### Feed Metadata
 
 - Input file: display the source as a URL if provided; otherwise show the local file path and resolved filename.
-- Timestamp must be UTC, ISO-8601.
+- Timestamp must be UTC, Milliseconds since epoch 
 
 | Metric               | Value |
 |----------------------|-------|
