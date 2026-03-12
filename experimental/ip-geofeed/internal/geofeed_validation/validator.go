@@ -6,7 +6,6 @@ import (
 	"ip-geofeed/internal/parser"
 	"net"
 	"os"
-	"path/filepath"
 	"regexp"
 	"strings"
 	"time"
@@ -91,8 +90,9 @@ type Record struct {
 
 // Netname represents a grouping of geofeeds by netname
 type Netname struct {
-	Name    string
-	Records []Record
+	Name     string
+	Records  []Record
+	TableURL string
 }
 
 // RIR represents a Regional Internet Registry with its associated netnames
@@ -326,23 +326,18 @@ func sanitize(s string) string {
 	return reg.ReplaceAllString(s, "")
 }
 
-func OutputPath(source string, netname string) string {
-	var parts []string
-
+func GetSourceTablePath(source string) string {
 	if source != "" {
-		parts = append(parts, strings.ToLower(sanitize(source)))
+		return strings.ToLower(sanitize(source))
 	}
+	return ""
+}
 
+func GetNetnameTablePath(netname string) string {
 	if netname != "" {
-		parts = append(parts, sanitize(netname))
+		return sanitize(netname)
 	}
-
-	// if filename == "" {
-	// 	filename = "index.html"
-	// }
-	// parts = append(parts, sanitize(filename))
-
-	return filepath.Join(parts...)
+	return ""
 }
 
 // ValidateIPPrefix validates the IP prefix format and properties
