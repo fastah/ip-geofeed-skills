@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/h3-js@4.1.0/dist/h3-js.umd.js"></script>
     <style>
         body {
             background-color: #adadad;
@@ -509,6 +510,9 @@
         .mode-toggle.tuning .mode-toggle-slider {
             transform: translateX(118px);
         }
+        .mode-toggle.h3mode .mode-toggle-slider {
+            transform: translateX(96px);
+        }
         .mode-toggle-label {
             font-weight: 600;
             color: #ffffff;
@@ -879,6 +883,26 @@
                 </div>
             </div>
         </div>
+	
+        <div style="margin-top: 30px;">
+            <table class="metrics-table" style="margin-bottom: 0; width: 100%; border-bottom-left-radius: 0; border-bottom-right-radius: 0;">
+                <tr style="background-color: #6b6b6b;">
+                    <td style="padding: 12px 15px; font-weight: bold; color: #ffffff; font-size: 1.1em; font-family: 'Raleway', sans-serif;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span><i class="bi bi-map-fill" style="margin-right: 10px;"></i>Geographic Coverage Map</span>
+                            <div class="mode-toggle-container" style="font-size: 1em;">
+                                <div class="mode-toggle" id="mapModeToggle" onclick="switchMapMode()" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();switchMapMode();}" style="width: 170px;">
+                                    <span class="mode-toggle-text active" id="mapModeBboxText">BBox</span>
+                                    <div class="mode-toggle-slider" style="width: 81px;"></div>
+                                    <span class="mode-toggle-text" id="mapModeH3Text">H3 Cells</span>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+            <div id="summaryMap" style="height: 480px; border: 1px solid #bbb; border-top: none; border-radius: 0 0 4px 4px;"></div>
+        </div>
     </div>
 
     
@@ -938,6 +962,12 @@
         
         /** @type {boolean} Flag indicating if modal is currently open */
         let isModalOpen = false;
+
+        
+        let summaryMapInstance = null;
+        let summaryLayerGroup = null;
+        let currentMapMode = 'bbox';
+        let summaryRowData = [];
 
         /**
          * Stores CSV comment lines by line number for download functionality
@@ -1967,6 +1997,8 @@
                 currentPage = Math.ceil(allRows.length / rowsPerPage);
                 updatePagination();
             });
+            
+            initSummaryMap();
         });
         
         /**
@@ -1975,6 +2007,148 @@
          */
         function initializePagination() {
             updatePagination();
+        }
+        
+        
+        function initSummaryMap() {
+            try {
+                const summaryMapEl = document.getElementById('summaryMap');
+                if (!summaryMapEl) return;
+                summaryMapInstance = L.map('summaryMap', {
+                    scrollWheelZoom: true,
+                    dragging: true,
+                    zoomControl: true,
+                    center: [20, 0],
+                    zoom: 2
+                });
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '\u00a9 <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+                    maxZoom: 19
+                }).addTo(summaryMapInstance);
+                summaryLayerGroup = L.layerGroup().addTo(summaryMapInstance);
+                // Parse and cache all row data once
+                summaryRowData = [];
+                const expandableRows = document.querySelectorAll('.expandable-row');
+                expandableRows.forEach(row => {
+                    const cells        = row.querySelectorAll('td');
+                    const hasError     = row.getAttribute('data-has-error')      === 'true';
+                    const hasWarning   = row.getAttribute('data-has-warning')    === 'true';
+                    const hasSugg      = row.getAttribute('data-has-suggestion') === 'true';
+                    let color = '#28a745';
+                    if (hasError)        color = '#dc3545';
+                    else if (hasWarning) color = '#fd7e14';
+                    else if (hasSugg)    color = '#17a2b8';
+                    const lineNum  = cells[CELL_INDEX.LINE]      ? cells[CELL_INDEX.LINE].textContent.trim()      : '';
+                    const ipPrefix = cells[CELL_INDEX.IP_PREFIX] ? cells[CELL_INDEX.IP_PREFIX].textContent.trim() : '';
+                    const country  = cells[CELL_INDEX.COUNTRY]   ? cells[CELL_INDEX.COUNTRY].textContent.trim()   : '';
+                    const region   = cells[CELL_INDEX.REGION]    ? cells[CELL_INDEX.REGION].textContent.trim()    : '';
+                    const city     = cells[CELL_INDEX.CITY]      ? cells[CELL_INDEX.CITY].textContent.trim()      : '';
+                    const status   = hasError ? 'ERROR' : hasWarning ? 'WARNING' : hasSugg ? 'SUGGESTION' : 'OK';
+                    const parts    = [];
+                    if (ipPrefix) parts.push('<b>' + escapeHtml(ipPrefix) + '</b>');
+                    if (city)     parts.push(escapeHtml(city));
+                    if (region)   parts.push(escapeHtml(region));
+                    if (country)  parts.push(escapeHtml(country));
+                    if (lineNum)  parts.push('<span style="color:#888;font-size:0.9em;">Line ' + escapeHtml(lineNum) + ' &bull; ' + status + '</span>');
+                    summaryRowData.push({
+                        rowId:    row.id,
+                        bbox:     row.getAttribute('data-bounding-box') || '',
+                        h3cells:  row.getAttribute('data-h3-cells')     || '',
+                        color:    color,
+                        popup:    parts.join('<br>')
+                    });
+                });
+                setTimeout(() => {
+                    summaryMapInstance.invalidateSize();
+                    switchMapMode('bbox');
+                }, 350);
+            } catch (err) {
+                console.error('initSummaryMap error:', err);
+            }
+        }
+        
+        function switchMapMode(mode) {
+            const toggle = document.getElementById('mapModeToggle');
+            const bboxText = document.getElementById('mapModeBboxText');
+            const h3Text   = document.getElementById('mapModeH3Text');
+            // If called with no argument, act as a toggle
+            if (mode === undefined) {
+                mode = currentMapMode === 'bbox' ? 'h3' : 'bbox';
+            }
+            if (mode === 'h3') {
+                toggle.classList.add('h3mode');
+                bboxText.classList.remove('active');
+                h3Text.classList.add('active');
+            } else {
+                toggle.classList.remove('h3mode');
+                bboxText.classList.add('active');
+                h3Text.classList.remove('active');
+            }
+            renderSummaryMapLayers(mode);
+        }
+        
+        function renderSummaryMapLayers(mode) {
+            if (!summaryMapInstance || !summaryLayerGroup) return;
+            currentMapMode = mode;
+            summaryLayerGroup.clearLayers();
+            const tempBoundsLayers = [];
+            summaryRowData.forEach(data => {
+                if (mode === 'bbox') {
+                    const raw = data.bbox.replace(/[\[\]]/g, '').trim();
+                    const pts = raw.split(/[\s,]+/).map(Number);
+                    if (pts.length !== 4 || pts.some(v => isNaN(v))) return;
+                    const [west, north, east, south] = pts;
+                    const lb = [[south, west], [north, east]];
+                    const rect = L.rectangle(lb, {
+                        color: data.color, weight: 3, opacity: 1,
+                        fillColor: data.color, fillOpacity: 0.35
+                    });
+                    rect.bindPopup(data.popup);
+                    rect.on('click', () => highlightTableRow(data.rowId, data.color));
+                    summaryLayerGroup.addLayer(rect);
+                    const cm = L.circleMarker([(south + north) / 2, (west + east) / 2], {
+                        radius: 5, color: data.color, fillColor: data.color, fillOpacity: 0.9, weight: 1
+                    });
+                    cm.bindPopup(data.popup);
+                    summaryLayerGroup.addLayer(cm);
+                    tempBoundsLayers.push(L.rectangle(lb));
+                } else {
+                    // H3 cells mode
+                    const raw = data.h3cells.replace(/[\[\]]/g, '').trim();
+                    if (!raw) return;
+                    const cellIds = raw.split(/[\s,]+/).filter(Boolean);
+                    cellIds.forEach(cellId => {
+                        try {
+                            const boundary = h3.cellToBoundary(cellId); // returns [[lat,lng],...]
+                            const poly = L.polygon(boundary, {
+                                color: data.color, weight: 2, opacity: 0.9,
+                                fillColor: data.color, fillOpacity: 0.35
+                            });
+                            poly.bindPopup(data.popup);
+                            poly.on('click', () => highlightTableRow(data.rowId, data.color));
+                            summaryLayerGroup.addLayer(poly);
+                            const b = poly.getBounds();
+                            tempBoundsLayers.push(L.rectangle([[b.getSouth(), b.getWest()], [b.getNorth(), b.getEast()]]));
+                        } catch (e) {
+                            console.warn('H3 render error for cell', cellId, e);
+                        }
+                    });
+                }
+            });
+            if (tempBoundsLayers.length > 0) {
+                const group = L.featureGroup(tempBoundsLayers);
+                summaryMapInstance.fitBounds(group.getBounds(), { padding: [40, 40], maxZoom: 14 });
+            }
+        }
+        
+        function highlightTableRow(rowId, color) {
+            const targetRow = document.getElementById(rowId);
+            if (targetRow) {
+                targetRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                const prev = targetRow.style.outline;
+                targetRow.style.outline = '3px solid ' + color;
+                setTimeout(() => { targetRow.style.outline = prev; }, 2000);
+            }
         }
         
         /**
