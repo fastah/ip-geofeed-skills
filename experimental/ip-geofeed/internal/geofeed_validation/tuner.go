@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+
+	"ip-geofeed/internal/parser"
 )
 
 // PlaceSearchRequest represents the request to the place-search API
@@ -35,11 +37,11 @@ type PlaceSearchResult struct {
 
 // Location represents a geographic location match
 type Location struct {
-	Name        string    `json:"name"`
+	Name        string    `json:"placeName"`
 	CountryCode string    `json:"countryCode"`
-	RegionCode  string    `json:"regionCode"`
+	RegionCode  string    `json:"stateCode"`
 	PlaceType   string    `json:"placeType"`
-	GeonamesId  int64     `json:"geonamesId"`
+	H3Cells     []string  `json:"h3Cells"`
 	BoundingBox []float64 `json:"boundingBox"`
 }
 
@@ -128,16 +130,7 @@ func TuneEntries(entries []Entry) {
 			// If there's a match, use it to populate tuned fields
 			if len(result.Matches) > 0 {
 				match := result.Matches[0]
-
-				// Populate tuned fields based on the best match
-				// Access entries[entryIdx] directly to modify the actual slice element, not a copy
-				entries[entryIdx].TunedCountry = match.CountryCode
-				entries[entryIdx].TunedRegion = match.RegionCode
-
-				// Only set TunedCity if the match is a city-level place
-				if match.PlaceType == "city" {
-					entries[entryIdx].TunedCity = match.Name
-				}
+				entries[entryIdx].TunedEntry = match
 			}
 		}
 	}
@@ -182,4 +175,69 @@ func callPlaceSearchAPI(request PlaceSearchRequest) ([]PlaceSearchResult, error)
 	}
 
 	return response.Results, nil
+}
+
+func GetEntriesFromServer(entry_rows []parser.Row) []Entry {
+	const maxBatchSize = 1000 // API limit
+
+	// Build the batch request
+	var entries []Entry
+	var rows []PlaceSearchRow
+	var entryIndices []int // Track which entries correspond to which rows
+
+	for i, entry := range entry_rows {
+		rows = append(rows, PlaceSearchRow{
+			CountryCode: entry.CountryCode,
+			RegionCode:  entry.RegionCode,
+			CityName:    entry.City,
+			MaxResults:  1, // We only need the best match
+			SearchMode:  "auto",
+		})
+		entryIndices = append(entryIndices, i)
+
+		entries = append(entries, Entry{
+			Row: entry,
+		})
+	}
+
+	// If no entries to process, return early
+	if len(rows) == 0 {
+		return entries
+	}
+
+	// Process in batches of up to 1000 rows
+	for batchStart := 0; batchStart < len(rows); batchStart += maxBatchSize {
+		batchEnd := batchStart + maxBatchSize
+		if batchEnd > len(rows) {
+			batchEnd = len(rows)
+		}
+
+		batchRows := rows[batchStart:batchEnd]
+		batchIndices := entryIndices[batchStart:batchEnd]
+
+		// Call the place-search API for this batch
+		request := PlaceSearchRequest{Rows: batchRows}
+		results, err := callPlaceSearchAPI(request)
+		if err != nil {
+			// Log error but don't fail - just skip tuning for this batch
+			fmt.Printf("Warning: Failed to call place-search API for batch %d-%d: %v\n", batchStart, batchEnd, err)
+			continue
+		}
+
+		// Process results and populate tuned fields
+		for i, result := range results {
+			if i >= len(batchIndices) {
+				break
+			}
+
+			entryIdx := batchIndices[i]
+
+			// If there's a match, use it to populate tuned fields
+			if len(result.Matches) > 0 {
+				match := result.Matches[0]
+				entries[entryIdx].TunedEntry = match
+			}
+		}
+	}
+	return entries
 }
