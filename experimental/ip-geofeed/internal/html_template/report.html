@@ -808,9 +808,11 @@
              data-has-error="{{.HasError}}" 
              data-has-suggestion="{{.HasSuggestion}}" 
              data-tunable="{{.Tunable}}" 
-             data-tuned-country="{{.TunedCountry}}" 
-             data-tuned-region="{{.TunedRegion}}" 
-             data-tuned-city="{{.TunedCity}}">
+             data-tuned-country="{{.TunedEntry.CountryCode}}" 
+             data-tuned-region="{{.TunedEntry.RegionCode}}" 
+             data-tuned-city="{{.TunedEntry.Name}}"
+             data-h3-cells="{{.TunedEntry.H3Cells}}"
+             data-bounding-box="{{.TunedEntry.BoundingBox}}">
                 <td><input type="checkbox" class="row-checkbox" checked></td>
                 <td>{{.Line}}</td>
                 <td><span class="status-badge status-{{if eq .Status "ERROR"}}error{{else if eq .Status "WARNING"}}warning{{else if eq .Status "SUGGESTION"}}suggestion{{else}}ok{{end}}"><i class="bi {{if eq .Status "ERROR"}}bi-x-circle-fill{{else if eq .Status "WARNING"}}bi-exclamation-triangle-fill{{else if eq .Status "SUGGESTION"}}bi-lightbulb-fill{{else}}bi-check-circle-fill{{end}}"></i>{{.Status}}</span></td>

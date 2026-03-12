@@ -59,10 +59,8 @@ type Entry struct {
 	IPVersion      string
 	DoNotGeolocate bool
 	GeocodingHint  string
-	TunedCountry   string
-	TunedRegion    string
-	TunedCity      string
 	Tunable        bool
+	TunedEntry     Location
 }
 
 // Metadata represents summary information
@@ -167,37 +165,32 @@ func LoadValidationData() (*ValidationContext, error) {
 }
 
 // ValidateEntries validates a list of entries and populates their messages and status
-func ValidateEntries(rows []parser.Row) ([]Entry, error) {
+func ValidateEntries(entries []Entry) error {
 	// Load validation data
 	ctx, err := LoadValidationData()
 	if err != nil {
-		return nil, fmt.Errorf("error loading validation data: %w", err)
-	}
-
-	entries := make([]Entry, len(rows))
-	for i, row := range rows {
-		entries[i] = Entry{Row: row}
+		return fmt.Errorf("error loading validation data: %w", err)
 	}
 
 	// Validate each entry
 	for i := range entries {
 		ValidateEntry(&entries[i], ctx)
 	}
-	return entries, nil
+	return nil
 }
 
-// ValidateAndTuneEntries validates entries and then applies tuning recommendations
-func ValidateAndTuneEntries(rows []parser.Row) ([]Entry, error) {
-	entries, err := ValidateEntries(rows)
-	if err != nil {
-		return nil, err
-	}
+// // ValidateAndTuneEntries validates entries and then applies tuning recommendations
+// func ValidateAndTuneEntries(rows []parser.Row) error {
+// 	entries, err := ValidateEntries(rows)
+// 	if err != nil {
+// 		return err
+// 	}
 
-	// Tune entries based on validation results and geocoding hints
-	TuneEntries(entries)
+// 	// Tune entries based on validation results and geocoding hints
+// 	TuneEntries(entries)
 
-	return entries, nil
-}
+// 	return nil
+// }
 
 func GetMetadataFromEntries(entries []Entry, inputFile string, invalidEntries int) Metadata {
 	metadata := Metadata{
