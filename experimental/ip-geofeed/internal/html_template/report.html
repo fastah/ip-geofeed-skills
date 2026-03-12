@@ -2104,7 +2104,6 @@
                         fillColor: data.color, fillOpacity: 0.35
                     });
                     rect.bindPopup(data.popup);
-                    rect.on('click', () => highlightTableRow(data.rowId, data.color));
                     summaryLayerGroup.addLayer(rect);
                     const cm = L.circleMarker([(south + north) / 2, (west + east) / 2], {
                         radius: 5, color: data.color, fillColor: data.color, fillOpacity: 0.9, weight: 1
@@ -2125,7 +2124,6 @@
                                 fillColor: data.color, fillOpacity: 0.35
                             });
                             poly.bindPopup(data.popup);
-                            poly.on('click', () => highlightTableRow(data.rowId, data.color));
                             summaryLayerGroup.addLayer(poly);
                             const b = poly.getBounds();
                             tempBoundsLayers.push(L.rectangle([[b.getSouth(), b.getWest()], [b.getNorth(), b.getEast()]]));
@@ -2141,15 +2139,6 @@
             }
         }
         
-        function highlightTableRow(rowId, color) {
-            const targetRow = document.getElementById(rowId);
-            if (targetRow) {
-                targetRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                const prev = targetRow.style.outline;
-                targetRow.style.outline = '3px solid ' + color;
-                setTimeout(() => { targetRow.style.outline = prev; }, 2000);
-            }
-        }
         
         /**
          * Updates pagination display for current page
