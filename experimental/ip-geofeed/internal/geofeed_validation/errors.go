@@ -18,11 +18,11 @@ type ValidationError struct {
 
 // IP Prefix Errors
 var (
-	ErrIPPrefixEmpty     = ValidationError{ID: "1101", Type: ErrorType, Field: "ip_prefix", Message: "IP prefix is empty", Tunable: false}
-	ErrIPPrefixInvalid   = ValidationError{ID: "1102", Type: ErrorType, Field: "ip_prefix", Message: "Invalid IP prefix: unable to parse as IPv4 or IPv6 network", Tunable: false}
-	ErrIPPrefixNonPublic = ValidationError{ID: "1103", Type: ErrorType, Field: "ip_prefix", Message: "Non-public IP range is not allowed in an RFC 8805 feed", Tunable: false}
-	WarnIPv4PrefixLarge  = ValidationError{ID: "2101", Type: WarningType, Field: "ip_prefix", Message: "IPv4 prefix is unusually large and may indicate a typo", Tunable: false}
-	WarnIPv6PrefixLarge  = ValidationError{ID: "2102", Type: WarningType, Field: "ip_prefix", Message: "IPv6 prefix is unusually large and may indicate a typo", Tunable: false}
+	ErrIPPrefixEmpty       = ValidationError{ID: "1101", Type: ErrorType, Field: "ip_prefix", Message: "IP prefix is empty", Tunable: false}
+	ErrIPPrefixInvalid     = ValidationError{ID: "1102", Type: ErrorType, Field: "ip_prefix", Message: "Invalid IP prefix: unable to parse as IPv4 or IPv6 network", Tunable: false}
+	ErrIPPrefixNonPublic   = ValidationError{ID: "1103", Type: ErrorType, Field: "ip_prefix", Message: "Non-public IP range is not allowed in an RFC 8805 feed", Tunable: false}
+	SuggestIPv4PrefixLarge = ValidationError{ID: "3101", Type: SuggestType, Field: "ip_prefix", Message: "IPv4 prefix is unusually large and may indicate a typo", Tunable: false}
+	SuggestIPv6PrefixLarge = ValidationError{ID: "3102", Type: SuggestType, Field: "ip_prefix", Message: "IPv6 prefix is unusually large and may indicate a typo", Tunable: false}
 )
 
 // Country Code Errors
