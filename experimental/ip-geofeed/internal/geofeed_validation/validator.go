@@ -372,12 +372,12 @@ func ValidateIPPrefix(entry *Entry) {
 	if entry.IPVersion == "IPv4" {
 		ones, _ := ipNet.Mask.Size()
 		if ones < 22 {
-			entry.AddStatusMessage(WarnIPv4PrefixLarge)
+			entry.AddStatusMessage(SuggestIPv4PrefixLarge)
 		}
 	} else { // IPv6
 		ones, _ := ipNet.Mask.Size()
 		if ones < 64 {
-			entry.AddStatusMessage(WarnIPv6PrefixLarge)
+			entry.AddStatusMessage(SuggestIPv6PrefixLarge)
 		}
 	}
 }
