@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Netname Records</title>
+    <title>Source Records</title>
     <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <style>
@@ -36,7 +36,7 @@
             border-radius: 15px 15px 0 0;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         }
-        .entries-table {
+        .source-table {
             width: 100%;
             border-collapse: collapse;
             border-radius: 8px;
@@ -44,11 +44,11 @@
             table-layout: fixed;
             margin-top: 20px;
         }
-        .entries-table thead {
+        .source-table thead {
             background-color: #4a4a4a;
             color: white;
         }
-        .entries-table th {
+        .source-table th {
             padding: 12px;
             text-align: left;
             border: 1px solid #d3d3d3;
@@ -56,49 +56,41 @@
             background-color: #6b6b6b;
             color: #ffffff;
         }
-        .entries-table td {
+        .source-table td {
             padding: 12px;
             border: 1px solid #d3d3d3;
             vertical-align: top;
             word-wrap: break-word;
             overflow-wrap: break-word;
         }
-        .entries-table tbody tr:nth-child(odd) {
+        .source-table tbody tr:nth-child(odd) {
             background-color: #f9f9f9;
         }
-        .entries-table tbody tr:hover {
+        .source-table tbody tr:hover {
             background-color: #f0f0f0;
         }
     </style>
 </head>
 <body>
     <div class="report-container">
-        <h1>Netname Records</h1>
-        <table class="entries-table">
+        <h1>Source Records</h1>
+        <table class="source-table">
             <colgroup>
-                <col style="width: 20%;">
-                <col style="width: 10%;">
-                <col style="width: 15%;">
-                <col style="width: 20%;">
-                <col style="width: 35%;">
+                <col style="width: 30%;">
+                <col style="width: 70%;">
             </colgroup>
             <thead>
                 <tr>
-                    <th>INETNUM</th>
                     <th>Source</th>
-                    <th>ORG</th>
                     <th>Netname</th>
-                    <th>Geofeed</th>
                 </tr>
             </thead>
             <tbody>
-                {{range .Records}}
+                {{$source := .Source}}
+                {{range .Netnames}}
                 <tr>
-                    <td><a href="{{.ReportURL}}" target="_blank">{{.Inetnum}}</a></td>
-                    <td>{{.Source}}</td>
-                    <td>{{.Org}}</td>
-                    <td>{{.Netname}}</td>
-                    <td>{{.Geofeed}}</td>
+                    <td>{{$source}}</td>
+                    <td><a href="{{.TableURL}}" target="_blank">{{.Name}}</a></td>
                 </tr>
                 {{end}}
             </tbody>

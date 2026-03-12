@@ -96,3 +96,44 @@ func GenerateNetnameHTMLTable(records []geofeed_validation.Record, path string) 
 
 	return nil
 }
+
+func GenerateSourceHTMLTable(Netnames []geofeed_validation.Netname, source, path string) error {
+	// Parse the template file
+	tmpl, err := template.ParseFiles("internal/html_template/source_table.html")
+	if err != nil {
+		return fmt.Errorf("parsing template file: %w", err)
+	}
+
+	// Create the data structure to pass to the template
+	data := struct {
+		Netnames []geofeed_validation.Netname
+		Source   string
+	}{
+		Netnames: Netnames,
+		Source:   source,
+	}
+
+	// Extract directory
+	filePath := filepath.Join("run", "output", path)
+	dirPath := filepath.Dir(filePath)
+
+	// Create directories if they don't exist
+	err = os.MkdirAll(dirPath, 0755)
+	if err != nil {
+		return fmt.Errorf("creating output directory: %w", err)
+	}
+
+	outputFile, err := os.Create(filePath)
+	if err != nil {
+		return fmt.Errorf("creating output file: %w", err)
+	}
+	defer outputFile.Close()
+
+	// Execute the template with the data
+	err = tmpl.Execute(outputFile, data)
+	if err != nil {
+		return fmt.Errorf("executing template: %w", err)
+	}
+
+	return nil
+}
