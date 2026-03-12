@@ -18,16 +18,20 @@ func GeofeedsValidation(path string, limitEntries int) error {
 
 	for _, rir := range RIRCollection.RIRs {
 		fmt.Println("Processing RIR:", rir.Name)
+		sourceTableData := []geofeed_validation.Netname{}
+		rirPathPrefix := geofeed_validation.GetSourceTablePath(rir.Name)
 
 		for _, netname := range rir.Netnames {
 			fmt.Println("Processing Netname:", netname.Name)
-			outPath := geofeed_validation.OutputPath(rir.Name, netname.Name)
-			netname_table_data := []geofeed_validation.Record{}
+			netnameTableData := []geofeed_validation.Record{}
+			sanitizedNetname := geofeed_validation.GetNetnameTablePath(netname.Name)
+			netnamePathPrefix := filepath.Join(rirPathPrefix, sanitizedNetname)
 
 			for index, record := range netname.Records {
-				filename := fmt.Sprintf("%d.html", index+1)
+				reportRelativePath := fmt.Sprintf("%d.html", index+1)
+				reportPath := filepath.Join(netnamePathPrefix, reportRelativePath)
 
-				err := GeofeedValidation(record.Geofeed, filepath.Join(outPath, filename), limitEntries)
+				err := GeofeedValidation(record.Geofeed, reportPath, limitEntries)
 				if err != nil {
 					fmt.Printf("Error processing Geofeed: %v\n", err)
 					continue
@@ -35,21 +39,41 @@ func GeofeedsValidation(path string, limitEntries int) error {
 					fmt.Printf("Successfully processed Geofeed: %s\n", record.Geofeed)
 				}
 
-				record.ReportURL = filename
-				netname_table_data = append(netname_table_data, record)
+				record.ReportURL = reportRelativePath
+				netnameTableData = append(netnameTableData, record)
 			}
 
-			if len(netname_table_data) == 0 {
+			if len(netnameTableData) == 0 {
 				fmt.Printf("No valid records found for Netname: %s\n", netname.Name)
 				continue
 			}
-			err := html_template.GenerateNetnameHTMLTable(netname_table_data, filepath.Join(outPath, "index.html"))
+
+			netnameTableRelativePath := filepath.Join(sanitizedNetname, "index.html")
+			err := html_template.GenerateNetnameHTMLTable(netnameTableData, filepath.Join(rirPathPrefix, netnameTableRelativePath))
 			if err != nil {
 				fmt.Printf("Error generating Netname HTML table: %v\n", err)
 				continue
 			} else {
 				fmt.Printf("Successfully generated Netname HTML table for: %s\n", netname.Name)
 			}
+			sourceTableData = append(sourceTableData, geofeed_validation.Netname{
+				Name:     netname.Name,
+				TableURL: netnameTableRelativePath,
+			})
+		}
+
+		if len(sourceTableData) == 0 {
+			fmt.Printf("No valid records found for RIR: %s\n", rir.Name)
+			continue
+		}
+
+		sourceTableURL := filepath.Join(rirPathPrefix, "index.html")
+		err := html_template.GenerateSourceHTMLTable(sourceTableData, rir.Name, sourceTableURL)
+		if err != nil {
+			fmt.Printf("Error generating Source HTML table: %v\n", err)
+			continue
+		} else {
+			fmt.Printf("Successfully generated Source HTML table for: %s\n", rir.Name)
 		}
 	}
 	return nil
