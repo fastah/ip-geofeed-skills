@@ -89,10 +89,12 @@ func GeofeedValidation(path, outputPath string, limitEntries int) error {
 	}
 
 	// Validate entries
-	entries := geofeed_validation.GetEntriesFromServer(rows)
-	err = geofeed_validation.ValidateEntries(entries)
+	entries, errEntries, err := geofeed_validation.ValidateEntries(rows)
 	if err != nil {
 		return fmt.Errorf("error validating entries: %w", err)
+	}
+	for _, errEntry := range errEntries {
+		fmt.Printf("Error validating entry: %v, %s, %s, %s, %s\n", errEntry.Line, errEntry.IPPrefix, errEntry.CountryCode, errEntry.RegionCode, errEntry.City)
 	}
 
 	// Metadata summary

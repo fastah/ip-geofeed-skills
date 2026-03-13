@@ -165,18 +165,19 @@ func LoadValidationData() (*ValidationContext, error) {
 }
 
 // ValidateEntries validates a list of entries and populates their messages and status
-func ValidateEntries(entries []Entry) error {
+func ValidateEntries(rows []parser.Row) ([]Entry, []Entry, error) {
 	// Load validation data
 	ctx, err := LoadValidationData()
 	if err != nil {
-		return fmt.Errorf("error loading validation data: %w", err)
+		return nil, nil, fmt.Errorf("error loading validation data: %w", err)
 	}
+	entries, errEntries := GetEntriesFromServer(rows, ctx)
 
 	// Validate each entry
 	for i := range entries {
 		ValidateEntry(&entries[i], ctx)
 	}
-	return nil
+	return entries, errEntries, nil
 }
 
 // // ValidateAndTuneEntries validates entries and then applies tuning recommendations
@@ -490,4 +491,19 @@ func ValidatePostalCode(entry *Entry) {
 	if entry.PostalCode != "" {
 		entry.AddStatusMessage(ErrPostalCodeDeprecated)
 	}
+}
+
+func CheckForIsuues(country, region string, ctx *ValidationContext) bool {
+	if country == "" {
+		return false
+	}
+	if _, exists := ctx.Countries[country]; exists {
+		return true
+	}
+
+	if _, exists := ctx.Regions[region]; region != "" && exists {
+		return true
+	}
+
+	return false
 }

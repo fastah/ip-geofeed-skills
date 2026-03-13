@@ -177,13 +177,14 @@ func callPlaceSearchAPI(request PlaceSearchRequest) ([]PlaceSearchResult, error)
 	return response.Results, nil
 }
 
-func GetEntriesFromServer(entry_rows []parser.Row) []Entry {
+func GetEntriesFromServer(entry_rows []parser.Row, ctx *ValidationContext) ([]Entry, []Entry) {
 	const maxBatchSize = 1000 // API limit
 
 	// Build the batch request
-	var entries []Entry
+	entries := make([]Entry, 0, len(entry_rows))
 	var rows []PlaceSearchRow
 	var entryIndices []int // Track which entries correspond to which rows
+	errEntries := make([]Entry, 0)
 
 	for i, entry := range entry_rows {
 		rows = append(rows, PlaceSearchRow{
@@ -202,7 +203,7 @@ func GetEntriesFromServer(entry_rows []parser.Row) []Entry {
 
 	// If no entries to process, return early
 	if len(rows) == 0 {
-		return entries
+		return entries, errEntries
 	}
 
 	// Process in batches of up to 1000 rows
@@ -236,8 +237,11 @@ func GetEntriesFromServer(entry_rows []parser.Row) []Entry {
 			if len(result.Matches) > 0 {
 				match := result.Matches[0]
 				entries[entryIdx].TunedEntry = match
+			} else if hasIssue := CheckForIsuues(entries[entryIdx].CountryCode, entries[entryIdx].RegionCode, ctx); hasIssue {
+				errEntries = append(errEntries, entries[entryIdx])
 			}
+
 		}
 	}
-	return entries
+	return entries, errEntries
 }
