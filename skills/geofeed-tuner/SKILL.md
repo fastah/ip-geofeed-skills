@@ -80,8 +80,8 @@ All generated, temporary, and output files must be written to these directories:
   - **Phase 3: Checks & Suggestions**  
     Validate CSV structure, analyze IP prefixes, and check geolocation data quality.
 
-  - **Phase 4: Region Suggestion Lookup**  
-    For entries missing region codes but with city names, perform lookups to suggest region codes.
+  - **Phase 4: Tuning Data Lookup**  
+    Use Fastah's MCP tool to retrieve tuning data for improving geolocation accuracy.
 
   - **Phase 5: Generate Tuning Report**  
     Create a HTML report summarizing the analysis and suggestions.
@@ -132,7 +132,7 @@ This research phase establishes the conceptual foundation needed before performi
 - Generate **exactly one script** for this phase.
 - Do NOT combine this phase with others.
 - Do NOT precompute future-phase data.
-- Store the output as a JSON file at: [`./run/data/temp.json`](./run/data/temp.json)
+- Store the output as a JSON file at: [`./run/data/report-data.json`](./run/data/report-data.json)
 
 #### Schema Definition
 
@@ -421,46 +421,44 @@ This phase applies **opinionated recommendations** beyond RFC 8805 — suggestio
     - Message: `Confirm whether this subnet is intentionally marked as do-not-geolocate or missing location data`
 
 
-### Phase 4: Region Suggestion Lookup
+### Phase 4: Tuning Data Lookup
 
 #### Objective
-Generate region suggestions for applicable entries using the Mapbox reverse geocode tool.
+Lookup all the entries in file using Fastah's `rfc8805-row-place-search` tool.
 
 #### Execution Rules
 - Use **separate script** for payload generation.
-- Perform the lookup **once per validation run** (batch mode).
-- Construct the payload and send it to the MCP server.
+- Server only accepts 1000 entries per request, so if there are more than 1000 entries, split into multiple requests.
+- Construct the payloads and send them to the MCP server.
 - Failure to retrieve suggestions must **NOT block validation**.
-- Suggestions are **advisory only** — **never auto-populate** the `region` field.
+- Suggestions are **advisory only** — **never auto-populate** them.
 
 #### Step 1: Load Dataset
-Load the dataset from: [./run/data/temp.json](./run/data/temp.json)
+Load the dataset from: [./run/data/report-data.json](./run/data/report-data.json)
 - Read the `entries` array.
-- Include entries where:
-  - `need_region == true`
-- Exclude all others.
+- Include all entries 
 
 #### Step 2: Build Lookup Payload
 
-Construct a deduplicated list of city–country pairs:
+Store a map to associate responses with their original entries. The server returns suggestions in the same order as the requests, allowing positional matching.
 
 ```json
 [
-  {"q": "Bangalore", "country": ["IN"], "limit": 3},
-  {"q": "Mumbai", "country": ["IN"], "limit": 3},
-  {"q": "Pune", "country": ["IN"], "limit": 3}
+    {"countryCode":"CA","regionCode":"CA-ON","cityName":"Toronto"},
+    {"countryCode":"IN","regionCode":"IN-KA","cityName":"Bangalore"}
+    {"countryCode":"IN","regionCode":"IN-KA"}
 ]
 ```
+
 Rules:
-- Deduplicate identical pairs.
-- Write payload to: [./run/data/region-lookup-input.json](./run/data/region-lookup-input.json)
+- Write payload to: [./run/data/mcp-server-payload.json](./run/data/mcp-server-payload.json)
 - Exit the script after writing the payload.
 
-#### Step 3: Invoke Mapbox MCP Tool
+#### Step 3: Invoke Fastah MCP Tool
 
-- Server: `https://mcp.mapbox.com/mcp`
-- Tool: `search_and_geocode_tool `
-- Open [./run/data/region-lookup-input.json](./run/data/region-lookup-input.json) and send all entries parallely.
+- Server: `https://mcp.fastah.ai/mcp`
+- Tool: `rfc8805-row-place-search`
+- Open [./run/data/mcp-server-payload.json](./run/data/mcp-server-payload.json) and send all entries in a single request if there are fewer than 1000 entries. If there are more than 1000 entries, split into multiple requests of 1000 entries each.      
 
 - Do NOT use local data.
 
@@ -469,7 +467,6 @@ Rules:
 Use the data received from the MCP server.
 
 Rules:
-- Deduplicate suggestions by `region_code`.
 - Preserve response order (assumed relevance-ranked)
 - Keep **at least three suggestions** when available
 - If fewer than three exist, keep all returned values
@@ -480,33 +477,34 @@ Rules:
 #### Step 5: Attach Suggestions to Entries
 
 - Use **separate script** for attaching suggestions.
-- Load: [./run/data/temp.json](./run/data/temp.json)
+- Load: [./run/data/report-data.json](./run/data/report-data.json)
 - Match responses back to entries using:
-  - `city`
-  - `country`
+  - Positional matching (rely on order of entries in the request and response)
 
 Create the field if it does not exist:
 
 ```json
-"region_suggestions": []
+"tuned_entries": []
 ```
 
 Populate with:
 
 ```json
 {
-  "region_code": "",
-  "region_name": "",
-  "relevance": 0.0
+  "placeName": "",
+  "countryCode": "",
+  "regionCode": "",
+  "placeType": "",
+  "h3Cells": [],
+  "boundingBox": []
 }
 ```
 
 #### Step 6: Store Updated Dataset
 
-- Write the dataset back to: [./run/data/temp.json](./run/data/temp.json)
+- Write the dataset back to: [./run/data/report-data.json](./run/data/report-data.json)
 - Rules:
   - Maintain all existing validation flags.
-  - Do NOT modify the `region` field.
   - Do NOT create additional intermediate files.
 
 
