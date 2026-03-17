@@ -292,8 +292,8 @@ The goal is to ensure the file can be parsed reliably and normalized into a **co
       - Any subnet failing mandatory RFC 8805 constraints
       - Message: `Subnet is not valid for publication in an RFC 8805 geofeed`
 
-  - **WARNING**
-    - Report the following conditions as **WARNING**:
+  - **SUGGESTION**
+    - Report the following conditions as **SUGGESTION**:
 
     - **Overly large IPv6 subnets**
       - Prefixes shorter than `/64`
