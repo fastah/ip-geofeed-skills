@@ -40,7 +40,7 @@ The following directories contain static distribution assets. **Do not create, m
 
 | Directory      | Purpose                                                    |
 |----------------|------------------------------------------------------------|
-| `assets/`      | Static data files (ISO codes, Bootstrap CSS/JS, examples)  |
+| `assets/`      | Static data files (ISO codes, examples)  |
 | `references/`  | RFC specifications and code snippets for reference         |
 | `scripts/`     | Contains executable code that agents can run and HTML template files used as visual references for reports  |
 
@@ -141,12 +141,12 @@ The JSON structure below is **IMMUTABLE**.
 ```json
 {
   "input_file": "",          // Filename or URL
-  "tuning_timestamp": "",   // Milliseconds since epoch 
+  "timestamp": "",   // Milliseconds since epoch 
 
   "total_entries": 0,
   "ipv4_entries": 0,
   "ipv6_entries": 0,
-  "invalid_subnet_entries": 0,
+  "invalid_entries": 0,
 
   "error_count": 0,
   "warning_count": 0,
@@ -163,7 +163,7 @@ The JSON structure below is **IMMUTABLE**.
       "line": 0,                 // Line number in CSV
       "ip_prefix": "",
       "country": "",
-      "flag": "",             
+//      "flag": "",             
       "region": "",
       "city": "",
 
@@ -176,7 +176,6 @@ The JSON structure below is **IMMUTABLE**.
         }
       ],            // List of validation messages
 
-      "need_region": false,
       "has_error": false,
       "has_warning": false,
       "has_suggestion": false,
@@ -186,11 +185,11 @@ The JSON structure below is **IMMUTABLE**.
 }
 ```
 - `input_file`: The original input source, either a local filename or a remote URL.
-- `tuning_timestamp`: The timestamp when the tuning was performed, in Milliseconds since epoch.
+- `timestamp`: The timestamp when the tuning was performed, in Milliseconds since epoch.
 - `total_entries`: The total number of entries processed from the input CSV.
 - `ipv4_entries`: The count of entries that are IPv4 subnets.
 - `ipv6_entries`: The count of entries that are IPv6 subnets.
-- `invalid_subnet_entries`: The count of entries that failed subnet parsing and validation.
+- `invalid_entries`: The count of entries that failed parsing and validation.
 - `error_count`: The total number of entries flagged with an ERROR status.
 - `warning_count`: The total number of entries flagged with a WARNING status.
 - `ok_count`: The total number of entries flagged with an OK status.
@@ -203,7 +202,7 @@ The JSON structure below is **IMMUTABLE**.
   - `line`: The line number in the original CSV file (1-based index).
   - `ip_prefix`: The normalized IP prefix in CIDR notation.
   - `country`: The country code (alpha-2) associated with the subnet.
-  - `flag`: The country flag emoji associated with the country code, if available.
+  <!-- - `flag`: The country flag emoji associated with the country code, if available. -->
   - `region`: The region code (ISO 3166-2) associated with the subnet, if provided.
   - `city`: The city name associated with the subnet, if provided.
   - `status`: The highest severity status assigned to the entry after validation (ERROR > WARNING > SUGGESTION > OK).
@@ -257,6 +256,11 @@ The goal is to ensure the file can be parsed reliably and normalized into a **co
     - Write the output file with a **UTF-8 BOM**.
     - Optionally remove comment rows where the **first column begins with `#`**.
     - This will also remove a header row if it begins with `#`.
+
+- **CSV Comments**
+  - Create a map of comments in a CSV file using the line number as the key and the line data as the value.
+  - Store empty lines as well.
+  - Store this map in a JSON file at: [`./run/data/comments.json`](./run/data/comments.json)
 
 - **Notes**
   - Both implementation paths (`pandas` and built-in `csv`) must write output using
@@ -517,168 +521,22 @@ Populate with:
 ### Phase 5: Generate Tuning Report
 
 - Generate a **self-contained HTML report** summarizing the analysis, issues, and improvement suggestions.
-- The report must use **local Bootstrap 5.3.8 assets** bundled in [`assets/bootstrap-5.3.8-dist/`](assets/bootstrap-5.3.8-dist/) for styling.
-  - Reference the local CSS file: `assets/bootstrap-5.3.8-dist/css/bootstrap.min.css`
-  - Reference the local JS file (if needed): `assets/bootstrap-5.3.8-dist/js/bootstrap.bundle.min.js`
-  - **Do not use CDN links** — the report must work offline without network access.
-- If inline rendering is supported by the UI, render the report directly. 
-- Write the HTML report to `./run/report/`, using [`./run/data/temp.json`](./run/data/temp.json) and open it with the system default browser.
-- Prefer Bootstrap layout classes, tables, badges, alerts, and collapsible UI elements for readability and consistency.
+- Write the HTML report to `./run/report/`  
+- Use the data from `./run/data/report-data.json` and `./run/data/comments.json.`
+- Use `./scripts/templates/index.html` as the template.
+- Do not modify anything in the template except embedding the required values.
+- After generating the report, open it using the system’s default browser.
 
-#### Summary Section
-
-Render a **fixed metrics panel** at the top of the report, consisting of **four separate tables stacked vertically (top-down)**.
-Each table must appear **one after the other**, never side-by-side.
-
-##### Table layout and styling requirements
-
-- Use `./scripts/templates/report_header.html` as the **visual and structural reference** for the metrics panel.
-- **Style the template and all summary tables using Bootstrap (v5.3.x)** for layout, spacing, and typography.
-  - Use Bootstrap table utilities (`.table`, `.table-bordered`, `.table-sm`, etc.) where appropriate.
-  - Use Bootstrap spacing and container classes to enforce margins and alignment.
-- All tables must have a **consistent width** across the report.
-- Table width must **fit within the page viewport** and respect horizontal margins.
-- Apply equal **left and right margins** so tables are visually centered.
-- Use a **clean, readable report style**:
-  - Clear table borders
-  - Bold header row
-  - Adequate cell padding
-- Do not allow tables to overflow horizontally.
-- Tables must scale cleanly for typical desktop screen widths and printing.
-
-Each table must use a **two-column key–value layout**:
-- **Left column**: metric label
-- **Right column**: computed value only
-
-
-###### Feed Metadata
-
-- Input file: display the source as a URL if provided; otherwise show the local file path and resolved filename.
-- Timestamp must be UTC, Milliseconds since epoch 
-
-| Metric               | Value |
-|----------------------|-------|
-| Input file           |       |
-| Tuning timestamp     |       |
-
-
-###### Entries
-
-| Metric                     | Value |
-|----------------------------|-------|
-| Total entries              |       |
-| IPv4 entries               |       |
-| IPv6 entries               |       |
-
-
-###### Analysis Summary
-
-| Metric        | Value |
-|---------------|-------|
-| ERROR count   |       |
-| WARNING count |       |
-| OK count      |       |
-
-
-###### Geographical Accuracy Classification
-
-| Metric                     | Value |
-|----------------------------|-------|
-| City-level accuracy        |       |
-| Region-level accuracy      |       |
-| Country-level accuracy     |       |
-| Do-not-geolocate entries   |       |
-
-
-#### Results Table
-
-Render a **single, stable, sortable HTML table** with **one row per input CSV entry**.
-- Preserve the **original CSV row order** by default.
-- Use `./scripts/templates/report_table.html` as the **visual and structural reference** for the table.
-
-Columns **must appear in this exact order**:
-
-| Column    | Description                                               |
-|-----------|-----------------------------------------------------------|
-| Line      | 1-based CSV line number                                   |
-| IP Prefix | Normalized CIDR notation                                  |
-| Country   | `alpha2code` with the corresponding country flag emoji    |
-| Region    | Region code or empty                                      |
-| City      | City name or empty                                        |
-| Status    | ERROR, WARNING, SUGGESTION, or OK                         |
-| Messages  | Ordered list of issues and suggestions                    |
-
-##### Large Feed Optimization
-
-- If the input CSV contains **10,000 or more entries**, the Results Table MUST include **only rows with issues** (ERROR, WARNING, SUGGESTION status) to prevent browser performance degradation.
-- OK entries are excluded from the table but **still counted** in the summary statistics.
-- This threshold balances completeness with browser rendering performance — a 10K-row table renders smoothly, while 100K+ rows cause browsers to hang.
-
-##### Column Definitions
-
-- **Line**  
-  - The **1-based line number** from the original input CSV file.  
-  - This value must refer to the physical line in the source file after comment handling.
-
-- **IP Prefix**  
-  - The IP subnet expressed in **normalized CIDR notation**.  
-
-- **Country**  
-  The two-letter ISO 3166-1 `alpha2code` associated with the subnet.  
-  - Always display the **country flag emoji** alongside the code in the HTML report.
-  - If the country code is invalid, display the raw value with the emoji omitted or replaced according to the rules.
-
-- **Region**  
-
-  The **ISO 3166-2 subdivision code** (for example, `US-CA`).
-
-  - UI Behavior
-    - Render the **Region** field as a **dropdown menu**.
-    - The **default selected value** MUST be the value provided in the CSV.
-    - Populate the dropdown with `region_suggestions` if available.
-    - Suggestions SHOULD be ordered by **confidence or relevance**, when available.
-    - Leave the field empty if no region is specified or applicable.
-    - The user MAY override the suggested value by selecting a different option from the dropdown.
-
-- **City**  
-  The city name associated with the subnet.  
-  - Leave empty if no city is provided.
-
-- **Status**  
-  - The **highest severity level** assigned to the row after all phases complete.  
-  - Severity order: `ERROR` > `WARNING` > `SUGGESTION` > `OK`
-
-
-- **Messages**  
-  An **ordered list** of issues and suggestions for the row.  
-  - Includes **ERROR**, **WARNING**, **SUGGESTION**, and **OBSERVATION** messages.
-
-##### Filtering and Visual Encoding
-
-- Apply **row-level visual styling** based on status:
-  - **ERROR**: light red background
-  - **WARNING**: light yellow background
-  - **SUGGESTION**: light blue or neutral background
-  - **OK**: light green background
-
-- Provide a **status filter dropdown** positioned **above the table**, aligned with the table title.
-  - Options:
-    - ERROR
-    - WARNING
-    - SUGGESTION
-    - OK
-    - All (default)
-
-- Filtering must:
-  - Operate on the **single table**
-  - Preserve original row order
-  - Toggle visibility only (do not remove rows from the DOM)
+#### Embedding Data into the Report
+- Embed summary statistics (total entries, error/warning/suggestion counts, accuracy levels) in the appropriate sections of the report.
+- Embed the detailed results table, including all entries and their validation messages, in the results section of the report.
+- Ensure that all data is properly escaped and formatted for HTML display to prevent rendering issues or security vulnerabilities.
+- Do not add any additional data or sections to the report beyond what is specified in the template and the dataset.
 
 
 #### Output Guarantees
 
 - Report must be readable in any modern browser without external network dependencies.
-- All Bootstrap CSS/JS must be referenced from local `assets/bootstrap-5.3.8-dist/` files.
 - All values must be derived **only from analysis output**, not recomputed heuristically.
 
 ### Phase 6: Final Review
