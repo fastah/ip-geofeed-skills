@@ -440,7 +440,13 @@ Load the dataset from: [./run/data/report-data.json](./run/data/report-data.json
 
 #### Step 2: Build Lookup Payload
 
-Store a map to associate responses with their original entries. The server returns suggestions in the same order as the requests, allowing positional matching.
+Because the server only accepts 1000 entries per request, you **must** preserve global ordering across multiple batched requests:
+- Assign each element of `entries` an `originalIndex` equal to its position in the `entries` array.
+- Build request batches of up to 1000 items each, **preserving the order** of `entries` within every batch.
+- For each batch, keep an in-memory structure like `[{ originalIndex, payload }, ...]` so you can later match responses back to the correct `originalIndex`.
+- When writing the MCP payload file, serialize only the `payload` objects (as shown below), but always in the same order as your in-memory batch list.
+- When reading responses for a batch, assume the server returns suggestions in the same order as the batch request. For the i‑th response in a batch, use the stored `originalIndex` of the i‑th request entry in that batch to attach the suggestion to the correct entry (`entries[originalIndex]` or a suggestions array indexed by `originalIndex`).
+- When combining results from multiple batches, reconstruct the global suggestion list by `originalIndex` so that suggestions remain aligned with the original `entries` ordering.
 
 ```json
 [
