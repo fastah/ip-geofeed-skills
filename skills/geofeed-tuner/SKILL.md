@@ -445,7 +445,7 @@ Store a map to associate responses with their original entries. The server retur
 ```json
 [
     {"countryCode":"CA","regionCode":"CA-ON","cityName":"Toronto"},
-    {"countryCode":"IN","regionCode":"IN-KA","cityName":"Bangalore"}
+    {"countryCode":"IN","regionCode":"IN-KA","cityName":"Bangalore"},
     {"countryCode":"IN","regionCode":"IN-KA"}
 ]
 ```
