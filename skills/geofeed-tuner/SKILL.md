@@ -427,9 +427,9 @@ This phase applies **opinionated recommendations** beyond RFC 8805 — suggestio
 Lookup all the entries in file using Fastah's `rfc8805-row-place-search` tool.
 
 #### Execution Rules
-- Use **separate script** for payload generation.
+- Use a **separate script** _only_ for payload generation (read the dataset and write one or more payload JSON files; do not call MCP from this script).
 - Server only accepts 1000 entries per request, so if there are more than 1000 entries, split into multiple requests.
-- Construct the payloads and send them to the MCP server.
+- The agent must read the generated payload files, construct the requests from them, and send those requests to the MCP server in batches of at most 1000 entries each.
 - Failure to retrieve suggestions must **NOT block validation**.
 - Suggestions are **advisory only** — **never auto-populate** them.
 
