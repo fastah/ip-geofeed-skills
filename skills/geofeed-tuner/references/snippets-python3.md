@@ -33,6 +33,33 @@
 
 Use a Python dictionary to track subnets and their associated geolocation properties. `IPv4Network`, `IPv6Network`, `IPv4Address`, and `IPv6Address` are all hashable and can be used as dictionary keys.
 
+## Detecting non-public IP ranges
+
+The SKILL.md references `is_private` for detecting non-public ranges. Use the network's properties:
+
+```python
+import ipaddress
+
+def is_non_public(network):
+    """Check if a network is non-public (private, loopback, link-local, multicast, or reserved).
+    
+    Note: In Python < 3.11, is_private may incorrectly flag some ranges
+    (e.g., 100.64.0.0/10 CGNAT space). Use is_global as the primary check
+    when available, with fallbacks for edge cases.
+    """
+    addr = network.network_address
+    return (
+        network.is_private
+        or network.is_loopback
+        or network.is_link_local
+        or network.is_multicast
+        or network.is_reserved
+        or not network.is_global  # catches most non-routable space
+    )
+```
+
+**Caution with `is_private` on Python < 3.11:** The `100.64.0.0/10` (Carrier-Grade NAT) range returns `is_private=True` but `is_global=False` in older Python versions. Since CGNAT space is not globally routable, flagging it as non-public is correct for RFC 8805 purposes.
+
 ## ISO 3166-1 country code validation
 
 Read the valid ISO 2-letter country codes from [assets/iso3166-1.json](../assets/iso3166-1.json), specifically the `alpha_2` attribute:
@@ -43,4 +70,16 @@ import json
 with open('assets/iso3166-1.json') as f:
     data = json.load(f)
     valid_countries = {c['alpha_2'] for c in data['3166-1']}
+```
+
+## ISO 3166-2 region code validation
+
+Read the valid region codes from [assets/iso3166-2.json](../assets/iso3166-2.json), specifically the `code` attribute. The top-level key is `3166-2` (matching the iso3166-1 pattern):
+
+```python
+import json
+
+with open('assets/iso3166-2.json') as f:
+    data = json.load(f)
+    valid_regions = {r['code'] for r in data['3166-2']}
 ```

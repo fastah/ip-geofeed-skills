@@ -68,6 +68,7 @@ All generated, temporary, and output files go in these directories:
 3. **All generated HTML reports** must be saved to `./run/report/`.
 4. **All generated Python scripts** must be saved to `./run/`.
 5. The `run/` directory may be cleared between sessions; do not store permanent data there.
+6. **Working directory for execution:** All generated scripts in `./run/` must be executed with the **skill root directory** (the directory containing `SKILL.md`) as the current working directory, so that relative paths like `assets/iso3166-1.json` and `./run/data/report-data.json` resolve correctly. Do not `cd` into `./run/` before running scripts.
 
 
 ## Processing Pipeline: Sequential Phase Execution
@@ -161,12 +162,12 @@ The key requirements from RFC 8805 that this skill enforces are summarized below
 
 #### Schema Definition
 
-The JSON structure below is **IMMUTABLE**.
+The JSON structure below is **IMMUTABLE** during Phase 3. Phase 4 will later add a `tuned_entries` array to each object in `entries` — this is the only permitted schema extension and happens in a separate phase.
 
 ```json
 {
   "input_file": "",
-  "timestamp": "",
+  "timestamp": 0,
 
   "total_entries": 0,
   "ipv4_entries": 0,
@@ -362,6 +363,8 @@ This phase runs after structural checks pass.
   - Sample code is available in the `references/` directory.
 
   - If a country is found in [`assets/small-territories.json`](assets/small-territories.json), set `is_small_territory` to `true`. This value is used in later checks and suggestions related to small territories.
+
+  - **Note:** `small-territories.json` contains some historic/disputed codes (`AN`, `CS`, `XK`) that are not present in `iso3166-1.json`. An entry using one of these as its `alpha2code` will fail the country code validation (ERROR) even though it matches as a small territory. The country code ERROR takes precedence — do not suppress it based on the small-territory flag.
 
   - **ERROR**
     - Report the following conditions as **ERROR**:
@@ -567,13 +570,15 @@ Entries with no UUID match (i.e. the MCP server returned no response for their U
 
 Generate a **self-contained HTML report** by injecting data from `./run/data/report-data.json` and `./run/data/comments.json` into the template at `./scripts/templates/index.html`.
 
-Write the completed report to `./run/report/geofeed-report.html`. After generating, open it in the system's default browser.
+Write the completed report to `./run/report/geofeed-report.html`. After generating, attempt to open it in the system's default browser (e.g., `webbrowser.open()`). If running in a headless environment, CI pipeline, or remote container where no browser is available, skip the browser step and instead present the file path to the user so they can open or download it.
 
 **Do not hand-write HTML for individual rows.** Write a Python script that reads the data files and produces the final HTML. Do not modify any CSS, JavaScript, or structural HTML in the template outside the injection points described below.
 
 #### Step 1: Inject Summary Metadata
 
-Replace the hardcoded values in the following elements by string substitution. All values come from `report-data.json` top-level fields:
+Replace the hardcoded values in the following elements by string substitution. All values come from `report-data.json` top-level fields.
+
+**Implementation note:** The template contains **pre-filled placeholder values** (e.g., `<span id="errorCountMetrics">0</span>`, `<span id="suggestionsMetrics">21</span>`) that differ per element. Use a regex pattern like `(<span id="{element_id}">)(.*?)(</span>)` to replace the inner text regardless of the existing content. Do not hardcode the old values.
 
 | Element (by `id`)        | Source field            | Notes                                                         |
 |--------------------------|-------------------------|---------------------------------------------------------------|
@@ -631,8 +636,8 @@ Replace the entire content of `<tbody id="entriesTableBody">` with generated row
  data-tuned-country="{tuned_entries[0].countryCode or ''}"
  data-tuned-region="{tuned_entries[0].regionCode or ''}"
  data-tuned-city="{tuned_entries[0].placeName or ''}"
- data-h3-cells="{JSON array string of tuned_entries[0].h3Cells or '[]'}"
- data-bounding-box="{JSON array string of tuned_entries[0].boundingBox or '[]'}">
+ data-h3-cells="{bracket-wrapped space-separated h3Cells from tuned_entries[0], or '[]'}"
+ data-bounding-box="{bracket-wrapped space-separated boundingBox from tuned_entries[0], or '[]'}">
     <td><input type="checkbox" class="row-checkbox" checked></td>
     <td>{line}</td>
     <td><span class="status-badge status-{status.lower()}">{status_icon}{status}</span></td>
@@ -653,6 +658,13 @@ Status badge icons — use exactly this markup per status:
 | `SUGGESTION` | `status-suggestion`        | `<i class="bi bi-lightbulb-fill"></i>`                    |
 
 `data-tunable` must be the string `"true"` only when `tuned_entries` is present and has at least one element — this is what allows the "Tune All" button to apply suggested values to the row.
+
+**Important: `data-h3-cells` and `data-bounding-box` format.** These are **NOT JSON arrays**. They are bracket-wrapped, space-separated values. The template JavaScript strips brackets with a regex and splits on whitespace/commas. Do **not** use JSON serialization (no quotes around string elements, no commas between numbers). Examples:
+- `data-h3-cells="[836752fffffffff 836755fffffffff]"` — correct
+- `data-h3-cells="["836752fffffffff","836755fffffffff"]"` — **WRONG**, quotes will break parsing
+- `data-bounding-box="[-71.70 10.73 -71.52 10.55]"` — correct (west north east south, space-separated)
+- `data-bounding-box="[-71.70, 10.73, -71.52, 10.55]"` — also works (commas tolerated) but spaces-only matches the template convention
+- Empty: use `"[]"` for both attributes when no tuning data is available.
 
 **Row 2 — Previous-values row:**
 ```html
@@ -709,6 +721,7 @@ Perform a final verification pass using concrete, checkable assertions before pr
 - On failure: `Row count mismatch: input has {N} data rows but report contains {M} entries.`
 
 **Check 2 — Summary counter integrity**
+- These counters use **mutual exclusion** based on the boolean flags, which mirrors the highest-severity `status` field. An entry with both `has_error: true` and `has_warning: true` is counted only in `error_count`, never in `warning_count`. This is equivalent to counting by the entry's `status` field.
 - Assert all of the following; correct any that fail before generating the report:
   - `error_count == sum(1 for e in entries if e['has_error'])`
   - `warning_count == sum(1 for e in entries if e['has_warning'] and not e['has_error'])`
@@ -718,6 +731,7 @@ Perform a final verification pass using concrete, checkable assertions before pr
 
 **Check 3 — Accuracy bucket integrity**
 - Assert: `city_level_accuracy + region_level_accuracy + country_level_accuracy + do_not_geolocate_entries == total_entries - invalid_entries`
+- **Note:** The accuracy buckets defined in Phase 3 say "Do not count entries with `has_error: true`", but the Check 3 formula above uses `total_entries - invalid_entries` (which still includes ERROR entries). This means ERROR entries (those that parsed as valid IPs but failed validation) **are** counted in accuracy buckets by their geo-field presence. Only `invalid_entries` (unparseable IP prefixes) are excluded. Follow the Check 3 formula as the authoritative rule.
 - On failure, trace and fix the bucketing logic before proceeding.
 
 **Check 4 — No duplicate line numbers**
