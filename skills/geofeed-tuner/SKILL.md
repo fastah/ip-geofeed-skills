@@ -513,6 +513,13 @@ Rules:
 
 #### Step 3: Invoke Fastah MCP Tool
 
+- An example `mcp.json` style configuration of Fastah MCP server is as follows:
+```json
+    "fastah-ip-geofeed": {
+      "type": "http",
+      "url": "https://mcp.fastah.ai/mcp"
+    }
+```
 - Server: `https://mcp.fastah.ai/mcp`
 - Tool: `rfc8805-row-place-search`
 - Open [./run/data/mcp-server-payload.json](./run/data/mcp-server-payload.json) and send all deduplicated entries with their rowKeys.
