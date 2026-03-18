@@ -68,14 +68,14 @@ All phases must be executed **in order**, from Phase 1 through Phase 6. Each pha
 
 The phases are summarized below. The agent must follow the detailed steps outlined further in each phase section.
 
-| Phase | Name                       | Description                                                         |
-|-------|----------------------------|---------------------------------------------------------------------|
-| 1     | Understand the Standard    | Learn RFC 8805 requirements for self-published IP geolocation feeds |
-| 2     | Gather Input               | Collect IP subnet data from local files or remote URLs              |
-| 3     | Checks & Suggestions       | Validate CSV structure, analyze IP prefixes, and check data quality |
-| 4     | Region Suggestion Lookup   | Suggest region codes for entries with city but no region            |
-| 5     | Generate Tuning Report     | Create an HTML report summarizing the analysis and suggestions      |
-| 6     | Final Review               | Ensure consistency and completeness of the report                   |
+| Phase | Name                       | Description                                                                       |
+|-------|----------------------------|-----------------------------------------------------------------------------------|
+| 1     | Understand the Standard    | Learn RFC 8805 requirements for self-published IP geolocation feeds               |
+| 2     | Gather Input               | Collect IP subnet data from local files or remote URLs                            |
+| 3     | Checks & Suggestions       | Validate CSV structure, analyze IP prefixes, and check data quality               |
+| 4     | Tuning Data Lookup         | Use Fastah's MCP tool to retrieve tuning data for improving geolocation accuracy. |
+| 5     | Generate Tuning Report     | Create an HTML report summarizing the analysis and suggestions                    |
+| 6     | Final Review               | Ensure consistency and completeness of the report                                 |
 
 **Do not skip phases.** Each phase provides critical checks or data transformations required by subsequent stages.
 
