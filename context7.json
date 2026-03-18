@@ -3,12 +3,18 @@
   "projectTitle": "Geofeed Tuner by Fastah",
   "description": "Helps create, refine, and improve CSV-format IP geolocation feeds with opinionated recommendations beyond RFC 8805 compliance.",
   "folders": [],
-  "excludeFolders": ["experimental"],
+  "excludeFolders": [
+    "experimental"
+  ],
   "excludeFiles": [],
-  "rules": ["Refer to the SKILL.md file in the geofeed-tuner skill."],
+  "rules": [
+    "Refer to the SKILL.md file in the geofeed-tuner skill."
+  ],
   "previousVersions": [
     {
       "tag": "v0.0.3"
     }
-  ]
+  ],
+  "url": "https://context7.com/fastah/ip-geofeed-skills",
+  "public_key": "pk_Q6PD5HsE0gDncCQ41XRkg"
 }
