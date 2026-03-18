@@ -1,10 +1,18 @@
 ---
 name: geofeed-tuner
-description: Helps create, refine, and improve CSV-format IP geolocation feeds with opinionated recommendations beyond RFC 8805 compliance.
+description: >
+  Use this skill whenever the user mentions IP geolocation feeds, RFC 8805, geofeeds, inetnum,
+  inet6num, CIDR subnets, or wants help creating, tuning, validating, or publishing a
+  self-published IP geolocation feed in CSV format. Also trigger when the user is a network
+  operator, ISP, mobile carrier, cloud provider, hosting company, IXP, or satellite provider
+  asking about IP geolocation accuracy, prefix mapping, or WHOIS geofeed attributes.
+  Helps create, refine, and improve CSV-format IP geolocation feeds with opinionated
+  recommendations beyond RFC 8805 compliance. Do NOT use for private or internal IP address
+  management — applies only to publicly routable IP addresses.
 license: Apache-2.0
 metadata:
   author: Sid Mathur <support@getfastah.com>
-  version: "0.3"
+  version: "0.4"
 compatibility: Requires Python 3
 ---
 
@@ -70,12 +78,12 @@ The phases are summarized below. The agent must follow the detailed steps outlin
 
 | Phase | Name                       | Description                                                                       |
 |-------|----------------------------|-----------------------------------------------------------------------------------|
-| 1     | Understand the Standard    | Learn RFC 8805 requirements for self-published IP geolocation feeds               |
+| 1     | Understand the Standard    | Review the key requirements of RFC 8805 for self-published IP geolocation feeds   |
 | 2     | Gather Input               | Collect IP subnet data from local files or remote URLs                            |
 | 3     | Checks & Suggestions       | Validate CSV structure, analyze IP prefixes, and check data quality               |
-| 4     | Tuning Data Lookup         | Use Fastah's MCP tool to retrieve tuning data for improving geolocation accuracy. |
+| 4     | Tuning Data Lookup         | Use Fastah's MCP tool to retrieve tuning data for improving geolocation accuracy  |
 | 5     | Generate Tuning Report     | Create an HTML report summarizing the analysis and suggestions                    |
-| 6     | Final Review               | Ensure consistency and completeness of the report                                 |
+| 6     | Final Review               | Verify consistency and completeness of the report data                            |
 
 **Do not skip phases.** Each phase provides critical checks or data transformations required by subsequent stages.
 
@@ -93,14 +101,32 @@ The plan MUST:
 
 ### Phase 1: Understand the Standard
 
-Think deeply about Section 1 (**Introduction**) and Section 2 (**Self-Published IP Geolocation Feeds**) of the locally available document [RFC 8805 – A Format for Self-Published IP Geolocation Feeds](references/rfc8805.txt).
+The key requirements from RFC 8805 that this skill enforces are summarized below. **Use this summary as your working reference.** Only consult the full [RFC 8805 text](references/rfc8805.txt) for edge cases, ambiguous situations, or when the user asks a standards question not covered here.
 
-The goal is to understand the **foundation** for IP geolocation feeds, including:
-- The overall purpose and scope of RFC 8805
-- The required and optional data elements
-- The expected syntax and semantics
+#### RFC 8805 Key Facts
 
-This research phase establishes the conceptual foundation needed before performing any input handling or analysis in later phases.
+**Purpose:** A self-published IP geolocation feed lets network operators publish authoritative location data for their IP address space in a simple CSV format, allowing geolocation providers to incorporate operator-supplied corrections.
+
+**CSV Column Order (Sections 2.1.1.1–2.1.1.5):**
+
+| Column | Field         | Required | Notes                                                      |
+|--------|---------------|----------|------------------------------------------------------------|
+| 1      | `ip_prefix`   | Yes      | CIDR notation; IPv4 or IPv6; must be a network address     |
+| 2      | `alpha2code`  | No       | ISO 3166-1 alpha-2 country code; empty = do-not-geolocate |
+| 3      | `region`      | No       | ISO 3166-2 subdivision code (e.g., `US-CA`)               |
+| 4      | `city`        | No       | Free-text city name; no authoritative validation set       |
+| 5      | `postal_code` | No       | **Deprecated** — must be left empty or absent             |
+
+**Structural rules:**
+- Files may contain comment lines beginning with `#` (including the header, if present).
+- A header row is optional; if present, it is treated as a comment if it starts with `#`.
+- Files must be encoded in UTF-8.
+- Subnet host bits must not be set (i.e., `192.168.1.1/24` is invalid; use `192.168.1.0/24`).
+- Applies only to **globally routable** unicast addresses — not private, loopback, link-local, or multicast space.
+
+**Do-not-geolocate:** An entry with an empty `alpha2code` (and empty region/city) is an explicit signal that the operator does not want geolocation applied to that prefix.
+
+**Postal codes deprecated (Section 2.1.1.5):** The fifth column must not contain postal or ZIP codes. They are too fine-grained for IP-range mapping and raise privacy concerns.
 
 
 ### Phase 2: Gather Input
@@ -110,9 +136,20 @@ This research phase establishes the conceptual foundation needed before performi
   - A local CSV file
   - A remote URL pointing to a CSV file
 
-- If the input is a **remote URL**, download the CSV file into `./run/data/` before processing.
+- If the input is a **remote URL**:
+  - Attempt to download the CSV file to `./run/data/` before processing.
+  - On HTTP error (4xx, 5xx, timeout, or redirect loop), **stop immediately** and report to the user:
+    `Feed URL is not reachable: HTTP {status_code}. Please verify the URL is publicly accessible.`
+  - Do not proceed to Phase 3 with an incomplete or empty download.
+
 - If the input is a **local file**, process it directly without downloading.
-- Normalize all input data to **UTF-8** encoding.
+
+- **Encoding detection and normalization:**
+  1. Attempt to read the file as UTF-8 first.
+  2. If a `UnicodeDecodeError` is raised, try `utf-8-sig` (UTF-8 with BOM), then `latin-1`.
+  3. Once successfully decoded, re-encode and write the working copy as UTF-8.
+  4. If no encoding succeeds, stop and report: `Unable to decode input file. Please save it as UTF-8 and try again.`
+
 
 ### Phase 3: Checks & Suggestions
 
@@ -128,8 +165,8 @@ The JSON structure below is **IMMUTABLE**.
 
 ```json
 {
-  "input_file": "",          // Filename or URL
-  "timestamp": "",   // Milliseconds since epoch
+  "input_file": "",
+  "timestamp": "",
 
   "total_entries": 0,
   "ipv4_entries": 0,
@@ -148,72 +185,83 @@ The JSON structure below is **IMMUTABLE**.
 
   "entries": [
     {
-      "line": 0,                 // Line number in CSV
+      "line": 0,
       "ip_prefix": "",
       "country": "",
-//      "flag": "",             
       "region": "",
       "city": "",
 
-      "status": "",              // Highest severity: ERROR | WARNING | SUGGESTION | OK
+      "status": "",
 
       "messages": [
         {
-          "status": "",            // ERROR | WARNING | SUGGESTION
-          "message": ""            // Descriptive message for the issue or suggestion
+          "status": "",
+          "message": ""
         }
-      ],            // List of validation messages
+      ],
 
       "has_error": false,
       "has_warning": false,
       "has_suggestion": false,
+      "need_region": false,
       "is_small_territory": false
     }
   ]
 }
 ```
+
+Field definitions:
 - `input_file`: The original input source, either a local filename or a remote URL.
-- `timestamp`: The timestamp when the tuning was performed, in milliseconds since epoch.
-- `total_entries`: The total number of entries processed from the input CSV.
-- `ipv4_entries`: The count of entries that are IPv4 subnets.
-- `ipv6_entries`: The count of entries that are IPv6 subnets.
-- `invalid_entries`: The count of entries that failed parsing and validation.
-- `error_count`: The total number of entries flagged with an ERROR status.
-- `warning_count`: The total number of entries flagged with a WARNING status.
-- `ok_count`: The total number of entries flagged with an OK status.
-- `suggestion_count`: The total number of entries flagged with a SUGGESTION status.
-- `city_level_accuracy`: The count of entries with city-level geolocation accuracy.
-- `region_level_accuracy`: The count of entries with region-level geolocation accuracy.
-- `country_level_accuracy`: The count of entries with country-level geolocation accuracy.
-- `do_not_geolocate_entries`: The count of entries that are intentionally marked as do-not-geolocate (no geolocation data provided).
-- `entries`: An array of objects, each representing a single entry from the input CSV, with the following fields:
-  - `line`: The line number in the original CSV file (1-based index).
-  - `ip_prefix`: The normalized IP prefix in CIDR notation.
-  - `country`: The country code (alpha-2) associated with the subnet.
-  <!-- - `flag`: The country flag emoji associated with the country code, if available. -->
-  - `region`: The region code (ISO 3166-2) associated with the subnet, if provided.
-  - `city`: The city name associated with the subnet, if provided.
-  - `status`: The highest severity status assigned to the entry after validation (ERROR > WARNING > SUGGESTION > OK).
-  - `messages`: An array of validation messages (errors, warnings, suggestions) related to the entry.
-    - `status`: The severity level of the message (ERROR, WARNING, SUGGESTION).
-    - `message`: A descriptive message explaining the issue or suggestion.
-  - `need_region`: A boolean flag indicating whether a region suggestion is needed for this entry.
-  - `has_error`: A boolean flag indicating whether this entry has any ERROR messages.
-  - `has_warning`: A boolean flag indicating whether this entry has any WARNING messages.
-  - `has_suggestion`: A boolean flag indicating whether this entry has any SUGGESTION messages.
-  - `is_small_territory`: A boolean flag indicating whether the country is classified as a small territory based on the provided dataset.
+- `timestamp`: Milliseconds since Unix epoch when the tuning was performed.
+- `total_entries`: Total number of data rows processed (excluding comment and blank lines).
+- `ipv4_entries`: Count of entries that are IPv4 subnets.
+- `ipv6_entries`: Count of entries that are IPv6 subnets.
+- `invalid_entries`: Count of entries that failed IP prefix parsing.
+- `error_count`: Total entries whose `status` is `ERROR`.
+- `warning_count`: Total entries whose `status` is `WARNING`.
+- `ok_count`: Total entries whose `status` is `OK`.
+- `suggestion_count`: Total entries whose `status` is `SUGGESTION`.
+- `city_level_accuracy`: Count of valid entries where `city` is non-empty.
+- `region_level_accuracy`: Count of valid entries where `region` is non-empty and `city` is empty.
+- `country_level_accuracy`: Count of valid entries where `country` is non-empty, `region` is empty, and `city` is empty.
+- `do_not_geolocate_entries`: Count of valid entries where `country`, `region`, and `city` are all empty.
+- `entries`: Array of objects, one per data row, with the following per-entry fields:
+  - `line`: 1-based line number in the original CSV (counting all lines including comments and blanks).
+  - `ip_prefix`: The normalized IP prefix in CIDR slash notation.
+  - `country`: The ISO 3166-1 alpha-2 country code, or empty string.
+  - `region`: The ISO 3166-2 region code (e.g., `US-CA`), or empty string.
+  - `city`: The city name, or empty string.
+  - `status`: Highest severity assigned: `ERROR` > `WARNING` > `SUGGESTION` > `OK`.
+  - `messages`: Array of `{ "status": "...", "message": "..." }` validation messages.
+  - `has_error`: `true` if any message has status `ERROR`.
+  - `has_warning`: `true` if any message has status `WARNING`.
+  - `has_suggestion`: `true` if any message has status `SUGGESTION`.
+  - `need_region`: `true` if the entry triggered the "missing region when city is specified" suggestion.
+  - `is_small_territory`: `true` if the country is classified as a small territory per `assets/small-territories.json`.
+
+#### Accuracy Level Counting Rules
+
+Accuracy levels are **mutually exclusive**. Assign each valid (non-ERROR, non-invalid) entry to exactly one bucket based on the most granular non-empty geo field:
+
+| Condition                                       | Bucket                     |
+|-------------------------------------------------|----------------------------|
+| `city` is non-empty                             | `city_level_accuracy`      |
+| `region` non-empty AND `city` is empty          | `region_level_accuracy`    |
+| `country` non-empty, `region` and `city` empty  | `country_level_accuracy`   |
+| All three fields (`country`, `region`, `city`) empty | `do_not_geolocate_entries` |
+
+**Do not count** entries with `has_error: true` or entries in `invalid_entries` in any accuracy bucket.
 
 The agent MUST NOT:
+- Rename fields
+- Add or remove fields
+- Change data types
+- Reorder keys
+- Alter nesting
+- Wrap the object
+- Split into multiple files
 
-- Rename fields  
-- Add or remove fields  
-- Change data types  
-- Reorder keys  
-- Alter nesting  
-- Wrap the object  
-- Split into multiple files  
-
-If a value is unknown, **leave it empty** never invent data.
+If a value is unknown, **leave it empty** — never invent data.
 
 #### Structure & Format Check
 
@@ -246,9 +294,9 @@ The goal is to ensure the file can be parsed reliably and normalized into a **co
   - **Comments**
     - Remove comment rows where the **first column begins with `#`**.
     - This also removes a header row if it begins with `#`.
-    - Create a map of comments using the line number as the key and the line data as the value.
-    - Store empty lines as well.
+    - Create a map of comments using the **1-based line number** as the key and the full original line as the value. Also store blank lines.
     - Store this map in a JSON file at: [`./run/data/comments.json`](./run/data/comments.json)
+    - Example: `{ "4": "# It's OK for small city states to leave state ISO2 code unspecified" }`
 
 - **Notes**
   - Both implementation paths (`pandas` and built-in `csv`) must write output using
@@ -315,7 +363,7 @@ This phase runs after structural checks pass.
 
   - If a country is found in [`assets/small-territories.json`](assets/small-territories.json), set `is_small_territory` to `true`. This value is used in later checks and suggestions related to small territories.
 
-  - **ERROR** 
+  - **ERROR**
     - Report the following conditions as **ERROR**:
     - **Invalid country code**
       - Condition: `alpha2code` is present but not found in the `alpha_2` set
@@ -332,13 +380,15 @@ This phase runs after structural checks pass.
     - Check that the format matches `{COUNTRY}-{SUBDIVISION}` (e.g., `US-CA`, `AU-NSW`).
     - Check the value against the `code` attribute (already prefixed with the country code).
 
-  - **ERROR** 
+  - **Small-territory exception:** If `is_small_territory` is `true` **and** the `region` value equals the entry's `alpha2code` (e.g., `SG` as both country and region for Singapore), treat the region as acceptable — skip all region validation checks for this entry. Small territories are effectively city-states with no meaningful ISO 3166-2 administrative subdivisions.
+
+  - **ERROR**
     - Report the following conditions as **ERROR**:
     - **Invalid region format**
-      - Condition: `region` does not match `{COUNTRY}-{SUBDIVISION}`
+      - Condition: `region` does not match `{COUNTRY}-{SUBDIVISION}` **and** the small-territory exception does not apply
       - Message: `Invalid region format; expected COUNTRY-SUBDIVISION (e.g., US-CA)`
     - **Unknown region code**
-      - Condition: `region` value is not found in the `code` set
+      - Condition: `region` value is not found in the `code` set **and** the small-territory exception does not apply
       - Message: `Invalid region code: not a valid ISO 3166-2 subdivision`
     - **Country–region mismatch**
       - Condition: Country portion of `region` does not match `alpha2code`
@@ -346,7 +396,7 @@ This phase runs after structural checks pass.
 
 ##### City Name Analysis
 
-  - City names are validated using **heuristic checks only**.  
+  - City names are validated using **heuristic checks only**.
   - There is currently **no authoritative dataset** available for validating city names.
 
   - **ERROR**
@@ -358,10 +408,10 @@ This phase runs after structural checks pass.
         - `null`
         - `N/A`
         - `TBD`
-        - `unknown` 
+        - `unknown`
       - Message: `Invalid city name: placeholder value is not allowed`
 
-    - **Truncated names, abbreviations, or airport codes**  
+    - **Truncated names, abbreviations, or airport codes**
       - Condition: Truncated names, abbreviations, or airport codes that do not represent valid city names:
         - `LA`
         - `Frft`
@@ -370,7 +420,7 @@ This phase runs after structural checks pass.
         - `SIN`
         - `MAA`
       - Message: `Invalid city name: abbreviated or code-based value detected`
-  
+
   - **WARNING**
     - Report the following conditions as **WARNING**:
     - **Inconsistent casing or formatting**
@@ -408,7 +458,7 @@ This phase applies **opinionated recommendations** beyond RFC 8805, learned from
       - `city` is non-empty
       - `region` is empty
       - `is_small_territory` is `false`
-    - Action: Set `need_region = true` 
+    - Action: Set `need_region = true`
     - Message: `Region code is recommended when a city is specified; consider adding the appropriate region code for better accuracy`
 
   - **Unspecified geolocation for subnet**
@@ -419,19 +469,19 @@ This phase applies **opinionated recommendations** beyond RFC 8805, learned from
 ### Phase 4: Tuning Data Lookup
 
 #### Objective
-Lookup all the entries in file using Fastah's `rfc8805-row-place-search` tool.
+Lookup all the entries in the file using Fastah's `rfc8805-row-place-search` tool.
 
 #### Execution Rules
 - Use a **separate script** _only_ for payload generation (read the dataset and write one or more payload JSON files; do not call MCP from this script).
 - Server only accepts 1000 entries per request, so if there are more than 1000 entries, split into multiple requests.
 - The agent must read the generated payload files, construct the requests from them, and send those requests to the MCP server in batches of at most 1000 entries each.
-- Failure to retrieve suggestions must **NOT block validation**.
+- **On MCP failure:** If the MCP server is unreachable, returns an error, or returns no results for any batch, log a warning and continue to Phase 5. Set `tuned_entries: []` for all affected entries. Do not block report generation. Notify the user clearly: `Tuning data lookup unavailable; the report will show validation results only.`
 - Suggestions are **advisory only** — **never auto-populate** them.
 
 #### Step 1: Load Dataset
 Load the dataset from: [./run/data/report-data.json](./run/data/report-data.json)
 - Read the `entries` array.
-- Include all entries 
+- Include all entries.
 
 #### Step 2: Build Lookup Payload with Deduplication
 
@@ -470,16 +520,16 @@ Rules:
 - The server will respond with the same `rowKey` field in each response for mapping back.
 - Do NOT use local data.
 
-#### Step 4: Attach tuned data to Entries
+#### Step 4: Attach Tuned Data to Entries
 
-- Use **separate script** for attaching tuned data.
+- Use a **separate script** for attaching tuned data.
 - Load both [./run/data/report-data.json](./run/data/report-data.json) and the deduplication map (held in memory from Step 2, or re-derived from the payload file).
 - For each response from the MCP server:
   - Extract the `rowKey` from the response.
   - Look up the `entryIndices` array associated with that `rowKey` from the deduplication map.
   - For each index in `entryIndices`, attach the normalized suggestions to `entries[index]`.
-- Keep **at least three suggestions** when available
-- If fewer than three exist, keep all returned values
+- Keep **at least three suggestions** when available.
+- If fewer than three exist, keep all returned values.
 
 Create the field on each affected entry if it does not exist:
 
@@ -505,32 +555,172 @@ Entries with no UUID match (i.e. the MCP server returned no response for their U
   - Maintain all existing validation flags.
   - Do NOT create additional intermediate files.
 
+
 ### Phase 5: Generate Tuning Report
 
-- Generate a **self-contained HTML report** summarizing the analysis, issues, and improvement suggestions.
-- Write the HTML report to `./run/report/`.
-- Use the data from `./run/data/report-data.json` and `./run/data/comments.json`.
-- Use `./scripts/templates/index.html` as the template.
-- Do not modify anything in the template except embedding the required values.
-- After generating the report, open it using the system’s default browser.
+Generate a **self-contained HTML report** by injecting data from `./run/data/report-data.json` and `./run/data/comments.json` into the template at `./scripts/templates/index.html`.
 
-#### Embedding Data into the Report
-- Embed summary statistics (total entries, error/warning/suggestion counts, accuracy levels) in the appropriate sections of the report.
-- Embed the detailed results table, including all entries and their validation messages, in the results section of the report.
-- Ensure that all data is properly escaped and formatted for HTML display to prevent rendering issues or security vulnerabilities.
-- Do not add any additional data or sections to the report beyond what is specified in the template and the dataset.
+Write the completed report to `./run/report/geofeed-report.html`. After generating, open it in the system's default browser.
 
+**Do not hand-write HTML for individual rows.** Write a Python script that reads the data files and produces the final HTML. Do not modify any CSS, JavaScript, or structural HTML in the template outside the injection points described below.
+
+#### Step 1: Inject Summary Metadata
+
+Replace the hardcoded values in the following elements by string substitution. All values come from `report-data.json` top-level fields:
+
+| Element (by `id`)        | Source field            | Notes                                                         |
+|--------------------------|-------------------------|---------------------------------------------------------------|
+| `#inputFileMetrics`      | `input_file`            | Replace inner text of the `<span>`                           |
+| timestamp `<script>`     | `timestamp`             | Replace only the integer `1773720806552` with the actual value|
+| `#totalEntriesMetrics`   | `total_entries`         | Replace inner text of the `<span>`                           |
+| `#ipv4EntriesMetrics`    | `ipv4_entries`          | Replace inner text of the `<span>`                           |
+| `#ipv6EntriesMetrics`    | `ipv6_entries`          | Replace inner text of the `<span>`                           |
+| `#invalidEntriesMetrics` | `invalid_entries`       | Replace inner text of the `<span>`                           |
+| `#errorCountMetrics`     | `error_count`           | Replace inner text of the `<span>`                           |
+| `#warningCountMetrics`   | `warning_count`         | Replace inner text of the `<span>`                           |
+| `#suggestionsMetrics`    | `suggestion_count`      | Replace inner text of the `<span>`                           |
+| `#okCountMetrics`        | `ok_count`              | Replace inner text of the `<span>`                           |
+| `#cityAccuracy`          | `city_level_accuracy`   | Replace inner text of the `<span>`                           |
+| `#regionAccuracy`        | `region_level_accuracy` | Replace inner text of the `<span>`                           |
+| `#countryAccuracy`       | `country_level_accuracy`| Replace inner text of the `<span>`                           |
+| `#doNotGeolocate`        | `do_not_geolocate_entries` | Replace inner text of the `<span>`                        |
+
+The timestamp element requires special treatment. Find this exact pattern in the template and replace only the integer literal:
+```html
+new Date( 1773720806552 )
+```
+Replace with:
+```html
+new Date( {timestamp} )
+```
+where `{timestamp}` is the integer millisecond epoch value from `report-data.json`.
+
+#### Step 2: Inject the Comment Map
+
+Locate this exact literal string in the template:
+```javascript
+const commentMap = JSON.parse('{}');
+```
+Replace the `'{}'` portion with the serialized, single-quote-safe JSON string of the comments map loaded from `./run/data/comments.json`. The result must be syntactically valid JavaScript — escape any single quotes inside comment text:
+```javascript
+const commentMap = JSON.parse('{...escaped JSON string...}');
+```
+
+#### Step 3: Generate and Inject Row HTML
+
+Replace the entire content of `<tbody id="entriesTableBody">` with generated rows. For each entry in `report-data.json`'s `entries` array, generate **three consecutive `<tr>` elements**:
+
+**Row 1 — Data row:**
+```html
+<tr
+ id="csv-r-{line}"
+ class="expandable-row"
+ data-geocoding-hint=""
+ data-do-not-geolocate="{true if country+region+city all empty, else false}"
+ data-has-warning="{has_warning}"
+ data-has-error="{has_error}"
+ data-has-suggestion="{has_suggestion}"
+ data-tunable="{true if tuned_entries is non-empty, else false}"
+ data-tuned-country="{tuned_entries[0].countryCode or ''}"
+ data-tuned-region="{tuned_entries[0].regionCode or ''}"
+ data-tuned-city="{tuned_entries[0].placeName or ''}"
+ data-h3-cells="{JSON array string of tuned_entries[0].h3Cells or '[]'}"
+ data-bounding-box="{JSON array string of tuned_entries[0].boundingBox or '[]'}">
+    <td><input type="checkbox" class="row-checkbox" checked></td>
+    <td>{line}</td>
+    <td><span class="status-badge status-{status.lower()}">{status_icon}{status}</span></td>
+    <td><strong>{ip_prefix}</strong></td>
+    <td>{country}</td>
+    <td>{region}</td>
+    <td>{city}</td>
+</tr>
+```
+
+Status badge icons — use exactly this markup per status:
+
+| `status`     | CSS class on `<span>`      | Icon `<i>` markup                                         |
+|--------------|----------------------------|-----------------------------------------------------------|
+| `OK`         | `status-ok`                | `<i class="bi bi-check-circle-fill"></i>`                 |
+| `WARNING`    | `status-warning`           | `<i class="bi bi-exclamation-triangle-fill"></i>`         |
+| `ERROR`      | `status-error`             | `<i class="bi bi-x-circle-fill"></i>`                     |
+| `SUGGESTION` | `status-suggestion`        | `<i class="bi bi-lightbulb-fill"></i>`                    |
+
+`data-tunable` must be the string `"true"` only when `tuned_entries` is present and has at least one element — this is what allows the "Tune All" button to apply suggested values to the row.
+
+**Row 2 — Previous-values row:**
+```html
+<tr class="expand-details-row previous-values-row">
+    <td></td>
+    <td></td>
+    <td></td>
+    <td><strong>Previous values:</strong></td>
+    <td class="previous-value"><span class="default-country">{country}</span></td>
+    <td class="previous-value"><span class="default-region">{region}</span></td>
+    <td class="previous-value"><span class="default-city">{city}</span></td>
+</tr>
+```
+
+**Row 3 — Issues row:**
+```html
+<tr class="expand-details-row issues-row">
+    <td></td>
+    <td></td>
+    <td colspan="5">
+        <div class="issues-header">
+            <strong>Issues:</strong>
+            <button class="tune-all-btn" onclick="handleTuneButtonClick(this)">Tune</button>
+        </div>
+        {message_lines}
+    </td>
+</tr>
+```
+
+For each message in the entry's `messages` array, generate one `<div>`:
+```html
+<div class="message-line" data-id="{line * 100 + message_index}">
+    <span>{message.message}</span>
+    <input type="checkbox" disabled>
+</div>
+```
+Use `message_index` as the 0-based position of the message within the entry's `messages` list. If `messages` is empty, omit the message divs — leave only the issues header `<div>`.
 
 #### Output Guarantees
 
-- Report must be readable in any modern browser without external network dependencies.
+- The report must be readable in any modern browser without extra network dependencies beyond the CDN links already in the template (`leaflet`, `h3-js`, `bootstrap-icons`, Raleway font).
+- All values embedded in HTML must be **HTML-escaped** (`<`, `>`, `&`, `"`) to prevent rendering issues.
+- All values embedded inside JavaScript string literals (e.g., `commentMap`) must be **JSON-string-escaped**.
 - All values must be derived **only from analysis output**, not recomputed heuristically.
+
 
 ### Phase 6: Final Review
 
-Perform a final pass over the analyzed data and generated outputs to ensure nothing was missed or left inconsistent.
+Perform a final verification pass using concrete, checkable assertions before presenting results to the user.
 
-- Verify that all CSV rows have been processed and appear in the report.
-- Confirm that error/warning/ok counts in the summary match the actual row statuses.
-- Ensure no duplicate entries exist in the results table.
-- Validate that all file paths and references in the report are correct.
+**Check 1 — Entry count integrity**
+- Count non-comment, non-blank data rows in the original input CSV.
+- Assert: `len(entries) in report-data.json == data_row_count`
+- On failure: `Row count mismatch: input has {N} data rows but report contains {M} entries.`
+
+**Check 2 — Summary counter integrity**
+- Assert all of the following; correct any that fail before generating the report:
+  - `error_count == sum(1 for e in entries if e['has_error'])`
+  - `warning_count == sum(1 for e in entries if e['has_warning'] and not e['has_error'])`
+  - `suggestion_count == sum(1 for e in entries if e['has_suggestion'] and not e['has_error'] and not e['has_warning'])`
+  - `ok_count == sum(1 for e in entries if not e['has_error'] and not e['has_warning'] and not e['has_suggestion'])`
+  - `error_count + warning_count + suggestion_count + ok_count == total_entries - invalid_entries`
+
+**Check 3 — Accuracy bucket integrity**
+- Assert: `city_level_accuracy + region_level_accuracy + country_level_accuracy + do_not_geolocate_entries == total_entries - invalid_entries`
+- On failure, trace and fix the bucketing logic before proceeding.
+
+**Check 4 — No duplicate line numbers**
+- Assert: all `line` values in `entries` are unique.
+- On failure, report the duplicated line numbers to the user.
+
+**Check 5 — tuned_entries completeness**
+- Assert: every object in `entries` has a `tuned_entries` key (even if its value is `[]`).
+- On failure, add `"tuned_entries": []` to any entry missing the key, then re-save `report-data.json`.
+
+**Check 6 — Report file is present and non-empty**
+- Confirm `./run/report/geofeed-report.html` was written and has a file size greater than zero bytes.
+- On failure, regenerate the report before presenting to the user.
