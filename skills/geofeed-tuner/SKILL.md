@@ -19,14 +19,13 @@ This skill helps you create and improve IP geolocation feeds in CSV format by:
 ## When to Use This Skill
 
 - Use this skill when a user asks for help **creating, improving, or publishing** an IP geolocation feed file in CSV format.
-- Use it to **tune and troubleshoot CSV geolocation feeds** — catching errors, suggesting improvements, and ensuring real-world usability beyond just RFC compliance.
-- **Intended audience**:
+- Use it to **tune and troubleshoot CSV geolocation feeds** — catching errors, suggesting improvements, and ensuring real-world usability beyond RFC compliance.
+- **Intended audience:**
   - Network operators, administrators, and engineers responsible for publicly routable IP address space
   - Organizations such as ISPs, mobile carriers, cloud providers, hosting and colocation companies, Internet Exchange operators, and satellite internet providers
 - **Do not use** this skill for private or internal IP address management; it applies **only to publicly routable IP addresses**.
 
-
-## Prerequisite: CLI Tools and/or Languages
+## Prerequisites
 
 - **Python 3** is required.
 
@@ -36,17 +35,17 @@ This skill uses a clear separation between **distribution files** (read-only) an
 
 ### Read-Only Directories (Do Not Modify)
 
-The following directories contain static distribution assets. **Do not create, modify, or delete files in these directories**:
+The following directories contain static distribution assets. **Do not create, modify, or delete files in these directories:**
 
 | Directory      | Purpose                                                    |
 |----------------|------------------------------------------------------------|
-| `assets/`      | Static data files (ISO codes, examples)  |
+| `assets/`      | Static data files (ISO codes, examples)                    |
 | `references/`  | RFC specifications and code snippets for reference         |
-| `scripts/`     | Contains executable code that agents can run and HTML template files used as visual references for reports  |
+| `scripts/`     | Executable code and HTML template files for reports        |
 
 ### Working Directories (Generated Content)
 
-All generated, temporary, and output files must be written to these directories:
+All generated, temporary, and output files go in these directories:
 
 | Directory       | Purpose                                              |
 |-----------------|------------------------------------------------------|
@@ -65,35 +64,25 @@ All generated, temporary, and output files must be written to these directories:
 
 ## Processing Pipeline: Sequential Phase Execution
 
-- All phases of the skill must be executed **in order**, from Phase 1 through Phase 6.
-- Each phase depends on the successful completion of the previous phase.  
-  - For example, **structure checks** must complete before **quality analysis** can run.
+All phases must be executed **in order**, from Phase 1 through Phase 6. Each phase depends on the successful completion of the previous phase. For example, **structure checks** must complete before **quality analysis** can run.
 
-- The phases are summarized as follows, but the agent must follow the detailed steps outlined further below for each phase:
+The phases are summarized below. The agent must follow the detailed steps outlined further in each phase section.
 
-  - **Phase 1: Understand the Standard**  
-    Learn RFC 8805 requirements for self-published IP geolocation feeds.
+| Phase | Name                       | Description                                                         |
+|-------|----------------------------|---------------------------------------------------------------------|
+| 1     | Understand the Standard    | Learn RFC 8805 requirements for self-published IP geolocation feeds |
+| 2     | Gather Input               | Collect IP subnet data from local files or remote URLs              |
+| 3     | Checks & Suggestions       | Validate CSV structure, analyze IP prefixes, and check data quality |
+| 4     | Region Suggestion Lookup   | Suggest region codes for entries with city but no region            |
+| 5     | Generate Tuning Report     | Create an HTML report summarizing the analysis and suggestions      |
+| 6     | Final Review               | Ensure consistency and completeness of the report                   |
 
-  - **Phase 2: Gather Input**  
-    Collect IP subnet data from local files or remote URLs.
-
-  - **Phase 3: Checks & Suggestions**  
-    Validate CSV structure, analyze IP prefixes, and check geolocation data quality.
-
-  - **Phase 4: Tuning Data Lookup**  
-    Use Fastah's MCP tool to retrieve tuning data for improving geolocation accuracy.
-
-  - **Phase 5: Generate Tuning Report**  
-    Create a HTML report summarizing the analysis and suggestions.
-
-  - **Phase 6: Final Review**  
-    Perform a final pass to ensure consistency and completeness of the report.
-
-- Users or automation agents should **not skip phases**, as each phase provides critical checks or data transformations required for the next stage.
+**Do not skip phases.** Each phase provides critical checks or data transformations required by subsequent stages.
 
 
 ### Execution Plan Rules
-Before executing this phase, the agent MUST generate a visible TODO checklist.
+
+Before executing each phase, the agent MUST generate a visible TODO checklist.
 
 The plan MUST:
 - Appear at the very start of the phase
@@ -104,10 +93,9 @@ The plan MUST:
 
 ### Phase 1: Understand the Standard
 
-Think deeply about Section 1 (**Introduction**) and Section 2 (**Self-Published IP Geolocation Feeds**) of the plain-text, locally-available document
-[RFC 8805 – A Format for Self-Published IP Geolocation Feeds](references/rfc8805.txt).
+Think deeply about Section 1 (**Introduction**) and Section 2 (**Self-Published IP Geolocation Feeds**) of the locally available document [RFC 8805 – A Format for Self-Published IP Geolocation Feeds](references/rfc8805.txt).
 
-The goal of this phase is to understand the **foundation** for IP geolocation feeds, including:
+The goal is to understand the **foundation** for IP geolocation feeds, including:
 - The overall purpose and scope of RFC 8805
 - The required and optional data elements
 - The expected syntax and semantics
@@ -117,13 +105,13 @@ This research phase establishes the conceptual foundation needed before performi
 
 ### Phase 2: Gather Input
 
-- If the user has not already provided a list of IP subnets or ranges (sometimes referred to as `inetnum` or `inet6num`), prompt them to supply it. The input may be provided via:
+- If the user has not already provided a list of IP subnets or ranges (sometimes referred to as `inetnum` or `inet6num`), prompt them to supply it. Accepted input formats:
   - Text pasted into the chat
   - A local CSV file
   - A remote URL pointing to a CSV file
 
-- If the input is a **remote URL**, download the CSV file into the `./run/data/` directory before processing.
-- If the input is a **local file**, continue processing it directly without downloading.
+- If the input is a **remote URL**, download the CSV file into `./run/data/` before processing.
+- If the input is a **local file**, process it directly without downloading.
 - Normalize all input data to **UTF-8** encoding.
 
 ### Phase 3: Checks & Suggestions
@@ -141,7 +129,7 @@ The JSON structure below is **IMMUTABLE**.
 ```json
 {
   "input_file": "",          // Filename or URL
-  "timestamp": "",   // Milliseconds since epoch 
+  "timestamp": "",   // Milliseconds since epoch
 
   "total_entries": 0,
   "ipv4_entries": 0,
@@ -185,7 +173,7 @@ The JSON structure below is **IMMUTABLE**.
 }
 ```
 - `input_file`: The original input source, either a local filename or a remote URL.
-- `timestamp`: The timestamp when the tuning was performed, in Milliseconds since epoch.
+- `timestamp`: The timestamp when the tuning was performed, in milliseconds since epoch.
 - `total_entries`: The total number of entries processed from the input CSV.
 - `ipv4_entries`: The count of entries that are IPv4 subnets.
 - `ipv6_entries`: The count of entries that are IPv6 subnets.
@@ -225,7 +213,7 @@ The agent MUST NOT:
 - Wrap the object  
 - Split into multiple files  
 
-If a value is unknown, **leave it empty** — never invent data.
+If a value is unknown, **leave it empty** never invent data.
 
 #### Structure & Format Check
 
@@ -241,43 +229,44 @@ The goal is to ensure the file can be parsed reliably and normalized into a **co
   - Otherwise, fall back to Python's built-in `csv` module.
 
   - Ensure the CSV contains **exactly 4 or 5 logical columns**.
-    - Comment lines are allowed.
-    - A header row **may or may not** be present.
-    - If no header row exists, assume the implicit column order:
-      ```
-      ip_prefix, alpha2code, region, city, postal code (deprecated)
-      ```
-    - Refer to the example input file:
-      [`assets/example/01-user-input-rfc8805-feed.csv`](assets/example/01-user-input-rfc8805-feed.csv)
+  - Comment lines are allowed.
+  - A header row **may or may not** be present.
+  - If no header row exists, assume the implicit column order:
+    ```
+    ip_prefix, alpha2code, region, city, postal code (deprecated)
+    ```
+  - Refer to the example input file:
+    [`assets/example/01-user-input-rfc8805-feed.csv`](assets/example/01-user-input-rfc8805-feed.csv)
 
 - **CSV Cleansing and Normalization**
   - Clean and normalize the CSV using Python logic equivalent to the following operations:
     - Select only the **first five columns**, dropping any columns beyond the fifth.
     - Write the output file with a **UTF-8 BOM**.
-    - Optionally remove comment rows where the **first column begins with `#`**.
-    - This will also remove a header row if it begins with `#`.
 
-- **CSV Comments**
-  - Create a map of comments in a CSV file using the line number as the key and the line data as the value.
-  - Store empty lines as well.
-  - Store this map in a JSON file at: [`./run/data/comments.json`](./run/data/comments.json)
+  - **Comments**
+    - Remove comment rows where the **first column begins with `#`**.
+    - This also removes a header row if it begins with `#`.
+    - Create a map of comments using the line number as the key and the line data as the value.
+    - Store empty lines as well.
+    - Store this map in a JSON file at: [`./run/data/comments.json`](./run/data/comments.json)
 
 - **Notes**
   - Both implementation paths (`pandas` and built-in `csv`) must write output using
     the `utf-8-sig` encoding to ensure a **UTF-8 BOM** is present.
 
 #### IP Prefix Analysis
-  - Extract and identify the full set of **IP subnets** referenced in the input.
-  - These subnets act as **hashing keys** in an internal map or dictionary.
-  - All subnets must be **de-duplicated** so each subnet is referenced only once.
+  - Check that the `ip_prefix` field is present and non-empty for each entry.
+  - Check for duplicate `ip_prefix` values across entries.
+  - If duplicates are found, stop the skill and report to the user with the message: `Duplicate IP prefix detected: {ip_prefix_value} appears on lines {line_numbers}`
+  - If no duplicates are found, continue with the analysis.
 
   - **Checks**
-    - Each subnet must parse cleanly as either an **IPv4 or IPv6 network** using the language-specific code snippets in the `references/` folder.
+    - Each subnet must parse cleanly as either an **IPv4 or IPv6 network** using the code snippets in the `references/` folder.
     - Subnets must be normalized and displayed in **CIDR slash notation**.
-      - Single-host IPv4 subnets must be represented as **`/32`**
-      - Single-host IPv6 subnets must be represented as **`/128`**
-      
-  - **ERROR** 
+      - Single-host IPv4 subnets must be represented as **`/32`**.
+      - Single-host IPv6 subnets must be represented as **`/128`**.
+
+  - **ERROR**
     - Report the following conditions as **ERROR**:
 
     - **Invalid subnet syntax**
@@ -303,10 +292,14 @@ The goal is to ensure the file can be parsed reliably and normalized into a **co
       - Prefixes shorter than `/22`
       - Message: `IPv4 prefix is unusually large and may indicate a typo`
 
-
 #### Geolocation Quality Check
 
-Analyze the **accuracy and consistency** of geolocation data — country codes, region codes, city names, and deprecated fields.
+Analyze the **accuracy and consistency** of geolocation data:
+  - Country codes
+  - Region codes
+  - City names
+  - Deprecated fields
+
 This phase runs after structural checks pass.
 
 ##### Country Code Analysis
@@ -316,11 +309,11 @@ This phase runs after structural checks pass.
       - `alpha_2`: two-letter country code
       - `name`: short country name
       - `flag`: flag emoji
-    - This file represents the **superset of valid `alpha2code` values** for an RFC 8805 CSV
+    - This file represents the **superset of valid `alpha2code` values** for an RFC 8805 CSV.
   - Check `alpha2code` (RFC 8805 Section 2.1.1.2) against the `alpha_2` attribute.
   - Sample code is available in the `references/` directory.
 
-  - If a country is found in [`assets/small-territories.json`](assets/small-territories.json) set `is_small_territory` to `true`. This will be used for later checks and suggestions related to small territories.
+  - If a country is found in [`assets/small-territories.json`](assets/small-territories.json), set `is_small_territory` to `true`. This value is used in later checks and suggestions related to small territories.
 
   - **ERROR** 
     - Report the following conditions as **ERROR**:
@@ -332,12 +325,11 @@ This phase runs after structural checks pass.
   - Use the locally available data table [`ISO3166-2`](assets/iso3166-2.json) for checking.
     - JSON array of country subdivisions with ISO-assigned codes
     - Each object includes:
-      - `code`: subdivision code prefixed with country code (for example, `US-CA`)
+      - `code`: subdivision code prefixed with country code (e.g., `US-CA`)
       - `name`: short subdivision name
-    - This file represents the **superset of valid `region` values** for an RFC 8805 CSV
+    - This file represents the **superset of valid `region` values** for an RFC 8805 CSV.
   - If a `region` value is provided (RFC 8805 Section 2.1.1.3):
-    - Check that the format matches `{COUNTRY}-{SUBDIVISION}`
-      (for example, `US-CA`, `AU-NSW`).
+    - Check that the format matches `{COUNTRY}-{SUBDIVISION}` (e.g., `US-CA`, `AU-NSW`).
     - Check the value against the `code` attribute (already prefixed with the country code).
 
   - **ERROR** 
@@ -389,8 +381,7 @@ This phase runs after structural checks pass.
 
 ##### Postal Code Check
   - RFC 8805 Section 2.1.1.5 explicitly **deprecates postal or ZIP codes**.
-  - Postal codes can represent very small populations and are **not considered privacy-safe**
-    for mapping IP address ranges, which are statistical in nature.
+  - Postal codes can represent very small populations and are **not considered privacy-safe** for mapping IP address ranges, which are statistical in nature.
 
   - **ERROR**
     - Report the following conditions as **ERROR**:
@@ -400,15 +391,15 @@ This phase runs after structural checks pass.
 
 #### Tuning & Recommendations
 
-This phase applies **opinionated recommendations** beyond RFC 8805 — suggestions learned from real-world geofeed deployments that improve accuracy and usability.
+This phase applies **opinionated recommendations** beyond RFC 8805, learned from real-world geofeed deployments, that improve accuracy and usability.
 
 - **SUGGESTION**
   - Report the following conditions as **SUGGESTION**:
 
   - **Region or city specified for small territory**
     - Condition:
-      - `is_small_territory` is `true` 
-      - `region` is non-empty **OR**.
+      - `is_small_territory` is `true`
+      - `region` is non-empty **OR**
       - `city` is non-empty.
     - Message: `Region or City-level granularity is usually unnecessary for small territories; consider removing the region and city values`
 
@@ -418,7 +409,7 @@ This phase applies **opinionated recommendations** beyond RFC 8805 — suggestio
       - `region` is empty
       - `is_small_territory` is `false`
     - Action: Set `need_region = true` 
-    - Message: `Region code is recommended when a city is specified; choose a region from the dropdown`
+    - Message: `Region code is recommended when a city is specified; consider adding the appropriate region code for better accuracy`
 
   - **Unspecified geolocation for subnet**
     - Condition: All geographical fields (`alpha2code`, `region`, `city`) are empty for a subnet.
@@ -477,12 +468,13 @@ Rules:
 Use the data received from the MCP server.
 
 Rules:
+- Deduplicate suggestions by `region_code`.
 - Preserve response order (assumed relevance-ranked)
 - Keep **at least three suggestions** when available
 - If fewer than three exist, keep all returned values
 - If none exist:
-  - Store an empty array
-  - Do NOT raise an error
+  - Store an empty array.
+  - Do NOT raise an error.
 
 #### Step 5: Attach Suggestions to Entries
 
@@ -517,12 +509,11 @@ Populate with:
   - Maintain all existing validation flags.
   - Do NOT create additional intermediate files.
 
-
 ### Phase 5: Generate Tuning Report
 
 - Generate a **self-contained HTML report** summarizing the analysis, issues, and improvement suggestions.
-- Write the HTML report to `./run/report/`  
-- Use the data from `./run/data/report-data.json` and `./run/data/comments.json.`
+- Write the HTML report to `./run/report/`.
+- Use the data from `./run/data/report-data.json` and `./run/data/comments.json`.
 - Use `./scripts/templates/index.html` as the template.
 - Do not modify anything in the template except embedding the required values.
 - After generating the report, open it using the system’s default browser.
