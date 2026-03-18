@@ -1,6 +1,6 @@
 {
   "servers": {
-    "fastah-ip-geo-mcp-gen2": {
+    "fastah-ip-geofeed": {
       "type": "http",
       "url": "https://mcp.fastah.ai/mcp"
     }
