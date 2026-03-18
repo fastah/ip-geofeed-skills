@@ -22,7 +22,7 @@ type Country struct {
 	Alpha3       string `json:"alpha_3"`
 	Flag         string `json:"flag"`
 	Name         string `json:"name"`
-	Numeric      string `json:"numeric"`
+	Numeric      string `json:"numeric,omitempty"`
 	OfficialName string `json:"official_name,omitempty"`
 }
 

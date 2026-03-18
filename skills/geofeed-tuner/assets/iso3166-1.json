@@ -1,1931 +1,1249 @@
 {
   "3166-1": [
     {
-      "alpha_2": "AW",
-      "alpha_3": "ABW",
-      "flag": "🇦🇼",
-      "name": "Aruba",
-      "numeric": "533"
-    },
-    {
-      "alpha_2": "AF",
-      "alpha_3": "AFG",
-      "flag": "🇦🇫",
-      "name": "Afghanistan",
-      "numeric": "004",
-      "official_name": "Islamic Republic of Afghanistan"
-    },
-    {
-      "alpha_2": "AO",
-      "alpha_3": "AGO",
-      "flag": "🇦🇴",
-      "name": "Angola",
-      "numeric": "024",
-      "official_name": "Republic of Angola"
-    },
-    {
-      "alpha_2": "AI",
-      "alpha_3": "AIA",
-      "flag": "🇦🇮",
-      "name": "Anguilla",
-      "numeric": "660"
-    },
-    {
-      "alpha_2": "AX",
-      "alpha_3": "ALA",
-      "flag": "🇦🇽",
-      "name": "Åland Islands",
-      "numeric": "248"
-    },
-    {
-      "alpha_2": "AL",
-      "alpha_3": "ALB",
-      "flag": "🇦🇱",
-      "name": "Albania",
-      "numeric": "008",
-      "official_name": "Republic of Albania"
-    },
-    {
       "alpha_2": "AD",
-      "alpha_3": "AND",
-      "flag": "🇦🇩",
       "name": "Andorra",
-      "numeric": "020",
-      "official_name": "Principality of Andorra"
+      "flag": "🇦🇩"
     },
     {
       "alpha_2": "AE",
-      "alpha_3": "ARE",
-      "flag": "🇦🇪",
       "name": "United Arab Emirates",
-      "numeric": "784"
+      "flag": "🇦🇪"
     },
     {
-      "alpha_2": "AR",
-      "alpha_3": "ARG",
-      "flag": "🇦🇷",
-      "name": "Argentina",
-      "numeric": "032",
-      "official_name": "Argentine Republic"
-    },
-    {
-      "alpha_2": "AM",
-      "alpha_3": "ARM",
-      "flag": "🇦🇲",
-      "name": "Armenia",
-      "numeric": "051",
-      "official_name": "Republic of Armenia"
-    },
-    {
-      "alpha_2": "AS",
-      "alpha_3": "ASM",
-      "flag": "🇦🇸",
-      "name": "American Samoa",
-      "numeric": "016"
-    },
-    {
-      "alpha_2": "AQ",
-      "alpha_3": "ATA",
-      "flag": "🇦🇶",
-      "name": "Antarctica",
-      "numeric": "010"
-    },
-    {
-      "alpha_2": "TF",
-      "alpha_3": "ATF",
-      "flag": "🇹🇫",
-      "name": "French Southern Territories",
-      "numeric": "260"
+      "alpha_2": "AF",
+      "name": "Afghanistan",
+      "flag": "🇦🇫"
     },
     {
       "alpha_2": "AG",
-      "alpha_3": "ATG",
-      "flag": "🇦🇬",
       "name": "Antigua and Barbuda",
-      "numeric": "028"
+      "flag": "🇦🇬"
     },
     {
-      "alpha_2": "AU",
-      "alpha_3": "AUS",
-      "flag": "🇦🇺",
-      "name": "Australia",
-      "numeric": "036"
+      "alpha_2": "AI",
+      "name": "Anguilla",
+      "flag": "🇦🇮"
+    },
+    {
+      "alpha_2": "AL",
+      "name": "Albania",
+      "flag": "🇦🇱"
+    },
+    {
+      "alpha_2": "AM",
+      "name": "Armenia",
+      "flag": "🇦🇲"
+    },
+    {
+      "alpha_2": "AO",
+      "name": "Angola",
+      "flag": "🇦🇴"
+    },
+    {
+      "alpha_2": "AQ",
+      "name": "Antarctica",
+      "flag": "🇦🇶"
+    },
+    {
+      "alpha_2": "AR",
+      "name": "Argentina",
+      "flag": "🇦🇷"
+    },
+    {
+      "alpha_2": "AS",
+      "name": "American Samoa",
+      "flag": "🇦🇸"
     },
     {
       "alpha_2": "AT",
-      "alpha_3": "AUT",
-      "flag": "🇦🇹",
       "name": "Austria",
-      "numeric": "040",
-      "official_name": "Republic of Austria"
+      "flag": "🇦🇹"
+    },
+    {
+      "alpha_2": "AU",
+      "name": "Australia",
+      "flag": "🇦🇺"
+    },
+    {
+      "alpha_2": "AW",
+      "name": "Aruba",
+      "flag": "🇦🇼"
+    },
+    {
+      "alpha_2": "AX",
+      "name": "Åland Islands",
+      "flag": "🇦🇽"
     },
     {
       "alpha_2": "AZ",
-      "alpha_3": "AZE",
-      "flag": "🇦🇿",
       "name": "Azerbaijan",
-      "numeric": "031",
-      "official_name": "Republic of Azerbaijan"
-    },
-    {
-      "alpha_2": "BI",
-      "alpha_3": "BDI",
-      "flag": "🇧🇮",
-      "name": "Burundi",
-      "numeric": "108",
-      "official_name": "Republic of Burundi"
-    },
-    {
-      "alpha_2": "BE",
-      "alpha_3": "BEL",
-      "flag": "🇧🇪",
-      "name": "Belgium",
-      "numeric": "056",
-      "official_name": "Kingdom of Belgium"
-    },
-    {
-      "alpha_2": "BJ",
-      "alpha_3": "BEN",
-      "flag": "🇧🇯",
-      "name": "Benin",
-      "numeric": "204",
-      "official_name": "Republic of Benin"
-    },
-    {
-      "alpha_2": "BQ",
-      "alpha_3": "BES",
-      "flag": "🇧🇶",
-      "name": "Bonaire, Sint Eustatius and Saba",
-      "numeric": "535",
-      "official_name": "Bonaire, Sint Eustatius and Saba"
-    },
-    {
-      "alpha_2": "BF",
-      "alpha_3": "BFA",
-      "flag": "🇧🇫",
-      "name": "Burkina Faso",
-      "numeric": "854"
-    },
-    {
-      "alpha_2": "BD",
-      "alpha_3": "BGD",
-      "flag": "🇧🇩",
-      "name": "Bangladesh",
-      "numeric": "050",
-      "official_name": "People's Republic of Bangladesh"
-    },
-    {
-      "alpha_2": "BG",
-      "alpha_3": "BGR",
-      "flag": "🇧🇬",
-      "name": "Bulgaria",
-      "numeric": "100",
-      "official_name": "Republic of Bulgaria"
-    },
-    {
-      "alpha_2": "BH",
-      "alpha_3": "BHR",
-      "flag": "🇧🇭",
-      "name": "Bahrain",
-      "numeric": "048",
-      "official_name": "Kingdom of Bahrain"
-    },
-    {
-      "alpha_2": "BS",
-      "alpha_3": "BHS",
-      "flag": "🇧🇸",
-      "name": "Bahamas",
-      "numeric": "044",
-      "official_name": "Commonwealth of the Bahamas"
+      "flag": "🇦🇿"
     },
     {
       "alpha_2": "BA",
-      "alpha_3": "BIH",
-      "flag": "🇧🇦",
       "name": "Bosnia and Herzegovina",
-      "numeric": "070",
-      "official_name": "Republic of Bosnia and Herzegovina"
-    },
-    {
-      "alpha_2": "BL",
-      "alpha_3": "BLM",
-      "flag": "🇧🇱",
-      "name": "Saint Barthélemy",
-      "numeric": "652"
-    },
-    {
-      "alpha_2": "BY",
-      "alpha_3": "BLR",
-      "flag": "🇧🇾",
-      "name": "Belarus",
-      "numeric": "112",
-      "official_name": "Republic of Belarus"
-    },
-    {
-      "alpha_2": "BZ",
-      "alpha_3": "BLZ",
-      "flag": "🇧🇿",
-      "name": "Belize",
-      "numeric": "084"
-    },
-    {
-      "alpha_2": "BM",
-      "alpha_3": "BMU",
-      "flag": "🇧🇲",
-      "name": "Bermuda",
-      "numeric": "060"
-    },
-    {
-      "alpha_2": "BO",
-      "alpha_3": "BOL",
-      "common_name": "Bolivia",
-      "flag": "🇧🇴",
-      "name": "Bolivia, Plurinational State of",
-      "numeric": "068",
-      "official_name": "Plurinational State of Bolivia"
-    },
-    {
-      "alpha_2": "BR",
-      "alpha_3": "BRA",
-      "flag": "🇧🇷",
-      "name": "Brazil",
-      "numeric": "076",
-      "official_name": "Federative Republic of Brazil"
+      "flag": "🇧🇦"
     },
     {
       "alpha_2": "BB",
-      "alpha_3": "BRB",
-      "flag": "🇧🇧",
       "name": "Barbados",
-      "numeric": "052"
+      "flag": "🇧🇧"
+    },
+    {
+      "alpha_2": "BD",
+      "name": "Bangladesh",
+      "flag": "🇧🇩"
+    },
+    {
+      "alpha_2": "BE",
+      "name": "Belgium",
+      "flag": "🇧🇪"
+    },
+    {
+      "alpha_2": "BF",
+      "name": "Burkina Faso",
+      "flag": "🇧🇫"
+    },
+    {
+      "alpha_2": "BG",
+      "name": "Bulgaria",
+      "flag": "🇧🇬"
+    },
+    {
+      "alpha_2": "BH",
+      "name": "Bahrain",
+      "flag": "🇧🇭"
+    },
+    {
+      "alpha_2": "BI",
+      "name": "Burundi",
+      "flag": "🇧🇮"
+    },
+    {
+      "alpha_2": "BJ",
+      "name": "Benin",
+      "flag": "🇧🇯"
+    },
+    {
+      "alpha_2": "BL",
+      "name": "Saint Barthélemy",
+      "flag": "🇧🇱"
+    },
+    {
+      "alpha_2": "BM",
+      "name": "Bermuda",
+      "flag": "🇧🇲"
     },
     {
       "alpha_2": "BN",
-      "alpha_3": "BRN",
-      "flag": "🇧🇳",
       "name": "Brunei Darussalam",
-      "numeric": "096"
+      "flag": "🇧🇳"
+    },
+    {
+      "alpha_2": "BO",
+      "name": "Bolivia, Plurinational State of",
+      "flag": "🇧🇴"
+    },
+    {
+      "alpha_2": "BQ",
+      "name": "Bonaire, Sint Eustatius and Saba",
+      "flag": "🇧🇶"
+    },
+    {
+      "alpha_2": "BR",
+      "name": "Brazil",
+      "flag": "🇧🇷"
+    },
+    {
+      "alpha_2": "BS",
+      "name": "Bahamas",
+      "flag": "🇧🇸"
     },
     {
       "alpha_2": "BT",
-      "alpha_3": "BTN",
-      "flag": "🇧🇹",
       "name": "Bhutan",
-      "numeric": "064",
-      "official_name": "Kingdom of Bhutan"
+      "flag": "🇧🇹"
     },
     {
       "alpha_2": "BV",
-      "alpha_3": "BVT",
-      "flag": "🇧🇻",
       "name": "Bouvet Island",
-      "numeric": "074"
+      "flag": "🇧🇻"
     },
     {
       "alpha_2": "BW",
-      "alpha_3": "BWA",
-      "flag": "🇧🇼",
       "name": "Botswana",
-      "numeric": "072",
-      "official_name": "Republic of Botswana"
+      "flag": "🇧🇼"
     },
     {
-      "alpha_2": "CF",
-      "alpha_3": "CAF",
-      "flag": "🇨🇫",
-      "name": "Central African Republic",
-      "numeric": "140"
+      "alpha_2": "BY",
+      "name": "Belarus",
+      "flag": "🇧🇾"
+    },
+    {
+      "alpha_2": "BZ",
+      "name": "Belize",
+      "flag": "🇧🇿"
     },
     {
       "alpha_2": "CA",
-      "alpha_3": "CAN",
-      "flag": "🇨🇦",
       "name": "Canada",
-      "numeric": "124"
+      "flag": "🇨🇦"
     },
     {
       "alpha_2": "CC",
-      "alpha_3": "CCK",
-      "flag": "🇨🇨",
       "name": "Cocos (Keeling) Islands",
-      "numeric": "166"
-    },
-    {
-      "alpha_2": "CH",
-      "alpha_3": "CHE",
-      "flag": "🇨🇭",
-      "name": "Switzerland",
-      "numeric": "756",
-      "official_name": "Swiss Confederation"
-    },
-    {
-      "alpha_2": "CL",
-      "alpha_3": "CHL",
-      "flag": "🇨🇱",
-      "name": "Chile",
-      "numeric": "152",
-      "official_name": "Republic of Chile"
-    },
-    {
-      "alpha_2": "CN",
-      "alpha_3": "CHN",
-      "flag": "🇨🇳",
-      "name": "China",
-      "numeric": "156",
-      "official_name": "People's Republic of China"
-    },
-    {
-      "alpha_2": "CI",
-      "alpha_3": "CIV",
-      "flag": "🇨🇮",
-      "name": "Côte d'Ivoire",
-      "numeric": "384",
-      "official_name": "Republic of Côte d'Ivoire"
-    },
-    {
-      "alpha_2": "CM",
-      "alpha_3": "CMR",
-      "flag": "🇨🇲",
-      "name": "Cameroon",
-      "numeric": "120",
-      "official_name": "Republic of Cameroon"
+      "flag": "🇨🇨"
     },
     {
       "alpha_2": "CD",
-      "alpha_3": "COD",
-      "flag": "🇨🇩",
       "name": "Congo, The Democratic Republic of the",
-      "numeric": "180"
+      "flag": "🇨🇩"
+    },
+    {
+      "alpha_2": "CF",
+      "name": "Central African Republic",
+      "flag": "🇨🇫"
     },
     {
       "alpha_2": "CG",
-      "alpha_3": "COG",
-      "flag": "🇨🇬",
       "name": "Congo",
-      "numeric": "178",
-      "official_name": "Republic of the Congo"
+      "flag": "🇨🇬"
+    },
+    {
+      "alpha_2": "CH",
+      "name": "Switzerland",
+      "flag": "🇨🇭"
+    },
+    {
+      "alpha_2": "CI",
+      "name": "Côte d'Ivoire",
+      "flag": "🇨🇮"
     },
     {
       "alpha_2": "CK",
-      "alpha_3": "COK",
-      "flag": "🇨🇰",
       "name": "Cook Islands",
-      "numeric": "184"
+      "flag": "🇨🇰"
+    },
+    {
+      "alpha_2": "CL",
+      "name": "Chile",
+      "flag": "🇨🇱"
+    },
+    {
+      "alpha_2": "CM",
+      "name": "Cameroon",
+      "flag": "🇨🇲"
+    },
+    {
+      "alpha_2": "CN",
+      "name": "China",
+      "flag": "🇨🇳"
     },
     {
       "alpha_2": "CO",
-      "alpha_3": "COL",
-      "flag": "🇨🇴",
       "name": "Colombia",
-      "numeric": "170",
-      "official_name": "Republic of Colombia"
-    },
-    {
-      "alpha_2": "KM",
-      "alpha_3": "COM",
-      "flag": "🇰🇲",
-      "name": "Comoros",
-      "numeric": "174",
-      "official_name": "Union of the Comoros"
-    },
-    {
-      "alpha_2": "CV",
-      "alpha_3": "CPV",
-      "flag": "🇨🇻",
-      "name": "Cabo Verde",
-      "numeric": "132",
-      "official_name": "Republic of Cabo Verde"
+      "flag": "🇨🇴"
     },
     {
       "alpha_2": "CR",
-      "alpha_3": "CRI",
-      "flag": "🇨🇷",
       "name": "Costa Rica",
-      "numeric": "188",
-      "official_name": "Republic of Costa Rica"
+      "flag": "🇨🇷"
     },
     {
       "alpha_2": "CU",
-      "alpha_3": "CUB",
-      "flag": "🇨🇺",
       "name": "Cuba",
-      "numeric": "192",
-      "official_name": "Republic of Cuba"
+      "flag": "🇨🇺"
+    },
+    {
+      "alpha_2": "CV",
+      "name": "Cabo Verde",
+      "flag": "🇨🇻"
     },
     {
       "alpha_2": "CW",
-      "alpha_3": "CUW",
-      "flag": "🇨🇼",
       "name": "Curaçao",
-      "numeric": "531",
-      "official_name": "Curaçao"
+      "flag": "🇨🇼"
     },
     {
       "alpha_2": "CX",
-      "alpha_3": "CXR",
-      "flag": "🇨🇽",
       "name": "Christmas Island",
-      "numeric": "162"
-    },
-    {
-      "alpha_2": "KY",
-      "alpha_3": "CYM",
-      "flag": "🇰🇾",
-      "name": "Cayman Islands",
-      "numeric": "136"
+      "flag": "🇨🇽"
     },
     {
       "alpha_2": "CY",
-      "alpha_3": "CYP",
-      "flag": "🇨🇾",
       "name": "Cyprus",
-      "numeric": "196",
-      "official_name": "Republic of Cyprus"
+      "flag": "🇨🇾"
     },
     {
       "alpha_2": "CZ",
-      "alpha_3": "CZE",
-      "flag": "🇨🇿",
       "name": "Czechia",
-      "numeric": "203",
-      "official_name": "Czech Republic"
+      "flag": "🇨🇿"
     },
     {
       "alpha_2": "DE",
-      "alpha_3": "DEU",
-      "flag": "🇩🇪",
       "name": "Germany",
-      "numeric": "276",
-      "official_name": "Federal Republic of Germany"
+      "flag": "🇩🇪"
     },
     {
       "alpha_2": "DJ",
-      "alpha_3": "DJI",
-      "flag": "🇩🇯",
       "name": "Djibouti",
-      "numeric": "262",
-      "official_name": "Republic of Djibouti"
-    },
-    {
-      "alpha_2": "DM",
-      "alpha_3": "DMA",
-      "flag": "🇩🇲",
-      "name": "Dominica",
-      "numeric": "212",
-      "official_name": "Commonwealth of Dominica"
+      "flag": "🇩🇯"
     },
     {
       "alpha_2": "DK",
-      "alpha_3": "DNK",
-      "flag": "🇩🇰",
       "name": "Denmark",
-      "numeric": "208",
-      "official_name": "Kingdom of Denmark"
+      "flag": "🇩🇰"
+    },
+    {
+      "alpha_2": "DM",
+      "name": "Dominica",
+      "flag": "🇩🇲"
     },
     {
       "alpha_2": "DO",
-      "alpha_3": "DOM",
-      "flag": "🇩🇴",
       "name": "Dominican Republic",
-      "numeric": "214"
+      "flag": "🇩🇴"
     },
     {
       "alpha_2": "DZ",
-      "alpha_3": "DZA",
-      "flag": "🇩🇿",
       "name": "Algeria",
-      "numeric": "012",
-      "official_name": "People's Democratic Republic of Algeria"
+      "flag": "🇩🇿"
     },
     {
       "alpha_2": "EC",
-      "alpha_3": "ECU",
-      "flag": "🇪🇨",
       "name": "Ecuador",
-      "numeric": "218",
-      "official_name": "Republic of Ecuador"
-    },
-    {
-      "alpha_2": "EG",
-      "alpha_3": "EGY",
-      "flag": "🇪🇬",
-      "name": "Egypt",
-      "numeric": "818",
-      "official_name": "Arab Republic of Egypt"
-    },
-    {
-      "alpha_2": "ER",
-      "alpha_3": "ERI",
-      "flag": "🇪🇷",
-      "name": "Eritrea",
-      "numeric": "232",
-      "official_name": "the State of Eritrea"
-    },
-    {
-      "alpha_2": "EH",
-      "alpha_3": "ESH",
-      "flag": "🇪🇭",
-      "name": "Western Sahara",
-      "numeric": "732"
-    },
-    {
-      "alpha_2": "ES",
-      "alpha_3": "ESP",
-      "flag": "🇪🇸",
-      "name": "Spain",
-      "numeric": "724",
-      "official_name": "Kingdom of Spain"
+      "flag": "🇪🇨"
     },
     {
       "alpha_2": "EE",
-      "alpha_3": "EST",
-      "flag": "🇪🇪",
       "name": "Estonia",
-      "numeric": "233",
-      "official_name": "Republic of Estonia"
+      "flag": "🇪🇪"
+    },
+    {
+      "alpha_2": "EG",
+      "name": "Egypt",
+      "flag": "🇪🇬"
+    },
+    {
+      "alpha_2": "EH",
+      "name": "Western Sahara",
+      "flag": "🇪🇭"
+    },
+    {
+      "alpha_2": "ER",
+      "name": "Eritrea",
+      "flag": "🇪🇷"
+    },
+    {
+      "alpha_2": "ES",
+      "name": "Spain",
+      "flag": "🇪🇸"
     },
     {
       "alpha_2": "ET",
-      "alpha_3": "ETH",
-      "flag": "🇪🇹",
       "name": "Ethiopia",
-      "numeric": "231",
-      "official_name": "Federal Democratic Republic of Ethiopia"
+      "flag": "🇪🇹"
     },
     {
       "alpha_2": "FI",
-      "alpha_3": "FIN",
-      "flag": "🇫🇮",
       "name": "Finland",
-      "numeric": "246",
-      "official_name": "Republic of Finland"
+      "flag": "🇫🇮"
     },
     {
       "alpha_2": "FJ",
-      "alpha_3": "FJI",
-      "flag": "🇫🇯",
       "name": "Fiji",
-      "numeric": "242",
-      "official_name": "Republic of Fiji"
+      "flag": "🇫🇯"
     },
     {
       "alpha_2": "FK",
-      "alpha_3": "FLK",
-      "flag": "🇫🇰",
       "name": "Falkland Islands (Malvinas)",
-      "numeric": "238"
-    },
-    {
-      "alpha_2": "FR",
-      "alpha_3": "FRA",
-      "flag": "🇫🇷",
-      "name": "France",
-      "numeric": "250",
-      "official_name": "French Republic"
-    },
-    {
-      "alpha_2": "FO",
-      "alpha_3": "FRO",
-      "flag": "🇫🇴",
-      "name": "Faroe Islands",
-      "numeric": "234"
+      "flag": "🇫🇰"
     },
     {
       "alpha_2": "FM",
-      "alpha_3": "FSM",
-      "flag": "🇫🇲",
       "name": "Micronesia, Federated States of",
-      "numeric": "583",
-      "official_name": "Federated States of Micronesia"
+      "flag": "🇫🇲"
+    },
+    {
+      "alpha_2": "FO",
+      "name": "Faroe Islands",
+      "flag": "🇫🇴"
+    },
+    {
+      "alpha_2": "FR",
+      "name": "France",
+      "flag": "🇫🇷"
     },
     {
       "alpha_2": "GA",
-      "alpha_3": "GAB",
-      "flag": "🇬🇦",
       "name": "Gabon",
-      "numeric": "266",
-      "official_name": "Gabonese Republic"
+      "flag": "🇬🇦"
     },
     {
       "alpha_2": "GB",
-      "alpha_3": "GBR",
-      "flag": "🇬🇧",
       "name": "United Kingdom",
-      "numeric": "826",
-      "official_name": "United Kingdom of Great Britain and Northern Ireland"
-    },
-    {
-      "alpha_2": "GE",
-      "alpha_3": "GEO",
-      "flag": "🇬🇪",
-      "name": "Georgia",
-      "numeric": "268"
-    },
-    {
-      "alpha_2": "GG",
-      "alpha_3": "GGY",
-      "flag": "🇬🇬",
-      "name": "Guernsey",
-      "numeric": "831"
-    },
-    {
-      "alpha_2": "GH",
-      "alpha_3": "GHA",
-      "flag": "🇬🇭",
-      "name": "Ghana",
-      "numeric": "288",
-      "official_name": "Republic of Ghana"
-    },
-    {
-      "alpha_2": "GI",
-      "alpha_3": "GIB",
-      "flag": "🇬🇮",
-      "name": "Gibraltar",
-      "numeric": "292"
-    },
-    {
-      "alpha_2": "GN",
-      "alpha_3": "GIN",
-      "flag": "🇬🇳",
-      "name": "Guinea",
-      "numeric": "324",
-      "official_name": "Republic of Guinea"
-    },
-    {
-      "alpha_2": "GP",
-      "alpha_3": "GLP",
-      "flag": "🇬🇵",
-      "name": "Guadeloupe",
-      "numeric": "312"
-    },
-    {
-      "alpha_2": "GM",
-      "alpha_3": "GMB",
-      "flag": "🇬🇲",
-      "name": "Gambia",
-      "numeric": "270",
-      "official_name": "Republic of the Gambia"
-    },
-    {
-      "alpha_2": "GW",
-      "alpha_3": "GNB",
-      "flag": "🇬🇼",
-      "name": "Guinea-Bissau",
-      "numeric": "624",
-      "official_name": "Republic of Guinea-Bissau"
-    },
-    {
-      "alpha_2": "GQ",
-      "alpha_3": "GNQ",
-      "flag": "🇬🇶",
-      "name": "Equatorial Guinea",
-      "numeric": "226",
-      "official_name": "Republic of Equatorial Guinea"
-    },
-    {
-      "alpha_2": "GR",
-      "alpha_3": "GRC",
-      "flag": "🇬🇷",
-      "name": "Greece",
-      "numeric": "300",
-      "official_name": "Hellenic Republic"
+      "flag": "🇬🇧"
     },
     {
       "alpha_2": "GD",
-      "alpha_3": "GRD",
-      "flag": "🇬🇩",
       "name": "Grenada",
-      "numeric": "308"
+      "flag": "🇬🇩"
     },
     {
-      "alpha_2": "GL",
-      "alpha_3": "GRL",
-      "flag": "🇬🇱",
-      "name": "Greenland",
-      "numeric": "304"
-    },
-    {
-      "alpha_2": "GT",
-      "alpha_3": "GTM",
-      "flag": "🇬🇹",
-      "name": "Guatemala",
-      "numeric": "320",
-      "official_name": "Republic of Guatemala"
+      "alpha_2": "GE",
+      "name": "Georgia",
+      "flag": "🇬🇪"
     },
     {
       "alpha_2": "GF",
-      "alpha_3": "GUF",
-      "flag": "🇬🇫",
       "name": "French Guiana",
-      "numeric": "254"
+      "flag": "🇬🇫"
     },
     {
-      "alpha_2": "GU",
-      "alpha_3": "GUM",
-      "flag": "🇬🇺",
-      "name": "Guam",
-      "numeric": "316"
+      "alpha_2": "GG",
+      "name": "Guernsey",
+      "flag": "🇬🇬"
     },
     {
-      "alpha_2": "GY",
-      "alpha_3": "GUY",
-      "flag": "🇬🇾",
-      "name": "Guyana",
-      "numeric": "328",
-      "official_name": "Republic of Guyana"
+      "alpha_2": "GH",
+      "name": "Ghana",
+      "flag": "🇬🇭"
     },
     {
-      "alpha_2": "HK",
-      "alpha_3": "HKG",
-      "flag": "🇭🇰",
-      "name": "Hong Kong",
-      "numeric": "344",
-      "official_name": "Hong Kong Special Administrative Region of China"
+      "alpha_2": "GI",
+      "name": "Gibraltar",
+      "flag": "🇬🇮"
     },
     {
-      "alpha_2": "HM",
-      "alpha_3": "HMD",
-      "flag": "🇭🇲",
-      "name": "Heard Island and McDonald Islands",
-      "numeric": "334"
+      "alpha_2": "GL",
+      "name": "Greenland",
+      "flag": "🇬🇱"
     },
     {
-      "alpha_2": "HN",
-      "alpha_3": "HND",
-      "flag": "🇭🇳",
-      "name": "Honduras",
-      "numeric": "340",
-      "official_name": "Republic of Honduras"
+      "alpha_2": "GM",
+      "name": "Gambia",
+      "flag": "🇬🇲"
     },
     {
-      "alpha_2": "HR",
-      "alpha_3": "HRV",
-      "flag": "🇭🇷",
-      "name": "Croatia",
-      "numeric": "191",
-      "official_name": "Republic of Croatia"
+      "alpha_2": "GN",
+      "name": "Guinea",
+      "flag": "🇬🇳"
     },
     {
-      "alpha_2": "HT",
-      "alpha_3": "HTI",
-      "flag": "🇭🇹",
-      "name": "Haiti",
-      "numeric": "332",
-      "official_name": "Republic of Haiti"
+      "alpha_2": "GP",
+      "name": "Guadeloupe",
+      "flag": "🇬🇵"
     },
     {
-      "alpha_2": "HU",
-      "alpha_3": "HUN",
-      "flag": "🇭🇺",
-      "name": "Hungary",
-      "numeric": "348",
-      "official_name": "Hungary"
+      "alpha_2": "GQ",
+      "name": "Equatorial Guinea",
+      "flag": "🇬🇶"
     },
     {
-      "alpha_2": "ID",
-      "alpha_3": "IDN",
-      "flag": "🇮🇩",
-      "name": "Indonesia",
-      "numeric": "360",
-      "official_name": "Republic of Indonesia"
-    },
-    {
-      "alpha_2": "IM",
-      "alpha_3": "IMN",
-      "flag": "🇮🇲",
-      "name": "Isle of Man",
-      "numeric": "833"
-    },
-    {
-      "alpha_2": "IN",
-      "alpha_3": "IND",
-      "flag": "🇮🇳",
-      "name": "India",
-      "numeric": "356",
-      "official_name": "Republic of India"
-    },
-    {
-      "alpha_2": "IO",
-      "alpha_3": "IOT",
-      "flag": "🇮🇴",
-      "name": "British Indian Ocean Territory",
-      "numeric": "086"
-    },
-    {
-      "alpha_2": "IE",
-      "alpha_3": "IRL",
-      "flag": "🇮🇪",
-      "name": "Ireland",
-      "numeric": "372"
-    },
-    {
-      "alpha_2": "IR",
-      "alpha_3": "IRN",
-      "common_name": "Iran",
-      "flag": "🇮🇷",
-      "name": "Iran, Islamic Republic of",
-      "numeric": "364",
-      "official_name": "Islamic Republic of Iran"
-    },
-    {
-      "alpha_2": "IQ",
-      "alpha_3": "IRQ",
-      "flag": "🇮🇶",
-      "name": "Iraq",
-      "numeric": "368",
-      "official_name": "Republic of Iraq"
-    },
-    {
-      "alpha_2": "IS",
-      "alpha_3": "ISL",
-      "flag": "🇮🇸",
-      "name": "Iceland",
-      "numeric": "352",
-      "official_name": "Republic of Iceland"
-    },
-    {
-      "alpha_2": "IL",
-      "alpha_3": "ISR",
-      "flag": "🇮🇱",
-      "name": "Israel",
-      "numeric": "376",
-      "official_name": "State of Israel"
-    },
-    {
-      "alpha_2": "IT",
-      "alpha_3": "ITA",
-      "flag": "🇮🇹",
-      "name": "Italy",
-      "numeric": "380",
-      "official_name": "Italian Republic"
-    },
-    {
-      "alpha_2": "JM",
-      "alpha_3": "JAM",
-      "flag": "🇯🇲",
-      "name": "Jamaica",
-      "numeric": "388"
-    },
-    {
-      "alpha_2": "JE",
-      "alpha_3": "JEY",
-      "flag": "🇯🇪",
-      "name": "Jersey",
-      "numeric": "832"
-    },
-    {
-      "alpha_2": "JO",
-      "alpha_3": "JOR",
-      "flag": "🇯🇴",
-      "name": "Jordan",
-      "numeric": "400",
-      "official_name": "Hashemite Kingdom of Jordan"
-    },
-    {
-      "alpha_2": "JP",
-      "alpha_3": "JPN",
-      "flag": "🇯🇵",
-      "name": "Japan",
-      "numeric": "392"
-    },
-    {
-      "alpha_2": "KZ",
-      "alpha_3": "KAZ",
-      "flag": "🇰🇿",
-      "name": "Kazakhstan",
-      "numeric": "398",
-      "official_name": "Republic of Kazakhstan"
-    },
-    {
-      "alpha_2": "KE",
-      "alpha_3": "KEN",
-      "flag": "🇰🇪",
-      "name": "Kenya",
-      "numeric": "404",
-      "official_name": "Republic of Kenya"
-    },
-    {
-      "alpha_2": "KG",
-      "alpha_3": "KGZ",
-      "flag": "🇰🇬",
-      "name": "Kyrgyzstan",
-      "numeric": "417",
-      "official_name": "Kyrgyz Republic"
-    },
-    {
-      "alpha_2": "KH",
-      "alpha_3": "KHM",
-      "flag": "🇰🇭",
-      "name": "Cambodia",
-      "numeric": "116",
-      "official_name": "Kingdom of Cambodia"
-    },
-    {
-      "alpha_2": "KI",
-      "alpha_3": "KIR",
-      "flag": "🇰🇮",
-      "name": "Kiribati",
-      "numeric": "296",
-      "official_name": "Republic of Kiribati"
-    },
-    {
-      "alpha_2": "KN",
-      "alpha_3": "KNA",
-      "flag": "🇰🇳",
-      "name": "Saint Kitts and Nevis",
-      "numeric": "659"
-    },
-    {
-      "alpha_2": "KR",
-      "alpha_3": "KOR",
-      "common_name": "South Korea",
-      "flag": "🇰🇷",
-      "name": "Korea, Republic of",
-      "numeric": "410"
-    },
-    {
-      "alpha_2": "KW",
-      "alpha_3": "KWT",
-      "flag": "🇰🇼",
-      "name": "Kuwait",
-      "numeric": "414",
-      "official_name": "State of Kuwait"
-    },
-    {
-      "alpha_2": "LA",
-      "alpha_3": "LAO",
-      "common_name": "Laos",
-      "flag": "🇱🇦",
-      "name": "Lao People's Democratic Republic",
-      "numeric": "418"
-    },
-    {
-      "alpha_2": "LB",
-      "alpha_3": "LBN",
-      "flag": "🇱🇧",
-      "name": "Lebanon",
-      "numeric": "422",
-      "official_name": "Lebanese Republic"
-    },
-    {
-      "alpha_2": "LR",
-      "alpha_3": "LBR",
-      "flag": "🇱🇷",
-      "name": "Liberia",
-      "numeric": "430",
-      "official_name": "Republic of Liberia"
-    },
-    {
-      "alpha_2": "LY",
-      "alpha_3": "LBY",
-      "flag": "🇱🇾",
-      "name": "Libya",
-      "numeric": "434",
-      "official_name": "Libya"
-    },
-    {
-      "alpha_2": "LC",
-      "alpha_3": "LCA",
-      "flag": "🇱🇨",
-      "name": "Saint Lucia",
-      "numeric": "662"
-    },
-    {
-      "alpha_2": "LI",
-      "alpha_3": "LIE",
-      "flag": "🇱🇮",
-      "name": "Liechtenstein",
-      "numeric": "438",
-      "official_name": "Principality of Liechtenstein"
-    },
-    {
-      "alpha_2": "LK",
-      "alpha_3": "LKA",
-      "flag": "🇱🇰",
-      "name": "Sri Lanka",
-      "numeric": "144",
-      "official_name": "Democratic Socialist Republic of Sri Lanka"
-    },
-    {
-      "alpha_2": "LS",
-      "alpha_3": "LSO",
-      "flag": "🇱🇸",
-      "name": "Lesotho",
-      "numeric": "426",
-      "official_name": "Kingdom of Lesotho"
-    },
-    {
-      "alpha_2": "LT",
-      "alpha_3": "LTU",
-      "flag": "🇱🇹",
-      "name": "Lithuania",
-      "numeric": "440",
-      "official_name": "Republic of Lithuania"
-    },
-    {
-      "alpha_2": "LU",
-      "alpha_3": "LUX",
-      "flag": "🇱🇺",
-      "name": "Luxembourg",
-      "numeric": "442",
-      "official_name": "Grand Duchy of Luxembourg"
-    },
-    {
-      "alpha_2": "LV",
-      "alpha_3": "LVA",
-      "flag": "🇱🇻",
-      "name": "Latvia",
-      "numeric": "428",
-      "official_name": "Republic of Latvia"
-    },
-    {
-      "alpha_2": "MO",
-      "alpha_3": "MAC",
-      "flag": "🇲🇴",
-      "name": "Macao",
-      "numeric": "446",
-      "official_name": "Macao Special Administrative Region of China"
-    },
-    {
-      "alpha_2": "MF",
-      "alpha_3": "MAF",
-      "flag": "🇲🇫",
-      "name": "Saint Martin (French part)",
-      "numeric": "663"
-    },
-    {
-      "alpha_2": "MA",
-      "alpha_3": "MAR",
-      "flag": "🇲🇦",
-      "name": "Morocco",
-      "numeric": "504",
-      "official_name": "Kingdom of Morocco"
-    },
-    {
-      "alpha_2": "MC",
-      "alpha_3": "MCO",
-      "flag": "🇲🇨",
-      "name": "Monaco",
-      "numeric": "492",
-      "official_name": "Principality of Monaco"
-    },
-    {
-      "alpha_2": "MD",
-      "alpha_3": "MDA",
-      "common_name": "Moldova",
-      "flag": "🇲🇩",
-      "name": "Moldova, Republic of",
-      "numeric": "498",
-      "official_name": "Republic of Moldova"
-    },
-    {
-      "alpha_2": "MG",
-      "alpha_3": "MDG",
-      "flag": "🇲🇬",
-      "name": "Madagascar",
-      "numeric": "450",
-      "official_name": "Republic of Madagascar"
-    },
-    {
-      "alpha_2": "MV",
-      "alpha_3": "MDV",
-      "flag": "🇲🇻",
-      "name": "Maldives",
-      "numeric": "462",
-      "official_name": "Republic of Maldives"
-    },
-    {
-      "alpha_2": "MX",
-      "alpha_3": "MEX",
-      "flag": "🇲🇽",
-      "name": "Mexico",
-      "numeric": "484",
-      "official_name": "United Mexican States"
-    },
-    {
-      "alpha_2": "MH",
-      "alpha_3": "MHL",
-      "flag": "🇲🇭",
-      "name": "Marshall Islands",
-      "numeric": "584",
-      "official_name": "Republic of the Marshall Islands"
-    },
-    {
-      "alpha_2": "MK",
-      "alpha_3": "MKD",
-      "flag": "🇲🇰",
-      "name": "North Macedonia",
-      "numeric": "807",
-      "official_name": "Republic of North Macedonia"
-    },
-    {
-      "alpha_2": "ML",
-      "alpha_3": "MLI",
-      "flag": "🇲🇱",
-      "name": "Mali",
-      "numeric": "466",
-      "official_name": "Republic of Mali"
-    },
-    {
-      "alpha_2": "MT",
-      "alpha_3": "MLT",
-      "flag": "🇲🇹",
-      "name": "Malta",
-      "numeric": "470",
-      "official_name": "Republic of Malta"
-    },
-    {
-      "alpha_2": "MM",
-      "alpha_3": "MMR",
-      "flag": "🇲🇲",
-      "name": "Myanmar",
-      "numeric": "104",
-      "official_name": "Republic of Myanmar"
-    },
-    {
-      "alpha_2": "ME",
-      "alpha_3": "MNE",
-      "flag": "🇲🇪",
-      "name": "Montenegro",
-      "numeric": "499",
-      "official_name": "Montenegro"
-    },
-    {
-      "alpha_2": "MN",
-      "alpha_3": "MNG",
-      "flag": "🇲🇳",
-      "name": "Mongolia",
-      "numeric": "496"
-    },
-    {
-      "alpha_2": "MP",
-      "alpha_3": "MNP",
-      "flag": "🇲🇵",
-      "name": "Northern Mariana Islands",
-      "numeric": "580",
-      "official_name": "Commonwealth of the Northern Mariana Islands"
-    },
-    {
-      "alpha_2": "MZ",
-      "alpha_3": "MOZ",
-      "flag": "🇲🇿",
-      "name": "Mozambique",
-      "numeric": "508",
-      "official_name": "Republic of Mozambique"
-    },
-    {
-      "alpha_2": "MR",
-      "alpha_3": "MRT",
-      "flag": "🇲🇷",
-      "name": "Mauritania",
-      "numeric": "478",
-      "official_name": "Islamic Republic of Mauritania"
-    },
-    {
-      "alpha_2": "MS",
-      "alpha_3": "MSR",
-      "flag": "🇲🇸",
-      "name": "Montserrat",
-      "numeric": "500"
-    },
-    {
-      "alpha_2": "MQ",
-      "alpha_3": "MTQ",
-      "flag": "🇲🇶",
-      "name": "Martinique",
-      "numeric": "474"
-    },
-    {
-      "alpha_2": "MU",
-      "alpha_3": "MUS",
-      "flag": "🇲🇺",
-      "name": "Mauritius",
-      "numeric": "480",
-      "official_name": "Republic of Mauritius"
-    },
-    {
-      "alpha_2": "MW",
-      "alpha_3": "MWI",
-      "flag": "🇲🇼",
-      "name": "Malawi",
-      "numeric": "454",
-      "official_name": "Republic of Malawi"
-    },
-    {
-      "alpha_2": "MY",
-      "alpha_3": "MYS",
-      "flag": "🇲🇾",
-      "name": "Malaysia",
-      "numeric": "458"
-    },
-    {
-      "alpha_2": "YT",
-      "alpha_3": "MYT",
-      "flag": "🇾🇹",
-      "name": "Mayotte",
-      "numeric": "175"
-    },
-    {
-      "alpha_2": "NA",
-      "alpha_3": "NAM",
-      "flag": "🇳🇦",
-      "name": "Namibia",
-      "numeric": "516",
-      "official_name": "Republic of Namibia"
-    },
-    {
-      "alpha_2": "NC",
-      "alpha_3": "NCL",
-      "flag": "🇳🇨",
-      "name": "New Caledonia",
-      "numeric": "540"
-    },
-    {
-      "alpha_2": "NE",
-      "alpha_3": "NER",
-      "flag": "🇳🇪",
-      "name": "Niger",
-      "numeric": "562",
-      "official_name": "Republic of the Niger"
-    },
-    {
-      "alpha_2": "NF",
-      "alpha_3": "NFK",
-      "flag": "🇳🇫",
-      "name": "Norfolk Island",
-      "numeric": "574"
-    },
-    {
-      "alpha_2": "NG",
-      "alpha_3": "NGA",
-      "flag": "🇳🇬",
-      "name": "Nigeria",
-      "numeric": "566",
-      "official_name": "Federal Republic of Nigeria"
-    },
-    {
-      "alpha_2": "NI",
-      "alpha_3": "NIC",
-      "flag": "🇳🇮",
-      "name": "Nicaragua",
-      "numeric": "558",
-      "official_name": "Republic of Nicaragua"
-    },
-    {
-      "alpha_2": "NU",
-      "alpha_3": "NIU",
-      "flag": "🇳🇺",
-      "name": "Niue",
-      "numeric": "570",
-      "official_name": "Niue"
-    },
-    {
-      "alpha_2": "NL",
-      "alpha_3": "NLD",
-      "flag": "🇳🇱",
-      "name": "Netherlands",
-      "numeric": "528",
-      "official_name": "Kingdom of the Netherlands"
-    },
-    {
-      "alpha_2": "NO",
-      "alpha_3": "NOR",
-      "flag": "🇳🇴",
-      "name": "Norway",
-      "numeric": "578",
-      "official_name": "Kingdom of Norway"
-    },
-    {
-      "alpha_2": "NP",
-      "alpha_3": "NPL",
-      "flag": "🇳🇵",
-      "name": "Nepal",
-      "numeric": "524",
-      "official_name": "Federal Democratic Republic of Nepal"
-    },
-    {
-      "alpha_2": "NR",
-      "alpha_3": "NRU",
-      "flag": "🇳🇷",
-      "name": "Nauru",
-      "numeric": "520",
-      "official_name": "Republic of Nauru"
-    },
-    {
-      "alpha_2": "NZ",
-      "alpha_3": "NZL",
-      "flag": "🇳🇿",
-      "name": "New Zealand",
-      "numeric": "554"
-    },
-    {
-      "alpha_2": "OM",
-      "alpha_3": "OMN",
-      "flag": "🇴🇲",
-      "name": "Oman",
-      "numeric": "512",
-      "official_name": "Sultanate of Oman"
-    },
-    {
-      "alpha_2": "PK",
-      "alpha_3": "PAK",
-      "flag": "🇵🇰",
-      "name": "Pakistan",
-      "numeric": "586",
-      "official_name": "Islamic Republic of Pakistan"
-    },
-    {
-      "alpha_2": "PA",
-      "alpha_3": "PAN",
-      "flag": "🇵🇦",
-      "name": "Panama",
-      "numeric": "591",
-      "official_name": "Republic of Panama"
-    },
-    {
-      "alpha_2": "PN",
-      "alpha_3": "PCN",
-      "flag": "🇵🇳",
-      "name": "Pitcairn",
-      "numeric": "612"
-    },
-    {
-      "alpha_2": "PE",
-      "alpha_3": "PER",
-      "flag": "🇵🇪",
-      "name": "Peru",
-      "numeric": "604",
-      "official_name": "Republic of Peru"
-    },
-    {
-      "alpha_2": "PH",
-      "alpha_3": "PHL",
-      "flag": "🇵🇭",
-      "name": "Philippines",
-      "numeric": "608",
-      "official_name": "Republic of the Philippines"
-    },
-    {
-      "alpha_2": "PW",
-      "alpha_3": "PLW",
-      "flag": "🇵🇼",
-      "name": "Palau",
-      "numeric": "585",
-      "official_name": "Republic of Palau"
-    },
-    {
-      "alpha_2": "PG",
-      "alpha_3": "PNG",
-      "flag": "🇵🇬",
-      "name": "Papua New Guinea",
-      "numeric": "598",
-      "official_name": "Independent State of Papua New Guinea"
-    },
-    {
-      "alpha_2": "PL",
-      "alpha_3": "POL",
-      "flag": "🇵🇱",
-      "name": "Poland",
-      "numeric": "616",
-      "official_name": "Republic of Poland"
-    },
-    {
-      "alpha_2": "PR",
-      "alpha_3": "PRI",
-      "flag": "🇵🇷",
-      "name": "Puerto Rico",
-      "numeric": "630"
-    },
-    {
-      "alpha_2": "KP",
-      "alpha_3": "PRK",
-      "common_name": "North Korea",
-      "flag": "🇰🇵",
-      "name": "Korea, Democratic People's Republic of",
-      "numeric": "408",
-      "official_name": "Democratic People's Republic of Korea"
-    },
-    {
-      "alpha_2": "PT",
-      "alpha_3": "PRT",
-      "flag": "🇵🇹",
-      "name": "Portugal",
-      "numeric": "620",
-      "official_name": "Portuguese Republic"
-    },
-    {
-      "alpha_2": "PY",
-      "alpha_3": "PRY",
-      "flag": "🇵🇾",
-      "name": "Paraguay",
-      "numeric": "600",
-      "official_name": "Republic of Paraguay"
-    },
-    {
-      "alpha_2": "PS",
-      "alpha_3": "PSE",
-      "flag": "🇵🇸",
-      "name": "Palestine, State of",
-      "numeric": "275",
-      "official_name": "the State of Palestine"
-    },
-    {
-      "alpha_2": "PF",
-      "alpha_3": "PYF",
-      "flag": "🇵🇫",
-      "name": "French Polynesia",
-      "numeric": "258"
-    },
-    {
-      "alpha_2": "QA",
-      "alpha_3": "QAT",
-      "flag": "🇶🇦",
-      "name": "Qatar",
-      "numeric": "634",
-      "official_name": "State of Qatar"
-    },
-    {
-      "alpha_2": "RE",
-      "alpha_3": "REU",
-      "flag": "🇷🇪",
-      "name": "Réunion",
-      "numeric": "638"
-    },
-    {
-      "alpha_2": "RO",
-      "alpha_3": "ROU",
-      "flag": "🇷🇴",
-      "name": "Romania",
-      "numeric": "642"
-    },
-    {
-      "alpha_2": "RU",
-      "alpha_3": "RUS",
-      "flag": "🇷🇺",
-      "name": "Russian Federation",
-      "numeric": "643"
-    },
-    {
-      "alpha_2": "RW",
-      "alpha_3": "RWA",
-      "flag": "🇷🇼",
-      "name": "Rwanda",
-      "numeric": "646",
-      "official_name": "Rwandese Republic"
-    },
-    {
-      "alpha_2": "SA",
-      "alpha_3": "SAU",
-      "flag": "🇸🇦",
-      "name": "Saudi Arabia",
-      "numeric": "682",
-      "official_name": "Kingdom of Saudi Arabia"
-    },
-    {
-      "alpha_2": "SD",
-      "alpha_3": "SDN",
-      "flag": "🇸🇩",
-      "name": "Sudan",
-      "numeric": "729",
-      "official_name": "Republic of the Sudan"
-    },
-    {
-      "alpha_2": "SN",
-      "alpha_3": "SEN",
-      "flag": "🇸🇳",
-      "name": "Senegal",
-      "numeric": "686",
-      "official_name": "Republic of Senegal"
-    },
-    {
-      "alpha_2": "SG",
-      "alpha_3": "SGP",
-      "flag": "🇸🇬",
-      "name": "Singapore",
-      "numeric": "702",
-      "official_name": "Republic of Singapore"
+      "alpha_2": "GR",
+      "name": "Greece",
+      "flag": "🇬🇷"
     },
     {
       "alpha_2": "GS",
-      "alpha_3": "SGS",
-      "flag": "🇬🇸",
       "name": "South Georgia and the South Sandwich Islands",
-      "numeric": "239"
+      "flag": "🇬🇸"
     },
     {
-      "alpha_2": "SH",
-      "alpha_3": "SHN",
-      "flag": "🇸🇭",
-      "name": "Saint Helena, Ascension and Tristan da Cunha",
-      "numeric": "654"
+      "alpha_2": "GT",
+      "name": "Guatemala",
+      "flag": "🇬🇹"
     },
     {
-      "alpha_2": "SJ",
-      "alpha_3": "SJM",
-      "flag": "🇸🇯",
-      "name": "Svalbard and Jan Mayen",
-      "numeric": "744"
+      "alpha_2": "GU",
+      "name": "Guam",
+      "flag": "🇬🇺"
     },
     {
-      "alpha_2": "SB",
-      "alpha_3": "SLB",
-      "flag": "🇸🇧",
-      "name": "Solomon Islands",
-      "numeric": "090"
+      "alpha_2": "GW",
+      "name": "Guinea-Bissau",
+      "flag": "🇬🇼"
     },
     {
-      "alpha_2": "SL",
-      "alpha_3": "SLE",
-      "flag": "🇸🇱",
-      "name": "Sierra Leone",
-      "numeric": "694",
-      "official_name": "Republic of Sierra Leone"
+      "alpha_2": "GY",
+      "name": "Guyana",
+      "flag": "🇬🇾"
     },
     {
-      "alpha_2": "SV",
-      "alpha_3": "SLV",
-      "flag": "🇸🇻",
-      "name": "El Salvador",
-      "numeric": "222",
-      "official_name": "Republic of El Salvador"
+      "alpha_2": "HK",
+      "name": "Hong Kong",
+      "flag": "🇭🇰"
     },
     {
-      "alpha_2": "SM",
-      "alpha_3": "SMR",
-      "flag": "🇸🇲",
-      "name": "San Marino",
-      "numeric": "674",
-      "official_name": "Republic of San Marino"
+      "alpha_2": "HM",
+      "name": "Heard Island and McDonald Islands",
+      "flag": "🇭🇲"
     },
     {
-      "alpha_2": "SO",
-      "alpha_3": "SOM",
-      "flag": "🇸🇴",
-      "name": "Somalia",
-      "numeric": "706",
-      "official_name": "Federal Republic of Somalia"
+      "alpha_2": "HN",
+      "name": "Honduras",
+      "flag": "🇭🇳"
+    },
+    {
+      "alpha_2": "HR",
+      "name": "Croatia",
+      "flag": "🇭🇷"
+    },
+    {
+      "alpha_2": "HT",
+      "name": "Haiti",
+      "flag": "🇭🇹"
+    },
+    {
+      "alpha_2": "HU",
+      "name": "Hungary",
+      "flag": "🇭🇺"
+    },
+    {
+      "alpha_2": "ID",
+      "name": "Indonesia",
+      "flag": "🇮🇩"
+    },
+    {
+      "alpha_2": "IE",
+      "name": "Ireland",
+      "flag": "🇮🇪"
+    },
+    {
+      "alpha_2": "IL",
+      "name": "Israel",
+      "flag": "🇮🇱"
+    },
+    {
+      "alpha_2": "IM",
+      "name": "Isle of Man",
+      "flag": "🇮🇲"
+    },
+    {
+      "alpha_2": "IN",
+      "name": "India",
+      "flag": "🇮🇳"
+    },
+    {
+      "alpha_2": "IO",
+      "name": "British Indian Ocean Territory",
+      "flag": "🇮🇴"
+    },
+    {
+      "alpha_2": "IQ",
+      "name": "Iraq",
+      "flag": "🇮🇶"
+    },
+    {
+      "alpha_2": "IR",
+      "name": "Iran, Islamic Republic of",
+      "flag": "🇮🇷"
+    },
+    {
+      "alpha_2": "IS",
+      "name": "Iceland",
+      "flag": "🇮🇸"
+    },
+    {
+      "alpha_2": "IT",
+      "name": "Italy",
+      "flag": "🇮🇹"
+    },
+    {
+      "alpha_2": "JE",
+      "name": "Jersey",
+      "flag": "🇯🇪"
+    },
+    {
+      "alpha_2": "JM",
+      "name": "Jamaica",
+      "flag": "🇯🇲"
+    },
+    {
+      "alpha_2": "JO",
+      "name": "Jordan",
+      "flag": "🇯🇴"
+    },
+    {
+      "alpha_2": "JP",
+      "name": "Japan",
+      "flag": "🇯🇵"
+    },
+    {
+      "alpha_2": "KE",
+      "name": "Kenya",
+      "flag": "🇰🇪"
+    },
+    {
+      "alpha_2": "KG",
+      "name": "Kyrgyzstan",
+      "flag": "🇰🇬"
+    },
+    {
+      "alpha_2": "KH",
+      "name": "Cambodia",
+      "flag": "🇰🇭"
+    },
+    {
+      "alpha_2": "KI",
+      "name": "Kiribati",
+      "flag": "🇰🇮"
+    },
+    {
+      "alpha_2": "KM",
+      "name": "Comoros",
+      "flag": "🇰🇲"
+    },
+    {
+      "alpha_2": "KN",
+      "name": "Saint Kitts and Nevis",
+      "flag": "🇰🇳"
+    },
+    {
+      "alpha_2": "KP",
+      "name": "Korea, Democratic People's Republic of",
+      "flag": "🇰🇵"
+    },
+    {
+      "alpha_2": "KR",
+      "name": "Korea, Republic of",
+      "flag": "🇰🇷"
+    },
+    {
+      "alpha_2": "KW",
+      "name": "Kuwait",
+      "flag": "🇰🇼"
+    },
+    {
+      "alpha_2": "KY",
+      "name": "Cayman Islands",
+      "flag": "🇰🇾"
+    },
+    {
+      "alpha_2": "KZ",
+      "name": "Kazakhstan",
+      "flag": "🇰🇿"
+    },
+    {
+      "alpha_2": "LA",
+      "name": "Lao People's Democratic Republic",
+      "flag": "🇱🇦"
+    },
+    {
+      "alpha_2": "LB",
+      "name": "Lebanon",
+      "flag": "🇱🇧"
+    },
+    {
+      "alpha_2": "LC",
+      "name": "Saint Lucia",
+      "flag": "🇱🇨"
+    },
+    {
+      "alpha_2": "LI",
+      "name": "Liechtenstein",
+      "flag": "🇱🇮"
+    },
+    {
+      "alpha_2": "LK",
+      "name": "Sri Lanka",
+      "flag": "🇱🇰"
+    },
+    {
+      "alpha_2": "LR",
+      "name": "Liberia",
+      "flag": "🇱🇷"
+    },
+    {
+      "alpha_2": "LS",
+      "name": "Lesotho",
+      "flag": "🇱🇸"
+    },
+    {
+      "alpha_2": "LT",
+      "name": "Lithuania",
+      "flag": "🇱🇹"
+    },
+    {
+      "alpha_2": "LU",
+      "name": "Luxembourg",
+      "flag": "🇱🇺"
+    },
+    {
+      "alpha_2": "LV",
+      "name": "Latvia",
+      "flag": "🇱🇻"
+    },
+    {
+      "alpha_2": "LY",
+      "name": "Libya",
+      "flag": "🇱🇾"
+    },
+    {
+      "alpha_2": "MA",
+      "name": "Morocco",
+      "flag": "🇲🇦"
+    },
+    {
+      "alpha_2": "MC",
+      "name": "Monaco",
+      "flag": "🇲🇨"
+    },
+    {
+      "alpha_2": "MD",
+      "name": "Moldova, Republic of",
+      "flag": "🇲🇩"
+    },
+    {
+      "alpha_2": "ME",
+      "name": "Montenegro",
+      "flag": "🇲🇪"
+    },
+    {
+      "alpha_2": "MF",
+      "name": "Saint Martin (French part)",
+      "flag": "🇲🇫"
+    },
+    {
+      "alpha_2": "MG",
+      "name": "Madagascar",
+      "flag": "🇲🇬"
+    },
+    {
+      "alpha_2": "MH",
+      "name": "Marshall Islands",
+      "flag": "🇲🇭"
+    },
+    {
+      "alpha_2": "MK",
+      "name": "North Macedonia",
+      "flag": "🇲🇰"
+    },
+    {
+      "alpha_2": "ML",
+      "name": "Mali",
+      "flag": "🇲🇱"
+    },
+    {
+      "alpha_2": "MM",
+      "name": "Myanmar",
+      "flag": "🇲🇲"
+    },
+    {
+      "alpha_2": "MN",
+      "name": "Mongolia",
+      "flag": "🇲🇳"
+    },
+    {
+      "alpha_2": "MO",
+      "name": "Macao",
+      "flag": "🇲🇴"
+    },
+    {
+      "alpha_2": "MP",
+      "name": "Northern Mariana Islands",
+      "flag": "🇲🇵"
+    },
+    {
+      "alpha_2": "MQ",
+      "name": "Martinique",
+      "flag": "🇲🇶"
+    },
+    {
+      "alpha_2": "MR",
+      "name": "Mauritania",
+      "flag": "🇲🇷"
+    },
+    {
+      "alpha_2": "MS",
+      "name": "Montserrat",
+      "flag": "🇲🇸"
+    },
+    {
+      "alpha_2": "MT",
+      "name": "Malta",
+      "flag": "🇲🇹"
+    },
+    {
+      "alpha_2": "MU",
+      "name": "Mauritius",
+      "flag": "🇲🇺"
+    },
+    {
+      "alpha_2": "MV",
+      "name": "Maldives",
+      "flag": "🇲🇻"
+    },
+    {
+      "alpha_2": "MW",
+      "name": "Malawi",
+      "flag": "🇲🇼"
+    },
+    {
+      "alpha_2": "MX",
+      "name": "Mexico",
+      "flag": "🇲🇽"
+    },
+    {
+      "alpha_2": "MY",
+      "name": "Malaysia",
+      "flag": "🇲🇾"
+    },
+    {
+      "alpha_2": "MZ",
+      "name": "Mozambique",
+      "flag": "🇲🇿"
+    },
+    {
+      "alpha_2": "NA",
+      "name": "Namibia",
+      "flag": "🇳🇦"
+    },
+    {
+      "alpha_2": "NC",
+      "name": "New Caledonia",
+      "flag": "🇳🇨"
+    },
+    {
+      "alpha_2": "NE",
+      "name": "Niger",
+      "flag": "🇳🇪"
+    },
+    {
+      "alpha_2": "NF",
+      "name": "Norfolk Island",
+      "flag": "🇳🇫"
+    },
+    {
+      "alpha_2": "NG",
+      "name": "Nigeria",
+      "flag": "🇳🇬"
+    },
+    {
+      "alpha_2": "NI",
+      "name": "Nicaragua",
+      "flag": "🇳🇮"
+    },
+    {
+      "alpha_2": "NL",
+      "name": "Netherlands",
+      "flag": "🇳🇱"
+    },
+    {
+      "alpha_2": "NO",
+      "name": "Norway",
+      "flag": "🇳🇴"
+    },
+    {
+      "alpha_2": "NP",
+      "name": "Nepal",
+      "flag": "🇳🇵"
+    },
+    {
+      "alpha_2": "NR",
+      "name": "Nauru",
+      "flag": "🇳🇷"
+    },
+    {
+      "alpha_2": "NU",
+      "name": "Niue",
+      "flag": "🇳🇺"
+    },
+    {
+      "alpha_2": "NZ",
+      "name": "New Zealand",
+      "flag": "🇳🇿"
+    },
+    {
+      "alpha_2": "OM",
+      "name": "Oman",
+      "flag": "🇴🇲"
+    },
+    {
+      "alpha_2": "PA",
+      "name": "Panama",
+      "flag": "🇵🇦"
+    },
+    {
+      "alpha_2": "PE",
+      "name": "Peru",
+      "flag": "🇵🇪"
+    },
+    {
+      "alpha_2": "PF",
+      "name": "French Polynesia",
+      "flag": "🇵🇫"
+    },
+    {
+      "alpha_2": "PG",
+      "name": "Papua New Guinea",
+      "flag": "🇵🇬"
+    },
+    {
+      "alpha_2": "PH",
+      "name": "Philippines",
+      "flag": "🇵🇭"
+    },
+    {
+      "alpha_2": "PK",
+      "name": "Pakistan",
+      "flag": "🇵🇰"
+    },
+    {
+      "alpha_2": "PL",
+      "name": "Poland",
+      "flag": "🇵🇱"
     },
     {
       "alpha_2": "PM",
-      "alpha_3": "SPM",
-      "flag": "🇵🇲",
       "name": "Saint Pierre and Miquelon",
-      "numeric": "666"
+      "flag": "🇵🇲"
+    },
+    {
+      "alpha_2": "PN",
+      "name": "Pitcairn",
+      "flag": "🇵🇳"
+    },
+    {
+      "alpha_2": "PR",
+      "name": "Puerto Rico",
+      "flag": "🇵🇷"
+    },
+    {
+      "alpha_2": "PS",
+      "name": "Palestine, State of",
+      "flag": "🇵🇸"
+    },
+    {
+      "alpha_2": "PT",
+      "name": "Portugal",
+      "flag": "🇵🇹"
+    },
+    {
+      "alpha_2": "PW",
+      "name": "Palau",
+      "flag": "🇵🇼"
+    },
+    {
+      "alpha_2": "PY",
+      "name": "Paraguay",
+      "flag": "🇵🇾"
+    },
+    {
+      "alpha_2": "QA",
+      "name": "Qatar",
+      "flag": "🇶🇦"
+    },
+    {
+      "alpha_2": "RE",
+      "name": "Réunion",
+      "flag": "🇷🇪"
+    },
+    {
+      "alpha_2": "RO",
+      "name": "Romania",
+      "flag": "🇷🇴"
     },
     {
       "alpha_2": "RS",
-      "alpha_3": "SRB",
-      "flag": "🇷🇸",
       "name": "Serbia",
-      "numeric": "688",
-      "official_name": "Republic of Serbia"
+      "flag": "🇷🇸"
     },
     {
-      "alpha_2": "SS",
-      "alpha_3": "SSD",
-      "flag": "🇸🇸",
-      "name": "South Sudan",
-      "numeric": "728",
-      "official_name": "Republic of South Sudan"
+      "alpha_2": "RU",
+      "name": "Russian Federation",
+      "flag": "🇷🇺"
     },
     {
-      "alpha_2": "ST",
-      "alpha_3": "STP",
-      "flag": "🇸🇹",
-      "name": "Sao Tome and Principe",
-      "numeric": "678",
-      "official_name": "Democratic Republic of Sao Tome and Principe"
+      "alpha_2": "RW",
+      "name": "Rwanda",
+      "flag": "🇷🇼"
     },
     {
-      "alpha_2": "SR",
-      "alpha_3": "SUR",
-      "flag": "🇸🇷",
-      "name": "Suriname",
-      "numeric": "740",
-      "official_name": "Republic of Suriname"
+      "alpha_2": "SA",
+      "name": "Saudi Arabia",
+      "flag": "🇸🇦"
     },
     {
-      "alpha_2": "SK",
-      "alpha_3": "SVK",
-      "flag": "🇸🇰",
-      "name": "Slovakia",
-      "numeric": "703",
-      "official_name": "Slovak Republic"
-    },
-    {
-      "alpha_2": "SI",
-      "alpha_3": "SVN",
-      "flag": "🇸🇮",
-      "name": "Slovenia",
-      "numeric": "705",
-      "official_name": "Republic of Slovenia"
-    },
-    {
-      "alpha_2": "SE",
-      "alpha_3": "SWE",
-      "flag": "🇸🇪",
-      "name": "Sweden",
-      "numeric": "752",
-      "official_name": "Kingdom of Sweden"
-    },
-    {
-      "alpha_2": "SZ",
-      "alpha_3": "SWZ",
-      "flag": "🇸🇿",
-      "name": "Eswatini",
-      "numeric": "748",
-      "official_name": "Kingdom of Eswatini"
-    },
-    {
-      "alpha_2": "SX",
-      "alpha_3": "SXM",
-      "flag": "🇸🇽",
-      "name": "Sint Maarten (Dutch part)",
-      "numeric": "534",
-      "official_name": "Sint Maarten (Dutch part)"
+      "alpha_2": "SB",
+      "name": "Solomon Islands",
+      "flag": "🇸🇧"
     },
     {
       "alpha_2": "SC",
-      "alpha_3": "SYC",
-      "flag": "🇸🇨",
       "name": "Seychelles",
-      "numeric": "690",
-      "official_name": "Republic of Seychelles"
+      "flag": "🇸🇨"
+    },
+    {
+      "alpha_2": "SD",
+      "name": "Sudan",
+      "flag": "🇸🇩"
+    },
+    {
+      "alpha_2": "SE",
+      "name": "Sweden",
+      "flag": "🇸🇪"
+    },
+    {
+      "alpha_2": "SG",
+      "name": "Singapore",
+      "flag": "🇸🇬"
+    },
+    {
+      "alpha_2": "SH",
+      "name": "Saint Helena, Ascension and Tristan da Cunha",
+      "flag": "🇸🇭"
+    },
+    {
+      "alpha_2": "SI",
+      "name": "Slovenia",
+      "flag": "🇸🇮"
+    },
+    {
+      "alpha_2": "SJ",
+      "name": "Svalbard and Jan Mayen",
+      "flag": "🇸🇯"
+    },
+    {
+      "alpha_2": "SK",
+      "name": "Slovakia",
+      "flag": "🇸🇰"
+    },
+    {
+      "alpha_2": "SL",
+      "name": "Sierra Leone",
+      "flag": "🇸🇱"
+    },
+    {
+      "alpha_2": "SM",
+      "name": "San Marino",
+      "flag": "🇸🇲"
+    },
+    {
+      "alpha_2": "SN",
+      "name": "Senegal",
+      "flag": "🇸🇳"
+    },
+    {
+      "alpha_2": "SO",
+      "name": "Somalia",
+      "flag": "🇸🇴"
+    },
+    {
+      "alpha_2": "SR",
+      "name": "Suriname",
+      "flag": "🇸🇷"
+    },
+    {
+      "alpha_2": "SS",
+      "name": "South Sudan",
+      "flag": "🇸🇸"
+    },
+    {
+      "alpha_2": "ST",
+      "name": "Sao Tome and Principe",
+      "flag": "🇸🇹"
+    },
+    {
+      "alpha_2": "SV",
+      "name": "El Salvador",
+      "flag": "🇸🇻"
+    },
+    {
+      "alpha_2": "SX",
+      "name": "Sint Maarten (Dutch part)",
+      "flag": "🇸🇽"
     },
     {
       "alpha_2": "SY",
-      "alpha_3": "SYR",
-      "common_name": "Syria",
-      "flag": "🇸🇾",
       "name": "Syrian Arab Republic",
-      "numeric": "760"
+      "flag": "🇸🇾"
+    },
+    {
+      "alpha_2": "SZ",
+      "name": "Eswatini",
+      "flag": "🇸🇿"
     },
     {
       "alpha_2": "TC",
-      "alpha_3": "TCA",
-      "flag": "🇹🇨",
       "name": "Turks and Caicos Islands",
-      "numeric": "796"
+      "flag": "🇹🇨"
     },
     {
       "alpha_2": "TD",
-      "alpha_3": "TCD",
-      "flag": "🇹🇩",
       "name": "Chad",
-      "numeric": "148",
-      "official_name": "Republic of Chad"
+      "flag": "🇹🇩"
+    },
+    {
+      "alpha_2": "TF",
+      "name": "French Southern Territories",
+      "flag": "🇹🇫"
     },
     {
       "alpha_2": "TG",
-      "alpha_3": "TGO",
-      "flag": "🇹🇬",
       "name": "Togo",
-      "numeric": "768",
-      "official_name": "Togolese Republic"
+      "flag": "🇹🇬"
     },
     {
       "alpha_2": "TH",
-      "alpha_3": "THA",
-      "flag": "🇹🇭",
       "name": "Thailand",
-      "numeric": "764",
-      "official_name": "Kingdom of Thailand"
+      "flag": "🇹🇭"
     },
     {
       "alpha_2": "TJ",
-      "alpha_3": "TJK",
-      "flag": "🇹🇯",
       "name": "Tajikistan",
-      "numeric": "762",
-      "official_name": "Republic of Tajikistan"
+      "flag": "🇹🇯"
     },
     {
       "alpha_2": "TK",
-      "alpha_3": "TKL",
-      "flag": "🇹🇰",
       "name": "Tokelau",
-      "numeric": "772"
-    },
-    {
-      "alpha_2": "TM",
-      "alpha_3": "TKM",
-      "flag": "🇹🇲",
-      "name": "Turkmenistan",
-      "numeric": "795"
+      "flag": "🇹🇰"
     },
     {
       "alpha_2": "TL",
-      "alpha_3": "TLS",
-      "flag": "🇹🇱",
       "name": "Timor-Leste",
-      "numeric": "626",
-      "official_name": "Democratic Republic of Timor-Leste"
+      "flag": "🇹🇱"
     },
     {
-      "alpha_2": "TO",
-      "alpha_3": "TON",
-      "flag": "🇹🇴",
-      "name": "Tonga",
-      "numeric": "776",
-      "official_name": "Kingdom of Tonga"
-    },
-    {
-      "alpha_2": "TT",
-      "alpha_3": "TTO",
-      "flag": "🇹🇹",
-      "name": "Trinidad and Tobago",
-      "numeric": "780",
-      "official_name": "Republic of Trinidad and Tobago"
+      "alpha_2": "TM",
+      "name": "Turkmenistan",
+      "flag": "🇹🇲"
     },
     {
       "alpha_2": "TN",
-      "alpha_3": "TUN",
-      "flag": "🇹🇳",
       "name": "Tunisia",
-      "numeric": "788",
-      "official_name": "Republic of Tunisia"
+      "flag": "🇹🇳"
+    },
+    {
+      "alpha_2": "TO",
+      "name": "Tonga",
+      "flag": "🇹🇴"
     },
     {
       "alpha_2": "TR",
-      "alpha_3": "TUR",
-      "flag": "🇹🇷",
       "name": "Türkiye",
-      "numeric": "792",
-      "official_name": "Republic of Türkiye"
+      "flag": "🇹🇷"
+    },
+    {
+      "alpha_2": "TT",
+      "name": "Trinidad and Tobago",
+      "flag": "🇹🇹"
     },
     {
       "alpha_2": "TV",
-      "alpha_3": "TUV",
-      "flag": "🇹🇻",
       "name": "Tuvalu",
-      "numeric": "798"
+      "flag": "🇹🇻"
     },
     {
       "alpha_2": "TW",
-      "alpha_3": "TWN",
-      "common_name": "Taiwan",
-      "flag": "🇹🇼",
       "name": "Taiwan, Province of China",
-      "numeric": "158",
-      "official_name": "Taiwan, Province of China"
+      "flag": "🇹🇼"
     },
     {
       "alpha_2": "TZ",
-      "alpha_3": "TZA",
-      "common_name": "Tanzania",
-      "flag": "🇹🇿",
       "name": "Tanzania, United Republic of",
-      "numeric": "834",
-      "official_name": "United Republic of Tanzania"
-    },
-    {
-      "alpha_2": "UG",
-      "alpha_3": "UGA",
-      "flag": "🇺🇬",
-      "name": "Uganda",
-      "numeric": "800",
-      "official_name": "Republic of Uganda"
+      "flag": "🇹🇿"
     },
     {
       "alpha_2": "UA",
-      "alpha_3": "UKR",
-      "flag": "🇺🇦",
       "name": "Ukraine",
-      "numeric": "804"
+      "flag": "🇺🇦"
+    },
+    {
+      "alpha_2": "UG",
+      "name": "Uganda",
+      "flag": "🇺🇬"
     },
     {
       "alpha_2": "UM",
-      "alpha_3": "UMI",
-      "flag": "🇺🇲",
       "name": "United States Minor Outlying Islands",
-      "numeric": "581"
-    },
-    {
-      "alpha_2": "UY",
-      "alpha_3": "URY",
-      "flag": "🇺🇾",
-      "name": "Uruguay",
-      "numeric": "858",
-      "official_name": "Eastern Republic of Uruguay"
+      "flag": "🇺🇲"
     },
     {
       "alpha_2": "US",
-      "alpha_3": "USA",
-      "flag": "🇺🇸",
       "name": "United States",
-      "numeric": "840",
-      "official_name": "United States of America"
+      "flag": "🇺🇸"
+    },
+    {
+      "alpha_2": "UY",
+      "name": "Uruguay",
+      "flag": "🇺🇾"
     },
     {
       "alpha_2": "UZ",
-      "alpha_3": "UZB",
-      "flag": "🇺🇿",
       "name": "Uzbekistan",
-      "numeric": "860",
-      "official_name": "Republic of Uzbekistan"
+      "flag": "🇺🇿"
     },
     {
       "alpha_2": "VA",
-      "alpha_3": "VAT",
-      "flag": "🇻🇦",
       "name": "Holy See (Vatican City State)",
-      "numeric": "336"
+      "flag": "🇻🇦"
     },
     {
       "alpha_2": "VC",
-      "alpha_3": "VCT",
-      "flag": "🇻🇨",
       "name": "Saint Vincent and the Grenadines",
-      "numeric": "670"
+      "flag": "🇻🇨"
     },
     {
       "alpha_2": "VE",
-      "alpha_3": "VEN",
-      "common_name": "Venezuela",
-      "flag": "🇻🇪",
       "name": "Venezuela, Bolivarian Republic of",
-      "numeric": "862",
-      "official_name": "Bolivarian Republic of Venezuela"
+      "flag": "🇻🇪"
     },
     {
       "alpha_2": "VG",
-      "alpha_3": "VGB",
-      "flag": "🇻🇬",
       "name": "Virgin Islands, British",
-      "numeric": "092",
-      "official_name": "British Virgin Islands"
+      "flag": "🇻🇬"
     },
     {
       "alpha_2": "VI",
-      "alpha_3": "VIR",
-      "flag": "🇻🇮",
       "name": "Virgin Islands, U.S.",
-      "numeric": "850",
-      "official_name": "Virgin Islands of the United States"
+      "flag": "🇻🇮"
     },
     {
       "alpha_2": "VN",
-      "alpha_3": "VNM",
-      "common_name": "Vietnam",
-      "flag": "🇻🇳",
       "name": "Viet Nam",
-      "numeric": "704",
-      "official_name": "Socialist Republic of Viet Nam"
+      "flag": "🇻🇳"
     },
     {
       "alpha_2": "VU",
-      "alpha_3": "VUT",
-      "flag": "🇻🇺",
       "name": "Vanuatu",
-      "numeric": "548",
-      "official_name": "Republic of Vanuatu"
+      "flag": "🇻🇺"
     },
     {
       "alpha_2": "WF",
-      "alpha_3": "WLF",
-      "flag": "🇼🇫",
       "name": "Wallis and Futuna",
-      "numeric": "876"
+      "flag": "🇼🇫"
     },
     {
       "alpha_2": "WS",
-      "alpha_3": "WSM",
-      "flag": "🇼🇸",
       "name": "Samoa",
-      "numeric": "882",
-      "official_name": "Independent State of Samoa"
+      "flag": "🇼🇸"
     },
     {
       "alpha_2": "YE",
-      "alpha_3": "YEM",
-      "flag": "🇾🇪",
       "name": "Yemen",
-      "numeric": "887",
-      "official_name": "Republic of Yemen"
+      "flag": "🇾🇪"
+    },
+    {
+      "alpha_2": "YT",
+      "name": "Mayotte",
+      "flag": "🇾🇹"
     },
     {
       "alpha_2": "ZA",
-      "alpha_3": "ZAF",
-      "flag": "🇿🇦",
       "name": "South Africa",
-      "numeric": "710",
-      "official_name": "Republic of South Africa"
+      "flag": "🇿🇦"
     },
     {
       "alpha_2": "ZM",
-      "alpha_3": "ZMB",
-      "flag": "🇿🇲",
       "name": "Zambia",
-      "numeric": "894",
-      "official_name": "Republic of Zambia"
+      "flag": "🇿🇲"
     },
     {
       "alpha_2": "ZW",
-      "alpha_3": "ZWE",
-      "flag": "🇿🇼",
       "name": "Zimbabwe",
-      "numeric": "716",
-      "official_name": "Republic of Zimbabwe"
+      "flag": "🇿🇼"
     }
   ]
 }
