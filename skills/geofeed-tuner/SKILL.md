@@ -433,23 +433,29 @@ Load the dataset from: [./run/data/report-data.json](./run/data/report-data.json
 - Read the `entries` array.
 - Include all entries 
 
-#### Step 2: Build Lookup Payload
+#### Step 2: Build Lookup Payload with Deduplication
 
-Because the server only accepts 1000 entries per request, you **must** preserve global ordering across multiple batched requests:
-- Assign each element of `entries` an `originalIndex` equal to its position in the `entries` array.
-- Build request batches of up to 1000 items each, **preserving the order** of `entries` within every batch.
-- For each batch, keep an in-memory structure like `[{ originalIndex, payload }, ...]` so you can later match responses back to the correct `originalIndex`.
-- When writing the MCP payload file, serialize only the `payload` objects (as shown below), but always in the same order as your in-memory batch list.
-- When reading responses for a batch, assume the server returns suggestions in the same order as the batch request. For the i‑th response in a batch, use the stored `originalIndex` of the i‑th request entry in that batch to attach the suggestion to the correct entry (`entries[originalIndex]` or a suggestions array indexed by `originalIndex`).
-- When combining results from multiple batches, reconstruct the global suggestion list by `originalIndex` so that suggestions remain aligned with the original `entries` ordering.
+Reduce server requests by deduplicating identical entries:
+- For each entry in `entries`, compute a content hash (hash of countryCode + regionCode + cityName).
+- Create a deduplication map: `{ contentHash -> { rowKey, payload, entryIndices: [] } }`. rowKey is a UUID that will be sent to the MCP server for matching responses.
+- If an entry's hash already exists, append its **0-based array index** in `entries` to that deduplication entry's `entryIndices` array.
+- If hash is new, generate a **UUID (rowKey)** and create a new deduplication entry.
+
+Build request batches:
+- Extract unique deduplicated entries from the map, keeping them in deduplication order.
+- Build request batches of up to 1000 items each.
+- For each batch, keep an in-memory structure like `[{ rowKey, payload, entryIndices }, ...]` to match responses back by rowKey.
+- When writing the MCP payload file, include the `rowKey` field with each payload object:
 
 ```json
 [
-    {"countryCode":"CA","regionCode":"CA-ON","cityName":"Toronto"},
-    {"countryCode":"IN","regionCode":"IN-KA","cityName":"Bangalore"},
-    {"countryCode":"IN","regionCode":"IN-KA"}
+    {"rowKey": "550e8400-e29b-41d4-a716-446655440000", "countryCode":"CA","regionCode":"CA-ON","cityName":"Toronto"},
+    {"rowKey": "6ba7b810-9dad-11d1-80b4-00c04fd430c8", "countryCode":"IN","regionCode":"IN-KA","cityName":"Bangalore"},
+    {"rowKey": "6ba7b811-9dad-11d1-80b4-00c04fd430c8", "countryCode":"IN","regionCode":"IN-KA"}
 ]
 ```
+
+- When reading responses, match each response `rowKey` field to the corresponding deduplication entry to retrieve all associated `entryIndices`.
 
 Rules:
 - Write payload to: [./run/data/mcp-server-payload.json](./run/data/mcp-server-payload.json)
@@ -459,50 +465,40 @@ Rules:
 
 - Server: `https://mcp.fastah.ai/mcp`
 - Tool: `rfc8805-row-place-search`
-- Open [./run/data/mcp-server-payload.json](./run/data/mcp-server-payload.json) and send all entries in a single request if there are fewer than 1000 entries. If there are more than 1000 entries, split into multiple requests of 1000 entries each.      
-
+- Open [./run/data/mcp-server-payload.json](./run/data/mcp-server-payload.json) and send all deduplicated entries with their rowKeys.
+- If there are more than 1000 deduplicated entries after deduplication, split into multiple requests of 1000 entries each.
+- The server will respond with the same `rowKey` field in each response for mapping back.
 - Do NOT use local data.
 
-#### Step 4: Normalize Suggestions
+#### Step 4: Attach tuned data to Entries
 
-Use the data received from the MCP server.
-
-Rules:
-- Deduplicate suggestions by `region_code`.
-- Preserve response order (assumed relevance-ranked)
+- Use **separate script** for attaching tuned data.
+- Load both [./run/data/report-data.json](./run/data/report-data.json) and the deduplication map (held in memory from Step 2, or re-derived from the payload file).
+- For each response from the MCP server:
+  - Extract the `rowKey` from the response.
+  - Look up the `entryIndices` array associated with that `rowKey` from the deduplication map.
+  - For each index in `entryIndices`, attach the normalized suggestions to `entries[index]`.
 - Keep **at least three suggestions** when available
 - If fewer than three exist, keep all returned values
-- If none exist:
-  - Store an empty array.
-  - Do NOT raise an error.
 
-#### Step 5: Attach Suggestions to Entries
-
-- Use **separate script** for attaching suggestions.
-- Load: [./run/data/report-data.json](./run/data/report-data.json)
-- Match responses back to entries using:
-  - Positional matching (rely on order of entries in the request and response)
-
-Create the field if it does not exist:
+Create the field on each affected entry if it does not exist:
 
 ```json
-"tuned_entries": []
+"tuned_entries": [
+  {
+    "placeName": "",
+    "countryCode": "",
+    "regionCode": "",
+    "placeType": "",
+    "h3Cells": [],
+    "boundingBox": []
+  }
+]
 ```
 
-Populate with:
+Entries with no UUID match (i.e. the MCP server returned no response for their UUID) must receive an empty `tuned_entries: []` array — never leave the field absent.
 
-```json
-{
-  "placeName": "",
-  "countryCode": "",
-  "regionCode": "",
-  "placeType": "",
-  "h3Cells": [],
-  "boundingBox": []
-}
-```
-
-#### Step 6: Store Updated Dataset
+#### Step 5: Store Updated Dataset
 
 - Write the dataset back to: [./run/data/report-data.json](./run/data/report-data.json)
 - Rules:
