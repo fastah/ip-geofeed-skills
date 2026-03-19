@@ -155,103 +155,163 @@ The key requirements from RFC 8805 that this skill enforces are summarized below
 ### Phase 3: Checks & Suggestions
 
 #### Execution Rules
-- Generate **exactly one script** for this phase.
+- Generate a **script** for this phase.
 - Do NOT combine this phase with others.
 - Do NOT precompute future-phase data.
 - Store the output as a JSON file at: [`./run/data/report-data.json`](./run/data/report-data.json)
 
 #### Schema Definition
 
-The JSON structure below is **IMMUTABLE** during Phase 3. Phase 4 will later add a `tuned_entries` array to each object in `entries` — this is the only permitted schema extension and happens in a separate phase.
+The JSON structure below is **IMMUTABLE** during Phase 3. Phase 4 will later add a `TunedEntry` object to each object in `Entries` — this is the only permitted schema extension and happens in a separate phase.
+
+JSON keys use the **same names as Go struct member fields** (PascalCase) so they map directly to Go template placeholders like `{{.CountryCode}}`, `{{.HasError}}`, etc.
 
 ```json
 {
-  "input_file": "",
-  "timestamp": 0,
+  "InputFile": "",
+  "Timestamp": 0,
 
-  "total_entries": 0,
-  "ipv4_entries": 0,
-  "ipv6_entries": 0,
-  "invalid_entries": 0,
+  "TotalEntries": 0,
+  "IpV4Entries": 0,
+  "IpV6Entries": 0,
+  "InvalidEntries": 0,
 
-  "error_count": 0,
-  "warning_count": 0,
-  "ok_count": 0,
-  "suggestion_count": 0,
+  "Errors": 0,
+  "Warnings": 0,
+  "OK": 0,
+  "Suggestions": 0,
 
-  "city_level_accuracy": 0,
-  "region_level_accuracy": 0,
-  "country_level_accuracy": 0,
-  "do_not_geolocate_entries": 0,
+  "CityLevelAccuracy": 0,
+  "RegionLevelAccuracy": 0,
+  "CountryLevelAccuracy": 0,
+  "DoNotGeolocate": 0,
 
-  "entries": [
+  "Entries": [
     {
-      "line": 0,
-      "ip_prefix": "",
-      "country": "",
-      "region": "",
-      "city": "",
+      "Line": 0,
+      "IPPrefix": "",
+      "CountryCode": "",
+      "RegionCode": "",
+      "City": "",
 
-      "status": "",
+      "Status": "",
+      "IPVersion": "",
 
-      "messages": [
+      "Messages": [
         {
-          "status": "",
-          "message": ""
+          "ID": "",
+          "Type": "",
+          "Text": "",
+          "Checked": false
         }
       ],
 
-      "has_error": false,
-      "has_warning": false,
-      "has_suggestion": false,
-      "need_region": false,
-      "is_small_territory": false
+      "HasError": false,
+      "HasWarning": false,
+      "HasSuggestion": false,
+      "DoNotGeolocate": false,
+      "GeocodingHint": "",
+      "Tunable": false
     }
   ]
 }
 ```
 
-Field definitions:
-- `input_file`: The original input source, either a local filename or a remote URL.
-- `timestamp`: Milliseconds since Unix epoch when the tuning was performed.
-- `total_entries`: Total number of data rows processed (excluding comment and blank lines).
-- `ipv4_entries`: Count of entries that are IPv4 subnets.
-- `ipv6_entries`: Count of entries that are IPv6 subnets.
-- `invalid_entries`: Count of entries that failed IP prefix parsing.
-- `error_count`: Total entries whose `status` is `ERROR`.
-- `warning_count`: Total entries whose `status` is `WARNING`.
-- `ok_count`: Total entries whose `status` is `OK`.
-- `suggestion_count`: Total entries whose `status` is `SUGGESTION`.
-- `city_level_accuracy`: Count of valid entries where `city` is non-empty.
-- `region_level_accuracy`: Count of valid entries where `region` is non-empty and `city` is empty.
-- `country_level_accuracy`: Count of valid entries where `country` is non-empty, `region` is empty, and `city` is empty.
-- `do_not_geolocate_entries`: Count of valid entries where `country`, `region`, and `city` are all empty.
-- `entries`: Array of objects, one per data row, with the following per-entry fields:
-  - `line`: 1-based line number in the original CSV (counting all lines including comments and blanks).
-  - `ip_prefix`: The normalized IP prefix in CIDR slash notation.
-  - `country`: The ISO 3166-1 alpha-2 country code, or empty string.
-  - `region`: The ISO 3166-2 region code (e.g., `US-CA`), or empty string.
-  - `city`: The city name, or empty string.
-  - `status`: Highest severity assigned: `ERROR` > `WARNING` > `SUGGESTION` > `OK`.
-  - `messages`: Array of `{ "status": "...", "message": "..." }` validation messages.
-  - `has_error`: `true` if any message has status `ERROR`.
-  - `has_warning`: `true` if any message has status `WARNING`.
-  - `has_suggestion`: `true` if any message has status `SUGGESTION`.
-  - `need_region`: `true` if the entry triggered the "missing region when city is specified" suggestion.
-  - `is_small_territory`: `true` if the country is classified as a small territory per `assets/small-territories.json`.
+Field definitions (keys match Go struct member names):
+
+**Top-level metadata** (matches Go `Metadata` struct):
+- `InputFile`: The original input source, either a local filename or a remote URL.
+- `Timestamp`: Milliseconds since Unix epoch when the tuning was performed.
+- `TotalEntries`: Total number of data rows processed (excluding comment and blank lines).
+- `IpV4Entries`: Count of entries that are IPv4 subnets.
+- `IpV6Entries`: Count of entries that are IPv6 subnets.
+- `InvalidEntries`: Count of entries that failed IP prefix parsing and CSV parsing.
+- `Errors`: Total entries whose `Status` is `ERROR`.
+- `Warnings`: Total entries whose `Status` is `WARNING`.
+- `OK`: Total entries whose `Status` is `OK`.
+- `Suggestions`: Total entries whose `Status` is `SUGGESTION`.
+- `CityLevelAccuracy`: Count of valid entries where `City` is non-empty.
+- `RegionLevelAccuracy`: Count of valid entries where `RegionCode` is non-empty and `City` is empty.
+- `CountryLevelAccuracy`: Count of valid entries where `CountryCode` is non-empty, `RegionCode` is empty, and `City` is empty.
+- `DoNotGeolocate` (metadata): Count of valid entries where `CountryCode`, `RegionCode`, and `City` are all empty.
+
+**Entry fields** (matches Go `Entry` struct, which embeds `parser.Row`):
+- `Entries`: Array of objects, one per data row, with the following per-entry fields:
+  - `Line`: 1-based line number in the original CSV (counting all lines including comments and blanks).
+  - `IPPrefix`: The normalized IP prefix in CIDR slash notation.
+  - `CountryCode`: The ISO 3166-1 alpha-2 country code, or empty string.
+  - `RegionCode`: The ISO 3166-2 region code (e.g., `US-CA`), or empty string.
+  - `City`: The city name, or empty string.
+  - `Status`: Highest severity assigned: `ERROR` > `WARNING` > `SUGGESTION` > `OK`.
+  - `IPVersion`: `"IPv4"` or `"IPv6"` based on the parsed IP prefix.
+  - `Messages`: Array of message objects (matches Go `Message` struct):
+    - `ID`: String identifier from the **Validation Rules Reference** table below (e.g., `"1101"`, `"3301"`).
+    - `Type`: The severity type: `"ERROR"`, `"WARNING"`, or `"SUGGESTION"`.
+    - `Text`: The human-readable validation message string.
+    - `Checked`: `true` if the validation rule is auto-tunable (`Tunable: true` in the reference table), `false` otherwise. Controls whether the checkbox in the report is `checked` or `disabled`.
+  - `HasError`: `true` if any message has `Type` `"ERROR"`.
+  - `HasWarning`: `true` if any message has `Type` `"WARNING"`.
+  - `HasSuggestion`: `true` if any message has `Type` `"SUGGESTION"`.
+  - `DoNotGeolocate` (entry): `true` if `CountryCode`, `RegionCode`, and `City` are all empty — the entry is an explicit do-not-geolocate signal.
+  - `GeocodingHint`: Always empty string `""` in Phase 3. Reserved for future use.
+  - `Tunable`: `true` if **any** message in the entry has `Checked: true`. Computed as logical OR across all messages' `Checked` values. This flag drives the "Tune" button visibility in the report.
+
+#### Validation Rules Reference
+
+When adding messages to an entry, use the `ID`, `Type`, `Text`, and `Checked` values from this table. This table is derived from the Go `errors.go` definitions and must be used to populate every message object.
+
+| ID     | Type         | Text                                                                                           | Checked | Condition Reference                    |
+|--------|--------------|------------------------------------------------------------------------------------------------|---------|----------------------------------------|
+| `1101` | `ERROR`      | IP prefix is empty                                                                             | `false` | IP Prefix Analysis: empty              |
+| `1102` | `ERROR`      | Invalid IP prefix: unable to parse as IPv4 or IPv6 network                                     | `false` | IP Prefix Analysis: invalid syntax     |
+| `1103` | `ERROR`      | Non-public IP range is not allowed in an RFC 8805 feed                                         | `false` | IP Prefix Analysis: non-public         |
+| `3101` | `SUGGESTION` | IPv4 prefix is unusually large and may indicate a typo                                         | `false` | IP Prefix Analysis: IPv4 < /22         |
+| `3102` | `SUGGESTION` | IPv6 prefix is unusually large and may indicate a typo                                         | `false` | IP Prefix Analysis: IPv6 < /64         |
+| `1201` | `ERROR`      | Invalid country code: not a valid ISO 3166-1 alpha-2 value                                     | `true`  | Country Code Analysis: invalid         |
+| `1301` | `ERROR`      | Invalid region format; expected COUNTRY-SUBDIVISION (e.g., US-CA)                              | `true`  | Region Code Analysis: bad format       |
+| `1302` | `ERROR`      | Invalid region code: not a valid ISO 3166-2 subdivision                                        | `true`  | Region Code Analysis: unknown code     |
+| `1303` | `ERROR`      | Region code does not match the specified country code                                          | `true`  | Region Code Analysis: mismatch         |
+| `1401` | `ERROR`      | Invalid city name: placeholder value is not allowed                                            | `false` | City Name Analysis: placeholder        |
+| `1402` | `ERROR`      | Invalid city name: abbreviated or code-based value detected                                    | `true`  | City Name Analysis: abbreviation       |
+| `2401` | `WARNING`    | City name formatting is inconsistent; consider normalizing the value                           | `true`  | City Name Analysis: formatting         |
+| `1501` | `ERROR`      | Postal codes are deprecated by RFC 8805 and must be removed for privacy reasons                | `true`  | Postal Code Check                      |
+| `3301` | `SUGGESTION` | Region is usually unnecessary for small territories; consider removing the region value        | `true`  | Tuning: small territory region         |
+| `3402` | `SUGGESTION` | City-level granularity is usually unnecessary for small territories; consider removing the city value | `true`  | Tuning: small territory city           |
+| `3303` | `SUGGESTION` | Region code is recommended when a city is specified; choose a region from the dropdown         | `true`  | Tuning: missing region with city       |
+| `3104` | `SUGGESTION` | Confirm whether this subnet is intentionally marked as do-not-geolocate or missing location data | `true`  | Tuning: unspecified geolocation        |
+
+#### Populating Messages
+
+When a validation check matches, add a message to the entry's `Messages` array using the values from the reference table:
+```python
+entry["Messages"].append({
+    "ID": "1201",      # From the table
+    "Type": "ERROR",   # From the table
+    "Text": "Invalid country code: not a valid ISO 3166-1 alpha-2 value",  # From the table
+    "Checked": True    # From the table (True = tunable)
+})
+```
+
+After populating all messages for an entry, derive the entry-level flags:
+```python
+entry["HasError"] = any(m["Type"] == "ERROR" for m in entry["Messages"])
+entry["HasWarning"] = any(m["Type"] == "WARNING" for m in entry["Messages"])
+entry["HasSuggestion"] = any(m["Type"] == "SUGGESTION" for m in entry["Messages"])
+entry["Tunable"] = any(m["Checked"] for m in entry["Messages"])
+```
 
 #### Accuracy Level Counting Rules
 
 Accuracy levels are **mutually exclusive**. Assign each valid (non-ERROR, non-invalid) entry to exactly one bucket based on the most granular non-empty geo field:
 
-| Condition                                       | Bucket                     |
-|-------------------------------------------------|----------------------------|
-| `city` is non-empty                             | `city_level_accuracy`      |
-| `region` non-empty AND `city` is empty          | `region_level_accuracy`    |
-| `country` non-empty, `region` and `city` empty  | `country_level_accuracy`   |
-| All three fields (`country`, `region`, `city`) empty | `do_not_geolocate_entries` |
+| Condition                                                    | Bucket                      |
+|--------------------------------------------------------------|-----------------------------|
+| `City` is non-empty                                          | `CityLevelAccuracy`         |
+| `RegionCode` non-empty AND `City` is empty                   | `RegionLevelAccuracy`       |
+| `CountryCode` non-empty, `RegionCode` and `City` empty       | `CountryLevelAccuracy`      |
+| All three fields (`CountryCode`, `RegionCode`, `City`) empty | `DoNotGeolocate` (metadata) |
 
-**Do not count** entries with `has_error: true` or entries in `invalid_entries` in any accuracy bucket.
+**Do not count** entries with `HasError: true` or entries in `InvalidEntries` in any accuracy bucket.
 
 The agent MUST NOT:
 - Rename fields
@@ -304,8 +364,8 @@ The goal is to ensure the file can be parsed reliably and normalized into a **co
     the `utf-8-sig` encoding to ensure a **UTF-8 BOM** is present.
 
 #### IP Prefix Analysis
-  - Check that the `ip_prefix` field is present and non-empty for each entry.
-  - Check for duplicate `ip_prefix` values across entries.
+  - Check that the `IPPrefix` field is present and non-empty for each entry.
+  - Check for duplicate `IPPrefix` values across entries.
   - If duplicates are found, stop the skill and report to the user with the message: `Duplicate IP prefix detected: {ip_prefix_value} appears on lines {line_numbers}`
   - If no duplicates are found, continue with the analysis.
 
@@ -319,12 +379,12 @@ The goal is to ensure the file can be parsed reliably and normalized into a **co
     - Report the following conditions as **ERROR**:
 
     - **Invalid subnet syntax**
-      - Message: `Invalid IP prefix: unable to parse as IPv4 or IPv6 network`
+      - Message ID: `1102`
 
     - **Non-public address space**
       - Applies to subnets that are **private, loopback, link-local, multicast, or otherwise non-public**
         - In Python, detect non-public ranges using `is_private` and related address properties as shown in `./references`.
-      - Message: `Non-public IP range is not allowed in an RFC 8805 feed`
+      - Message ID: `1103`
 
     - **RFC 8805–incompatible subnet**
       - Any subnet failing mandatory RFC 8805 constraints
@@ -335,11 +395,11 @@ The goal is to ensure the file can be parsed reliably and normalized into a **co
 
     - **Overly large IPv6 subnets**
       - Prefixes shorter than `/64`
-      - Message: `IPv6 prefix is unusually large and may indicate a typo`
+      - Message ID: `3102`
 
     - **Overly large IPv4 subnets**
       - Prefixes shorter than `/22`
-      - Message: `IPv4 prefix is unusually large and may indicate a typo`
+      - Message ID: `3101`
 
 #### Geolocation Quality Check
 
@@ -358,19 +418,28 @@ This phase runs after structural checks pass.
       - `alpha_2`: two-letter country code
       - `name`: short country name
       - `flag`: flag emoji
-    - This file represents the **superset of valid `alpha2code` values** for an RFC 8805 CSV.
-  - Check `alpha2code` (RFC 8805 Section 2.1.1.2) against the `alpha_2` attribute.
+    - This file represents the **superset of valid `CountryCode` values** for an RFC 8805 CSV.
+  - Check the entry's `CountryCode` (RFC 8805 Section 2.1.1.2, column `alpha2code`) against the `alpha_2` attribute.
   - Sample code is available in the `references/` directory.
 
-  - If a country is found in [`assets/small-territories.json`](assets/small-territories.json), set `is_small_territory` to `true`. This value is used in later checks and suggestions related to small territories.
+  - If a country is found in [`assets/small-territories.json`](assets/small-territories.json), mark the entry internally as a small territory. This flag is used in later checks and suggestions but is **not stored in the output JSON** (it is transient validation state).
 
-  - **Note:** `small-territories.json` contains some historic/disputed codes (`AN`, `CS`, `XK`) that are not present in `iso3166-1.json`. An entry using one of these as its `alpha2code` will fail the country code validation (ERROR) even though it matches as a small territory. The country code ERROR takes precedence — do not suppress it based on the small-territory flag.
+  - **Note:** `small-territories.json` contains some historic/disputed codes (`AN`, `CS`, `XK`) that are not present in `iso3166-1.json`. An entry using one of these as its `CountryCode` will fail the country code validation (ERROR) even though it matches as a small territory. The country code ERROR takes precedence — do not suppress it based on the small-territory flag.
 
   - **ERROR**
     - Report the following conditions as **ERROR**:
     - **Invalid country code**
-      - Condition: `alpha2code` is present but not found in the `alpha_2` set
-      - Message: `Invalid country code: not a valid ISO 3166-1 alpha-2 value`
+      - Condition: `CountryCode` is present but not found in the `alpha_2` set
+      - Message ID: `1201`
+
+  - **SUGGESTION**
+    - Report the following conditions as **SUGGESTION**:
+
+    - **Unspecified geolocation for subnet**
+      - Condition: All geographical fields (`CountryCode`, `RegionCode`, `City`) are empty for a subnet.
+      - Action: Set `DoNotGeolocate = true` for the entry **and** change the `CountryCode` field to `ZZ` to explicitly mark it as do-not-geolocate.
+      - Message ID: `3104`
+
 
 ##### Region Code Analysis
   - Use the locally available data table [`ISO3166-2`](assets/iso3166-2.json) for checking.
@@ -378,24 +447,24 @@ This phase runs after structural checks pass.
     - Each object includes:
       - `code`: subdivision code prefixed with country code (e.g., `US-CA`)
       - `name`: short subdivision name
-    - This file represents the **superset of valid `region` values** for an RFC 8805 CSV.
-  - If a `region` value is provided (RFC 8805 Section 2.1.1.3):
+    - This file represents the **superset of valid `RegionCode` values** for an RFC 8805 CSV.
+  - If a `RegionCode` value is provided (RFC 8805 Section 2.1.1.3):
     - Check that the format matches `{COUNTRY}-{SUBDIVISION}` (e.g., `US-CA`, `AU-NSW`).
     - Check the value against the `code` attribute (already prefixed with the country code).
 
-  - **Small-territory exception:** If `is_small_territory` is `true` **and** the `region` value equals the entry's `alpha2code` (e.g., `SG` as both country and region for Singapore), treat the region as acceptable — skip all region validation checks for this entry. Small territories are effectively city-states with no meaningful ISO 3166-2 administrative subdivisions.
+  - **Small-territory exception:** If the entry is a small territory **and** the `RegionCode` value equals the entry's `CountryCode` (e.g., `SG` as both country and region for Singapore), treat the region as acceptable — skip all region validation checks for this entry. Small territories are effectively city-states with no meaningful ISO 3166-2 administrative subdivisions.
 
   - **ERROR**
     - Report the following conditions as **ERROR**:
     - **Invalid region format**
-      - Condition: `region` does not match `{COUNTRY}-{SUBDIVISION}` **and** the small-territory exception does not apply
-      - Message: `Invalid region format; expected COUNTRY-SUBDIVISION (e.g., US-CA)`
+      - Condition: `RegionCode` does not match `{COUNTRY}-{SUBDIVISION}` **and** the small-territory exception does not apply
+      - Message ID: `1301`
     - **Unknown region code**
-      - Condition: `region` value is not found in the `code` set **and** the small-territory exception does not apply
-      - Message: `Invalid region code: not a valid ISO 3166-2 subdivision`
+      - Condition: `RegionCode` value is not found in the `code` set **and** the small-territory exception does not apply
+      - Message ID: `1302`
     - **Country–region mismatch**
-      - Condition: Country portion of `region` does not match `alpha2code`
-      - Message: `Region code does not match the specified country code`
+      - Condition: Country portion of `RegionCode` does not match `CountryCode`
+      - Message ID: `1303`
 
 ##### City Name Analysis
 
@@ -412,7 +481,7 @@ This phase runs after structural checks pass.
         - `N/A`
         - `TBD`
         - `unknown`
-      - Message: `Invalid city name: placeholder value is not allowed`
+      - Message ID: `1401`
 
     - **Truncated names, abbreviations, or airport codes**
       - Condition: Truncated names, abbreviations, or airport codes that do not represent valid city names:
@@ -422,7 +491,7 @@ This phase runs after structural checks pass.
         - `LHR`
         - `SIN`
         - `MAA`
-      - Message: `Invalid city name: abbreviated or code-based value detected`
+      - Message ID: `1402`
 
   - **WARNING**
     - Report the following conditions as **WARNING**:
@@ -430,7 +499,7 @@ This phase runs after structural checks pass.
       - Condition: City names with inconsistent casing, spacing, or formatting that may reduce data quality, for example:
         - `HongKong` vs `Hong Kong`
         - Mixed casing or unexpected script usage
-      - Message: `City name formatting is inconsistent; consider normalizing the value`
+      - Message ID: `2401`
 
 ##### Postal Code Check
   - RFC 8805 Section 2.1.1.5 explicitly **deprecates postal or ZIP codes**.
@@ -440,7 +509,7 @@ This phase runs after structural checks pass.
     - Report the following conditions as **ERROR**:
     - **Postal code present**
       - Condition: A non-empty value is present in the postal/ZIP code field.
-      - Message: `Postal codes are deprecated by RFC 8805 and must be removed for privacy reasons`
+      - Message ID: `1501`
 
 #### Tuning & Recommendations
 
@@ -451,23 +520,17 @@ This phase applies **opinionated recommendations** beyond RFC 8805, learned from
 
   - **Region or city specified for small territory**
     - Condition:
-      - `is_small_territory` is `true`
-      - `region` is non-empty **OR**
-      - `city` is non-empty.
-    - Message: `Region or City-level granularity is usually unnecessary for small territories; consider removing the region and city values`
+      - Entry is a small territory
+      - `RegionCode` is non-empty **OR**
+      - `City` is non-empty.
+    - Message IDs: `3301` (for region), `3402` (for city)
 
   - **Missing region code when city is specified**
     - Condition:
-      - `city` is non-empty
-      - `region` is empty
-      - `is_small_territory` is `false`
-    - Action: Set `need_region = true`
-    - Message: `Region code is recommended when a city is specified; consider adding the appropriate region code for better accuracy`
-
-  - **Unspecified geolocation for subnet**
-    - Condition: All geographical fields (`alpha2code`, `region`, `city`) are empty for a subnet.
-    - Message: `Confirm whether this subnet is intentionally marked as do-not-geolocate or missing location data`
-
+      - `City` is non-empty
+      - `RegionCode` is empty
+      - Entry is **not** a small territory
+    - Message ID: `3303`
 
 ### Phase 4: Tuning Data Lookup
 
@@ -475,23 +538,21 @@ This phase applies **opinionated recommendations** beyond RFC 8805, learned from
 Lookup all the entries in the file using Fastah's `rfc8805-row-place-search` tool.
 
 #### Execution Rules
-- Use a **separate script** _only_ for payload generation (read the dataset and write one or more payload JSON files; do not call MCP from this script).
+- Generate a new **script** _only_ for payload generation (read the dataset and write one or more payload JSON files; do not call MCP from this script).
 - Server only accepts 1000 entries per request, so if there are more than 1000 entries, split into multiple requests.
 - The agent must read the generated payload files, construct the requests from them, and send those requests to the MCP server in batches of at most 1000 entries each.
-- **On MCP failure:** If the MCP server is unreachable, returns an error, or returns no results for any batch, log a warning and continue to Phase 5. Set `tuned_entries: []` for all affected entries. Do not block report generation. Notify the user clearly: `Tuning data lookup unavailable; the report will show validation results only.`
+- **On MCP failure:** If the MCP server is unreachable, returns an error, or returns no results for any batch, log a warning and continue to Phase 5. Set `TunedEntry: {}` for all affected entries. Do not block report generation. Notify the user clearly: `Tuning data lookup unavailable; the report will show validation results only.`
 - Suggestions are **advisory only** — **never auto-populate** them.
 
-#### Step 1: Load Dataset
-Load the dataset from: [./run/data/report-data.json](./run/data/report-data.json)
-- Read the `entries` array.
-- Include all entries.
+#### Step 1: Build Lookup Payload with Deduplication
 
-#### Step 2: Build Lookup Payload with Deduplication
+Load the dataset from: [./run/data/report-data.json](./run/data/report-data.json)
+- Read the `Entries` array. Each entry will be used to build the MCP lookup payload.
 
 Reduce server requests by deduplicating identical entries:
-- For each entry in `entries`, compute a content hash (hash of countryCode + regionCode + cityName).
+- For each entry in `Entries`, compute a content hash (hash of `CountryCode` + `RegionCode` + `City`).
 - Create a deduplication map: `{ contentHash -> { rowKey, payload, entryIndices: [] } }`. rowKey is a UUID that will be sent to the MCP server for matching responses.
-- If an entry's hash already exists, append its **0-based array index** in `entries` to that deduplication entry's `entryIndices` array.
+- If an entry's hash already exists, append its **0-based array index** in `Entries` to that deduplication entry's `entryIndices` array.
 - If hash is new, generate a **UUID (rowKey)** and create a new deduplication entry.
 
 Build request batches:
@@ -514,7 +575,7 @@ Rules:
 - Write payload to: [./run/data/mcp-server-payload.json](./run/data/mcp-server-payload.json)
 - Exit the script after writing the payload.
 
-#### Step 3: Invoke Fastah MCP Tool
+#### Step 2: Invoke Fastah MCP Tool
 
 - An example `mcp.json` style configuration of Fastah MCP server is as follows:
 ```json
@@ -538,35 +599,44 @@ Rules:
 - The server will respond with the same `rowKey` field in each response for mapping back.
 - Do NOT use local data.
 
-#### Step 4: Attach Tuned Data to Entries
+#### Step 3: Attach Tuned Data to Entries
 
-- Use a **separate script** for attaching tuned data.
+- Generate a new **script** for attaching tuned data.
 - Load both [./run/data/report-data.json](./run/data/report-data.json) and the deduplication map (held in memory from Step 2, or re-derived from the payload file).
 - For each response from the MCP server:
   - Extract the `rowKey` from the response.
   - Look up the `entryIndices` array associated with that `rowKey` from the deduplication map.
-  - For each index in `entryIndices`, attach the normalized suggestions to `entries[index]`.
-- Keep **at least three suggestions** when available.
-- If fewer than three exist, keep all returned values.
+  - For each index in `entryIndices`, attach the best match to `Entries[index]`.
+- Use the **first (best) match** from the response when available.
 
-Create the field on each affected entry if it does not exist:
+Create the field on each affected entry if it does not exist. Remap the MCP API response keys to Go struct field names:
 
 ```json
-"tuned_entries": [
-  {
-    "placeName": "",
-    "countryCode": "",
-    "regionCode": "",
-    "placeType": "",
-    "h3Cells": [],
-    "boundingBox": []
-  }
-]
+"TunedEntry": {
+  "Name": "",
+  "CountryCode": "",
+  "RegionCode": "",
+  "PlaceType": "",
+  "H3Cells": [],
+  "BoundingBox": []
+}
 ```
 
-Entries with no UUID match (i.e. the MCP server returned no response for their UUID) must receive an empty `tuned_entries: []` array — never leave the field absent.
+The `TunedEntry` field is a **single object** (not an array), matching the Go struct `TunedEntry Location`. It holds the best match from the MCP server.
 
-#### Step 5: Store Updated Dataset
+**MCP response key → JSON key mapping** (remap API keys to Go struct field names):
+| MCP API response key | JSON key (Go struct field) |
+|----------------------|----------------------------|
+| `placeName`          | `Name`                     |
+| `countryCode`        | `CountryCode`              |
+| `stateCode`          | `RegionCode`               |
+| `placeType`          | `PlaceType`                |
+| `h3Cells`            | `H3Cells`                  |
+| `boundingBox`        | `BoundingBox`              |
+
+Entries with no UUID match (i.e. the MCP server returned no response for their UUID) must receive an empty `TunedEntry: {}` object — never leave the field absent.
+
+#### Step 4: Store Updated Dataset
 
 - Write the dataset back to: [./run/data/report-data.json](./run/data/report-data.json)
 - Rules:
@@ -576,146 +646,190 @@ Entries with no UUID match (i.e. the MCP server returned no response for their U
 
 ### Phase 5: Generate Tuning Report
 
-Generate a **self-contained HTML report** by injecting data from `./run/data/report-data.json` and `./run/data/comments.json` into the template at `./scripts/templates/index.html`.
+Generate a **self-contained HTML report** by rendering the Go template at `./scripts/templates/index.html` with data from `./run/data/report-data.json` and `./run/data/comments.json`.
 
 Write the completed report to `./run/report/geofeed-report.html`. After generating, attempt to open it in the system's default browser (e.g., `webbrowser.open()`). If running in a headless environment, CI pipeline, or remote container where no browser is available, skip the browser step and instead present the file path to the user so they can open or download it.
 
-**Do not hand-write HTML for individual rows.** Write a Python script that reads the data files and produces the final HTML. Do not modify any CSS, JavaScript, or structural HTML in the template outside the injection points described below.
+**The template uses Go `html/template` syntax** (`{{.Field}}`, `{{range}}`, `{{if eq}}`, etc.). Write a Python script that reads the template, builds a rendering context from the JSON data files, and processes the Go template placeholders to produce final HTML. Do not modify the template file itself — all processing happens in the Python script at render time.
 
-#### Step 1: Inject Summary Metadata
+#### Step 1: Replace Metadata Placeholders
 
-Replace the hardcoded values in the following elements by string substitution. All values come from `report-data.json` top-level fields.
+Replace each `{{.Metadata.X}}` placeholder in the template with the corresponding value from `report-data.json`. Since JSON keys now match the Go struct field names, the mapping is direct — `{{.Metadata.InputFile}}` maps to the `InputFile` JSON key, etc.
 
-**Implementation note:** The template contains **pre-filled placeholder values** (e.g., `<span id="errorCountMetrics">0</span>`, `<span id="suggestionsMetrics">21</span>`) that differ per element. Use a regex pattern like `(<span id="{element_id}">)(.*?)(</span>)` to replace the inner text regardless of the existing content. Do not hardcode the old values.
+| Go template placeholder               | JSON key (`report-data.json`)     |
+|----------------------------------------|-----------------------------------|
+| `{{.Metadata.InputFile}}`              | `InputFile`                       |
+| `{{.Metadata.Timestamp}}`              | `Timestamp`                       |
+| `{{.Metadata.TotalEntries}}`           | `TotalEntries`                    |
+| `{{.Metadata.IpV4Entries}}`            | `IpV4Entries`                     |
+| `{{.Metadata.IpV6Entries}}`            | `IpV6Entries`                     |
+| `{{.Metadata.InvalidEntries}}`         | `InvalidEntries`                  |
+| `{{.Metadata.Errors}}`                 | `Errors`                          |
+| `{{.Metadata.Warnings}}`               | `Warnings`                        |
+| `{{.Metadata.Suggestions}}`            | `Suggestions`                     |
+| `{{.Metadata.OK}}`                     | `OK`                              |
+| `{{.Metadata.CityLevelAccuracy}}`      | `CityLevelAccuracy`               |
+| `{{.Metadata.RegionLevelAccuracy}}`    | `RegionLevelAccuracy`             |
+| `{{.Metadata.CountryLevelAccuracy}}`   | `CountryLevelAccuracy`            |
+| `{{.Metadata.DoNotGeolocate}}`         | `DoNotGeolocate` (metadata)       |
 
-| Element (by `id`)        | Source field            | Notes                                                         |
-|--------------------------|-------------------------|---------------------------------------------------------------|
-| `#inputFileMetrics`      | `input_file`            | Replace inner text of the `<span>`                           |
-| timestamp `<script>`     | `timestamp`             | Replace only the integer `1773720806552` with the actual value|
-| `#totalEntriesMetrics`   | `total_entries`         | Replace inner text of the `<span>`                           |
-| `#ipv4EntriesMetrics`    | `ipv4_entries`          | Replace inner text of the `<span>`                           |
-| `#ipv6EntriesMetrics`    | `ipv6_entries`          | Replace inner text of the `<span>`                           |
-| `#invalidEntriesMetrics` | `invalid_entries`       | Replace inner text of the `<span>`                           |
-| `#errorCountMetrics`     | `error_count`           | Replace inner text of the `<span>`                           |
-| `#warningCountMetrics`   | `warning_count`         | Replace inner text of the `<span>`                           |
-| `#suggestionsMetrics`    | `suggestion_count`      | Replace inner text of the `<span>`                           |
-| `#okCountMetrics`        | `ok_count`              | Replace inner text of the `<span>`                           |
-| `#cityAccuracy`          | `city_level_accuracy`   | Replace inner text of the `<span>`                           |
-| `#regionAccuracy`        | `region_level_accuracy` | Replace inner text of the `<span>`                           |
-| `#countryAccuracy`       | `country_level_accuracy`| Replace inner text of the `<span>`                           |
-| `#doNotGeolocate`        | `do_not_geolocate_entries` | Replace inner text of the `<span>`                        |
+**Note on `{{.Metadata.Timestamp}}`:** This placeholder appears inside a JavaScript `new Date(...)` call. Replace it with the raw integer value (no HTML escaping needed for a numeric literal inside `<script>`). All other metadata values should be HTML-escaped since they appear inside HTML element text.
 
-The timestamp element requires special treatment. Find this exact pattern in the template and replace only the integer literal:
-```html
-new Date( 1773720806552 )
-```
-Replace with:
-```html
-new Date( {timestamp} )
-```
-where `{timestamp}` is the integer millisecond epoch value from `report-data.json`.
+#### Step 2: Replace the Comment Map Placeholder
 
-#### Step 2: Inject the Comment Map
-
-Locate this exact literal string in the template:
+Locate this pattern in the template:
 ```javascript
-const commentMap = JSON.parse('{}');
-```
-Replace the `'{}'` portion with the serialized, single-quote-safe JSON string of the comments map loaded from `./run/data/comments.json`. The result must be syntactically valid JavaScript — escape any single quotes inside comment text:
-```javascript
-const commentMap = JSON.parse('{...escaped JSON string...}');
+const commentMap = JSON.parse('{{.Comments}}');
 ```
 
-#### Step 3: Generate and Inject Row HTML
+Replace `{{.Comments}}` with the serialized, single-quote-safe JSON string of the comments map loaded from `./run/data/comments.json`. Escape any single quotes inside the JSON so the result is a valid JavaScript single-quoted string:
 
-Replace the entire content of `<tbody id="entriesTableBody">` with generated rows. For each entry in `report-data.json`'s `entries` array, generate **three consecutive `<tr>` elements**:
-
-**Row 1 — Data row:**
-```html
-<tr
- id="csv-r-{line}"
- class="expandable-row"
- data-geocoding-hint=""
- data-do-not-geolocate="{true if country+region+city all empty, else false}"
- data-has-warning="{has_warning}"
- data-has-error="{has_error}"
- data-has-suggestion="{has_suggestion}"
- data-tunable="{true if tuned_entries is non-empty, else false}"
- data-tuned-country="{tuned_entries[0].countryCode or ''}"
- data-tuned-region="{tuned_entries[0].regionCode or ''}"
- data-tuned-city="{tuned_entries[0].placeName or ''}"
- data-h3-cells="{bracket-wrapped space-separated h3Cells from tuned_entries[0], or '[]'}"
- data-bounding-box="{bracket-wrapped space-separated boundingBox from tuned_entries[0], or '[]'}">
-    <td><input type="checkbox" class="row-checkbox" checked></td>
-    <td>{line}</td>
-    <td><span class="status-badge status-{status.lower()}">{status_icon}{status}</span></td>
-    <td><strong>{ip_prefix}</strong></td>
-    <td>{country}</td>
-    <td>{region}</td>
-    <td>{city}</td>
-</tr>
+```python
+comments_json = json.dumps(comments, ensure_ascii=False).replace("'", "\\'")
+template = template.replace("{{.Comments}}", comments_json)
 ```
 
-Status badge icons — use exactly this markup per status:
+#### Step 3: Expand the Entries Range Block
 
-| `status`     | CSS class on `<span>`      | Icon `<i>` markup                                         |
-|--------------|----------------------------|-----------------------------------------------------------|
-| `OK`         | `status-ok`                | `<i class="bi bi-check-circle-fill"></i>`                 |
-| `WARNING`    | `status-warning`           | `<i class="bi bi-exclamation-triangle-fill"></i>`         |
-| `ERROR`      | `status-error`             | `<i class="bi bi-x-circle-fill"></i>`                     |
-| `SUGGESTION` | `status-suggestion`        | `<i class="bi bi-lightbulb-fill"></i>`                    |
+The template contains a `{{range .Entries}}...{{end}}` block inside `<tbody id="entriesTableBody">`. Process it as follows:
 
-`data-tunable` must be the string `"true"` only when `tuned_entries` is present and has at least one element — this is what allows the "Tune All" button to apply suggested values to the row.
+1. **Extract** the range block body using regex. **Critical:** The block contains nested `{{end}}` tags (from `{{if eq .Status ...}}`, `{{if .Checked}}`, and `{{range .Messages}}`). A naive non-greedy match like `\{\{range \.Entries\}\}(.*?)\{\{end\}\}` will match the **first** inner `{{end}}`, truncating the block. Instead, anchor the outer `{{end}}` to the `</tbody>` that follows it:
+    ```python
+    m = re.search(
+        r'\{\{range \.Entries\}\}(.*?)\{\{end\}\}\s*</tbody>',
+        template,
+        re.DOTALL,
+    )
+    entry_body = m.group(1)  # template text for one entry iteration
+    ```
+    This ensures you capture the full block body including all three `<tr>` rows and the nested `{{range .Messages}}...{{end}}`.
+2. **Iterate** over each entry in `report-data.json`'s `Entries` array.
+3. **Expand** the block body for each entry using the processing order below.
+4. **Replace** the entire match (from `{{range .Entries}}` through `</tbody>`) with the concatenated expanded HTML followed by `</tbody>`.
 
-**Important: `data-h3-cells` and `data-bounding-box` format.** These are **NOT JSON arrays**. They are bracket-wrapped, space-separated values. The template JavaScript strips brackets with a regex and splits on whitespace/commas. Do **not** use JSON serialization (no quotes around string elements, no commas between numbers). Examples:
-- `data-h3-cells="[836752fffffffff 836755fffffffff]"` — correct
-- `data-h3-cells="["836752fffffffff","836755fffffffff"]"` — **WRONG**, quotes will break parsing
-- `data-bounding-box="[-71.70 10.73 -71.52 10.55]"` — correct (west north east south, space-separated)
-- `data-bounding-box="[-71.70, 10.73, -71.52, 10.55]"` — also works (commas tolerated) but spaces-only matches the template convention
-- Empty: use `"[]"` for both attributes when no tuning data is available.
+**Processing order for each entry** (innermost constructs first to avoid `{{end}}` confusion):
+1. Evaluate `{{if eq .Status ...}}...{{end}}` conditionals (status badge class and icon).
+2. Evaluate `{{if .Checked}}...{{end}}` conditional (message checkbox).
+3. Expand `{{range .Messages}}...{{end}}` inner range.
+4. Replace simple `{{.Field}}` placeholders.
 
-**Row 2 — Previous-values row:**
-```html
-<tr class="expand-details-row previous-values-row">
-    <td></td>
-    <td></td>
-    <td></td>
-    <td><strong>Previous values:</strong></td>
-    <td class="previous-value"><span class="default-country">{country}</span></td>
-    <td class="previous-value"><span class="default-region">{region}</span></td>
-    <td class="previous-value"><span class="default-city">{city}</span></td>
-</tr>
+##### Entry Field Mapping
+
+Within the range block body, replace these placeholders for each entry. Since JSON keys match Go struct field names, the template placeholder `{{.X}}` maps directly to JSON key `X`:
+
+| Go template placeholder        | JSON key (`Entries[]`)       | Notes                                                        |
+|--------------------------------|------------------------------|--------------------------------------------------------------|
+| `{{.Line}}`                    | `Line`                       | Direct integer value                                         |
+| `{{.IPPrefix}}`                | `IPPrefix`                   | HTML-escaped                                                 |
+| `{{.CountryCode}}`             | `CountryCode`                | HTML-escaped                                                 |
+| `{{.RegionCode}}`              | `RegionCode`                 | HTML-escaped                                                 |
+| `{{.City}}`                    | `City`                       | HTML-escaped                                                 |
+| `{{.Status}}`                  | `Status`                     | HTML-escaped                                                 |
+| `{{.HasError}}`                | `HasError`                   | Lowercase string: `"true"` or `"false"`                      |
+| `{{.HasWarning}}`              | `HasWarning`                 | Lowercase string: `"true"` or `"false"`                      |
+| `{{.HasSuggestion}}`           | `HasSuggestion`              | Lowercase string: `"true"` or `"false"`                      |
+| `{{.GeocodingHint}}`           | `GeocodingHint`              | Empty string `""`                                             |
+| `{{.DoNotGeolocate}}`          | `DoNotGeolocate`             | `"true"` or `"false"`                                        |
+| `{{.Tunable}}`                 | `Tunable`                    | `"true"` or `"false"`                                        |
+| `{{.TunedEntry.CountryCode}}`  | `TunedEntry.CountryCode`     | `""` if `TunedEntry` is empty `{}`                            |
+| `{{.TunedEntry.RegionCode}}`   | `TunedEntry.RegionCode`      | `""` if `TunedEntry` is empty `{}`                            |
+| `{{.TunedEntry.Name}}`         | `TunedEntry.Name`            | `""` if `TunedEntry` is empty `{}`                            |
+| `{{.TunedEntry.H3Cells}}`      | `TunedEntry.H3Cells`         | Bracket-wrapped space-separated; `"[]"` if empty (see format below) |
+| `{{.TunedEntry.BoundingBox}}`  | `TunedEntry.BoundingBox`     | Bracket-wrapped space-separated; `"[]"` if empty (see format below) |
+
+**`data-h3-cells` and `data-bounding-box` format:** These are **NOT JSON arrays**. They are bracket-wrapped, space-separated values. Do **not** use JSON serialization (no quotes around string elements, no commas between numbers). Examples:
+- `[836752fffffffff 836755fffffffff]` — correct
+- `["836752fffffffff","836755fffffffff"]` — **WRONG**, quotes will break parsing
+- `[-71.70 10.73 -71.52 10.55]` — correct
+- `[]` — correct for empty
+
+##### Evaluating Status Conditionals
+
+**Process these BEFORE replacing simple `{{.Field}}` placeholders** — otherwise the `{{end}}` markers get consumed and the regex won't match.
+
+The template uses Go `{{if eq .Status "..."}}` conditionals for the status badge CSS class and icon. Evaluate these by checking the entry's `status` value and keeping only the matching branch text.
+
+The status badge line contains **two** `{{if eq .Status ...}}...{{end}}` blocks on a single line — one for the CSS class, one for the icon. Use `re.sub` with a callback to resolve all occurrences:
+
+```python
+STATUS_CSS = {"ERROR": "error", "WARNING": "warning", "SUGGESTION": "suggestion", "OK": "ok"}
+STATUS_ICON = {
+    "ERROR": "bi-x-circle-fill",
+    "WARNING": "bi-exclamation-triangle-fill",
+    "SUGGESTION": "bi-lightbulb-fill",
+    "OK": "bi-check-circle-fill",
+}
+
+def resolve_status_if(match_obj, status):
+    """Pick the branch matching `status` from a {{if eq .Status ...}}...{{end}} block."""
+    block = match_obj.group(0)
+    # Try each branch: {{if eq .Status "X"}}val{{else if ...}}val{{else}}val{{end}}
+    for st, val in [("ERROR",), ("WARNING",), ("SUGGESTION",)]:
+        # not needed to parse generically — just map from the known patterns
+    ...
 ```
 
-**Row 3 — Issues row:**
-```html
-<tr class="expand-details-row issues-row">
-    <td></td>
-    <td></td>
-    <td colspan="5">
-        <div class="issues-header">
-            <strong>Issues:</strong>
-            <button class="tune-all-btn" onclick="handleTuneButtonClick(this)">Tune</button>
-        </div>
-        {message_lines}
-    </td>
-</tr>
+A simpler approach: since there are exactly two known patterns, replace them as literal strings:
+```python
+css_class = STATUS_CSS.get(status, "ok")
+icon_class = STATUS_ICON.get(status, "bi-check-circle-fill")
+body = body.replace(
+    '{{if eq .Status "ERROR"}}error{{else if eq .Status "WARNING"}}warning{{else if eq .Status "SUGGESTION"}}suggestion{{else}}ok{{end}}',
+    css_class,
+)
+body = body.replace(
+    '{{if eq .Status "ERROR"}}bi-x-circle-fill{{else if eq .Status "WARNING"}}bi-exclamation-triangle-fill{{else if eq .Status "SUGGESTION"}}bi-lightbulb-fill{{else}}bi-check-circle-fill{{end}}',
+    icon_class,
+)
+```
+This avoids regex entirely and is safe because these exact strings appear verbatim in the template.
+
+#### Step 4: Expand the Nested Messages Range
+
+The `{{range .Messages}}...{{end}}` block contains a **nested** `{{if .Checked}} checked{{else}} disabled{{end}}` conditional, so its inner `{{end}}` would cause a simple non-greedy regex to match too early. Anchor the regex to `</td>` (the tag immediately after the messages range closing `{{end}}`) to capture the full block body:
+
+```python
+msg_match = re.search(
+    r'\{\{range \.Messages\}\}(.*?)\{\{end\}\}\s*(?=</td>)',
+    body, re.DOTALL
+)
 ```
 
-For each message in the entry's `messages` array, generate one `<div>`:
-```html
-<div class="message-line" data-id="{line * 100 + message_index}">
-    <span>{message.message}</span>
-    <input type="checkbox" disabled>
-</div>
-```
-Use `message_index` as the 0-based position of the message within the entry's `messages` list. If `messages` is empty, omit the message divs — leave only the issues header `<div>`.
+The lookahead `(?=</td>)` ensures the regex skips past the checkbox conditional's `{{end}}` (which is followed by `>`, not `</td>`) and matches only the range-closing `{{end}}` (which is followed by whitespace then `</td>`).
+
+For each message in the entry's `Messages` array, clone the captured block body and expand it:
+
+1. **Resolve the checkbox conditional** per message (must happen before simple placeholder replacement to remove the nested `{{end}}`):
+   ```python
+   if msg.get("Checked"):
+       msg_body = msg_body.replace(
+           '{{if .Checked}} checked{{else}} disabled{{end}}', ' checked'
+       )
+   else:
+       msg_body = msg_body.replace(
+           '{{if .Checked}} checked{{else}} disabled{{end}}', ' disabled'
+       )
+   ```
+
+2. **Replace message field placeholders**:
+
+   | Go template placeholder | Source                            | Notes                          |
+   |--------------------------|-----------------------------------|--------------------------------|
+   | `{{.ID}}`                | `Messages[i].ID`                  | Direct string value from JSON  |
+   | `{{.Text}}`              | `Messages[i].Text`                | HTML-escaped                   |
+
+3. **Concatenate** all expanded message blocks and replace the original `{{range .Messages}}...{{end}}` match (`msg_match.group(0)`) with the result:
+   ```python
+   body = body[:msg_match.start()] + "".join(expanded_msgs) + body[msg_match.end():]
+   ```
+
+If `Messages` is empty, replace the entire matched region with an empty string (no message divs — only the issues header remains).
 
 #### Output Guarantees
 
 - The report must be readable in any modern browser without extra network dependencies beyond the CDN links already in the template (`leaflet`, `h3-js`, `bootstrap-icons`, Raleway font).
 - All values embedded in HTML must be **HTML-escaped** (`<`, `>`, `&`, `"`) to prevent rendering issues.
-- All values embedded inside JavaScript string literals (e.g., `commentMap`) must be **JSON-string-escaped**.
+- All values embedded inside JavaScript string literals (e.g., `commentMap`) must be **JSON-string-escaped** with single quotes additionally escaped.
 - All values must be derived **only from analysis output**, not recomputed heuristically.
 
 
@@ -729,26 +843,26 @@ Perform a final verification pass using concrete, checkable assertions before pr
 - On failure: `Row count mismatch: input has {N} data rows but report contains {M} entries.`
 
 **Check 2 — Summary counter integrity**
-- These counters use **mutual exclusion** based on the boolean flags, which mirrors the highest-severity `status` field. An entry with both `has_error: true` and `has_warning: true` is counted only in `error_count`, never in `warning_count`. This is equivalent to counting by the entry's `status` field.
+- These counters use **mutual exclusion** based on the boolean flags, which mirrors the highest-severity `Status` field. An entry with both `HasError: true` and `HasWarning: true` is counted only in `Errors`, never in `Warnings`. This is equivalent to counting by the entry's `Status` field.
 - Assert all of the following; correct any that fail before generating the report:
-  - `error_count == sum(1 for e in entries if e['has_error'])`
-  - `warning_count == sum(1 for e in entries if e['has_warning'] and not e['has_error'])`
-  - `suggestion_count == sum(1 for e in entries if e['has_suggestion'] and not e['has_error'] and not e['has_warning'])`
-  - `ok_count == sum(1 for e in entries if not e['has_error'] and not e['has_warning'] and not e['has_suggestion'])`
-  - `error_count + warning_count + suggestion_count + ok_count == total_entries - invalid_entries`
+  - `Errors == sum(1 for e in Entries if e['HasError'])`
+  - `Warnings == sum(1 for e in Entries if e['HasWarning'] and not e['HasError'])`
+  - `Suggestions == sum(1 for e in Entries if e['HasSuggestion'] and not e['HasError'] and not e['HasWarning'])`
+  - `OK == sum(1 for e in Entries if not e['HasError'] and not e['HasWarning'] and not e['HasSuggestion'])`
+  - `Errors + Warnings + Suggestions + OK == TotalEntries - InvalidEntries`
 
 **Check 3 — Accuracy bucket integrity**
-- Assert: `city_level_accuracy + region_level_accuracy + country_level_accuracy + do_not_geolocate_entries == total_entries - invalid_entries`
-- **Note:** The accuracy buckets defined in Phase 3 say "Do not count entries with `has_error: true`", but the Check 3 formula above uses `total_entries - invalid_entries` (which still includes ERROR entries). This means ERROR entries (those that parsed as valid IPs but failed validation) **are** counted in accuracy buckets by their geo-field presence. Only `invalid_entries` (unparseable IP prefixes) are excluded. Follow the Check 3 formula as the authoritative rule.
+- Assert: `CityLevelAccuracy + RegionLevelAccuracy + CountryLevelAccuracy + DoNotGeolocate == TotalEntries - InvalidEntries`
+- **Note:** The accuracy buckets defined in Phase 3 say "Do not count entries with `HasError: true`", but the Check 3 formula above uses `TotalEntries - InvalidEntries` (which still includes ERROR entries). This means ERROR entries (those that parsed as valid IPs but failed validation) **are** counted in accuracy buckets by their geo-field presence. Only `InvalidEntries` (unparseable IP prefixes) are excluded. Follow the Check 3 formula as the authoritative rule.
 - On failure, trace and fix the bucketing logic before proceeding.
 
 **Check 4 — No duplicate line numbers**
-- Assert: all `line` values in `entries` are unique.
+- Assert: all `Line` values in `Entries` are unique.
 - On failure, report the duplicated line numbers to the user.
 
-**Check 5 — tuned_entries completeness**
-- Assert: every object in `entries` has a `tuned_entries` key (even if its value is `[]`).
-- On failure, add `"tuned_entries": []` to any entry missing the key, then re-save `report-data.json`.
+**Check 5 — TunedEntry completeness**
+- Assert: every object in `Entries` has a `TunedEntry` key (even if its value is `{}`).
+- On failure, add `"TunedEntry": {}` to any entry missing the key, then re-save `report-data.json`.
 
 **Check 6 — Report file is present and non-empty**
 - Confirm `./run/report/geofeed-report.html` was written and has a file size greater than zero bytes.
