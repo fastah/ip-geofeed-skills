@@ -1,4 +1,4 @@
-.PHONY: check-deps update-iso-tables
+.PHONY: check-deps update-iso-tables clean-runs clean-tuner-run clean-geofeed-run
 
 ASSETS_DIR := skills/geofeed-tuner/assets
 
@@ -24,3 +24,18 @@ update-iso-tables: check-deps
 	  | jq '."3166-2" |= (map({code, name}) | sort_by(.code))' > "$$tmp" \
 	  && mv "$$tmp" "$(ASSETS_DIR)/iso3166-2.json"
 	@echo "ISO tables updated successfully."
+
+# Clear all run directories
+clean-runs: clean-tuner-run clean-geofeed-run
+
+# Clear skills/geofeed-tuner/run directory (keeps run/data structure and .gitignore)
+clean-tuner-run:
+	@find skills/geofeed-tuner/run -type f ! -name '.gitignore' -delete
+	@find skills/geofeed-tuner/run -mindepth 2 -type d -delete
+	@echo "Cleared files in skills/geofeed-tuner/run (kept first-level dirs)"
+
+# Clear experimental/ip-geofeed/run directory (keeps run/data structure and .gitignore)
+clean-geofeed-run:
+	@find experimental/ip-geofeed/run -type f ! -name '.gitignore' -delete
+	@find experimental/ip-geofeed/run -mindepth 2 -type d -delete
+	@echo "Cleared files in experimental/ip-geofeed/run (kept first-level dirs)"
