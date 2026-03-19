@@ -164,7 +164,7 @@ The key requirements from RFC 8805 that this skill enforces are summarized below
 
 The JSON structure below is **IMMUTABLE** during Phase 3. Phase 4 will later add a `TunedEntry` object to each object in `Entries` — this is the only permitted schema extension and happens in a separate phase.
 
-JSON keys use the **same names as Go struct member fields** (PascalCase) so they map directly to Go template placeholders like `{{.CountryCode}}`, `{{.HasError}}`, etc.
+JSON keys map directly to template placeholders like `{{.CountryCode}}`, `{{.HasError}}`, etc.
 
 ```json
 {
@@ -217,9 +217,9 @@ JSON keys use the **same names as Go struct member fields** (PascalCase) so they
 }
 ```
 
-Field definitions (keys match Go struct member names):
+Field definitions:
 
-**Top-level metadata** (matches Go `Metadata` struct):
+**Top-level metadata:**
 - `InputFile`: The original input source, either a local filename or a remote URL.
 - `Timestamp`: Milliseconds since Unix epoch when the tuning was performed.
 - `TotalEntries`: Total number of data rows processed (excluding comment and blank lines).
@@ -235,7 +235,7 @@ Field definitions (keys match Go struct member names):
 - `CountryLevelAccuracy`: Count of valid entries where `CountryCode` is non-empty, `RegionCode` is empty, and `City` is empty.
 - `DoNotGeolocate` (metadata): Count of valid entries where `CountryCode`, `RegionCode`, and `City` are all empty.
 
-**Entry fields** (matches Go `Entry` struct, which embeds `parser.Row`):
+**Entry fields:**
 - `Entries`: Array of objects, one per data row, with the following per-entry fields:
   - `Line`: 1-based line number in the original CSV (counting all lines including comments and blanks).
   - `IPPrefix`: The normalized IP prefix in CIDR slash notation.
@@ -244,7 +244,7 @@ Field definitions (keys match Go struct member names):
   - `City`: The city name, or empty string.
   - `Status`: Highest severity assigned: `ERROR` > `WARNING` > `SUGGESTION` > `OK`.
   - `IPVersion`: `"IPv4"` or `"IPv6"` based on the parsed IP prefix.
-  - `Messages`: Array of message objects (matches Go `Message` struct):
+  - `Messages`: Array of message objects, each with:
     - `ID`: String identifier from the **Validation Rules Reference** table below (e.g., `"1101"`, `"3301"`).
     - `Type`: The severity type: `"ERROR"`, `"WARNING"`, or `"SUGGESTION"`.
     - `Text`: The human-readable validation message string.
@@ -258,7 +258,7 @@ Field definitions (keys match Go struct member names):
 
 #### Validation Rules Reference
 
-When adding messages to an entry, use the `ID`, `Type`, `Text`, and `Checked` values from this table. This table is derived from the Go `errors.go` definitions and must be used to populate every message object.
+When adding messages to an entry, use the `ID`, `Type`, `Text`, and `Checked` values from this table.
 
 | ID     | Type         | Text                                                                                           | Checked | Condition Reference                    |
 |--------|--------------|------------------------------------------------------------------------------------------------|---------|----------------------------------------|
@@ -309,7 +309,7 @@ Accuracy levels are **mutually exclusive**. Assign each valid (non-ERROR, non-in
 | `City` is non-empty                                          | `CityLevelAccuracy`         |
 | `RegionCode` non-empty AND `City` is empty                   | `RegionLevelAccuracy`       |
 | `CountryCode` non-empty, `RegionCode` and `City` empty       | `CountryLevelAccuracy`      |
-| All three fields (`CountryCode`, `RegionCode`, `City`) empty | `DoNotGeolocate` (metadata) |
+| `DoNotGeolocate` (entry) is `true`                           | `DoNotGeolocate` (metadata) |
 
 **Do not count** entries with `HasError: true` or entries in `InvalidEntries` in any accuracy bucket.
 
@@ -386,10 +386,6 @@ The goal is to ensure the file can be parsed reliably and normalized into a **co
         - In Python, detect non-public ranges using `is_private` and related address properties as shown in `./references`.
       - Message ID: `1103`
 
-    - **RFC 8805–incompatible subnet**
-      - Any subnet failing mandatory RFC 8805 constraints
-      - Message: `Subnet is not valid for publication in an RFC 8805 geofeed`
-
   - **SUGGESTION**
     - Report the following conditions as **SUGGESTION**:
 
@@ -437,7 +433,9 @@ This phase runs after structural checks pass.
 
     - **Unspecified geolocation for subnet**
       - Condition: All geographical fields (`CountryCode`, `RegionCode`, `City`) are empty for a subnet.
-      - Action: Set `DoNotGeolocate = true` for the entry **and** change the `CountryCode` field to `ZZ` to explicitly mark it as do-not-geolocate.
+      - Action: 
+        - Set `DoNotGeolocate = true` for the entry.
+        - Set `CountryCode` to `ZZ` for the entry.
       - Message ID: `3104`
 
 
@@ -535,7 +533,7 @@ This phase applies **opinionated recommendations** beyond RFC 8805, learned from
 ### Phase 4: Tuning Data Lookup
 
 #### Objective
-Lookup all the entries in the file using Fastah's `rfc8805-row-place-search` tool.
+Lookup all the `Entries` using Fastah's `rfc8805-row-place-search` tool.
 
 #### Execution Rules
 - Generate a new **script** _only_ for payload generation (read the dataset and write one or more payload JSON files; do not call MCP from this script).
@@ -602,7 +600,7 @@ Rules:
 #### Step 3: Attach Tuned Data to Entries
 
 - Generate a new **script** for attaching tuned data.
-- Load both [./run/data/report-data.json](./run/data/report-data.json) and the deduplication map (held in memory from Step 2, or re-derived from the payload file).
+- Load both [./run/data/report-data.json](./run/data/report-data.json) and the deduplication map (held in memory from Step 1, or re-derived from the payload file).
 - For each response from the MCP server:
   - Extract the `rowKey` from the response.
   - Look up the `entryIndices` array associated with that `rowKey` from the deduplication map.
@@ -622,10 +620,10 @@ Create the field on each affected entry if it does not exist. Remap the MCP API 
 }
 ```
 
-The `TunedEntry` field is a **single object** (not an array), matching the Go struct `TunedEntry Location`. It holds the best match from the MCP server.
+The `TunedEntry` field is a **single object** (not an array). It holds the best match from the MCP server.
 
-**MCP response key → JSON key mapping** (remap API keys to Go struct field names):
-| MCP API response key | JSON key (Go struct field) |
+**MCP response key → JSON key mapping**:
+| MCP API response key | JSON key                   |
 |----------------------|----------------------------|
 | `placeName`          | `Name`                     |
 | `countryCode`        | `CountryCode`              |
@@ -636,8 +634,6 @@ The `TunedEntry` field is a **single object** (not an array), matching the Go st
 
 Entries with no UUID match (i.e. the MCP server returned no response for their UUID) must receive an empty `TunedEntry: {}` object — never leave the field absent.
 
-#### Step 4: Store Updated Dataset
-
 - Write the dataset back to: [./run/data/report-data.json](./run/data/report-data.json)
 - Rules:
   - Maintain all existing validation flags.
@@ -646,17 +642,17 @@ Entries with no UUID match (i.e. the MCP server returned no response for their U
 
 ### Phase 5: Generate Tuning Report
 
-Generate a **self-contained HTML report** by rendering the Go template at `./scripts/templates/index.html` with data from `./run/data/report-data.json` and `./run/data/comments.json`.
+Generate a **self-contained HTML report** by rendering the template at `./scripts/templates/index.html` with data from `./run/data/report-data.json` and `./run/data/comments.json`.
 
 Write the completed report to `./run/report/geofeed-report.html`. After generating, attempt to open it in the system's default browser (e.g., `webbrowser.open()`). If running in a headless environment, CI pipeline, or remote container where no browser is available, skip the browser step and instead present the file path to the user so they can open or download it.
 
-**The template uses Go `html/template` syntax** (`{{.Field}}`, `{{range}}`, `{{if eq}}`, etc.). Write a Python script that reads the template, builds a rendering context from the JSON data files, and processes the Go template placeholders to produce final HTML. Do not modify the template file itself — all processing happens in the Python script at render time.
+**The template uses Go `html/template` syntax** (`{{.Field}}`, `{{range}}`, `{{if eq}}`, etc.). Write a Python script that reads the template, builds a rendering context from the JSON data files, and processes the template placeholders to produce final HTML. Do not modify the template file itself — all processing happens in the Python script at render time.
 
 #### Step 1: Replace Metadata Placeholders
 
-Replace each `{{.Metadata.X}}` placeholder in the template with the corresponding value from `report-data.json`. Since JSON keys now match the Go struct field names, the mapping is direct — `{{.Metadata.InputFile}}` maps to the `InputFile` JSON key, etc.
+Replace each `{{.Metadata.X}}` placeholder in the template with the corresponding value from `report-data.json`. Since JSON keys match the template placeholder, the mapping is direct — `{{.Metadata.InputFile}}` maps to the `InputFile` JSON key, etc.
 
-| Go template placeholder               | JSON key (`report-data.json`)     |
+| Template placeholder                   | JSON key (`report-data.json`)     |
 |----------------------------------------|-----------------------------------|
 | `{{.Metadata.InputFile}}`              | `InputFile`                       |
 | `{{.Metadata.Timestamp}}`              | `Timestamp`                       |
@@ -715,9 +711,9 @@ The template contains a `{{range .Entries}}...{{end}}` block inside `<tbody id="
 
 ##### Entry Field Mapping
 
-Within the range block body, replace these placeholders for each entry. Since JSON keys match Go struct field names, the template placeholder `{{.X}}` maps directly to JSON key `X`:
+Within the range block body, replace these placeholders for each entry. Since JSON keys match the template placeholder, the template placeholder `{{.X}}` maps directly to JSON key `X`:
 
-| Go template placeholder        | JSON key (`Entries[]`)       | Notes                                                        |
+| Template placeholder           | JSON key (`Entries[]`)       | Notes                                                        |
 |--------------------------------|------------------------------|--------------------------------------------------------------|
 | `{{.Line}}`                    | `Line`                       | Direct integer value                                         |
 | `{{.IPPrefix}}`                | `IPPrefix`                   | HTML-escaped                                                 |
@@ -728,12 +724,12 @@ Within the range block body, replace these placeholders for each entry. Since JS
 | `{{.HasError}}`                | `HasError`                   | Lowercase string: `"true"` or `"false"`                      |
 | `{{.HasWarning}}`              | `HasWarning`                 | Lowercase string: `"true"` or `"false"`                      |
 | `{{.HasSuggestion}}`           | `HasSuggestion`              | Lowercase string: `"true"` or `"false"`                      |
-| `{{.GeocodingHint}}`           | `GeocodingHint`              | Empty string `""`                                             |
+| `{{.GeocodingHint}}`           | `GeocodingHint`              | Empty string `""`                                            |
 | `{{.DoNotGeolocate}}`          | `DoNotGeolocate`             | `"true"` or `"false"`                                        |
 | `{{.Tunable}}`                 | `Tunable`                    | `"true"` or `"false"`                                        |
-| `{{.TunedEntry.CountryCode}}`  | `TunedEntry.CountryCode`     | `""` if `TunedEntry` is empty `{}`                            |
-| `{{.TunedEntry.RegionCode}}`   | `TunedEntry.RegionCode`      | `""` if `TunedEntry` is empty `{}`                            |
-| `{{.TunedEntry.Name}}`         | `TunedEntry.Name`            | `""` if `TunedEntry` is empty `{}`                            |
+| `{{.TunedEntry.CountryCode}}`  | `TunedEntry.CountryCode`     | `""` if `TunedEntry` is empty `{}`                           |
+| `{{.TunedEntry.RegionCode}}`   | `TunedEntry.RegionCode`      | `""` if `TunedEntry` is empty `{}`                           |
+| `{{.TunedEntry.Name}}`         | `TunedEntry.Name`            | `""` if `TunedEntry` is empty `{}`                           |
 | `{{.TunedEntry.H3Cells}}`      | `TunedEntry.H3Cells`         | Bracket-wrapped space-separated; `"[]"` if empty (see format below) |
 | `{{.TunedEntry.BoundingBox}}`  | `TunedEntry.BoundingBox`     | Bracket-wrapped space-separated; `"[]"` if empty (see format below) |
 
@@ -747,7 +743,7 @@ Within the range block body, replace these placeholders for each entry. Since JS
 
 **Process these BEFORE replacing simple `{{.Field}}` placeholders** — otherwise the `{{end}}` markers get consumed and the regex won't match.
 
-The template uses Go `{{if eq .Status "..."}}` conditionals for the status badge CSS class and icon. Evaluate these by checking the entry's `status` value and keeping only the matching branch text.
+The template uses `{{if eq .Status "..."}}` conditionals for the status badge CSS class and icon. Evaluate these by checking the entry's `status` value and keeping only the matching branch text.
 
 The status badge line contains **two** `{{if eq .Status ...}}...{{end}}` blocks on a single line — one for the CSS class, one for the icon. Use `re.sub` with a callback to resolve all occurrences:
 
@@ -813,7 +809,7 @@ For each message in the entry's `Messages` array, clone the captured block body 
 
 2. **Replace message field placeholders**:
 
-   | Go template placeholder | Source                            | Notes                          |
+   | Template placeholder | Source                            | Notes                          |
    |--------------------------|-----------------------------------|--------------------------------|
    | `{{.ID}}`                | `Messages[i].ID`                  | Direct string value from JSON  |
    | `{{.Text}}`              | `Messages[i].Text`                | HTML-escaped                   |
