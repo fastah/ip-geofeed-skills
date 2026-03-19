@@ -81,7 +81,7 @@
             color: #ffffff;
             border: 1px solid #28a745;
         }
-         
+        /* Checkbox styling */
         input[type="checkbox"] {
             width: 16px;
             height: 16px;
@@ -93,7 +93,7 @@
         input[type="checkbox"]:hover {
             transform: scale(1.1);
         }
-         
+        /* Disabled checkbox with X effect */
         input[type="checkbox"]:disabled {
             cursor: not-allowed;
             opacity: 0.6;
@@ -102,7 +102,7 @@
         input[type="checkbox"]:disabled:hover {
             transform: none;
         }
-         
+        /* Create X overlay on disabled checkbox */
         .message-line input[type="checkbox"]:disabled {
             appearance: none;
             -webkit-appearance: none;
@@ -519,7 +519,7 @@
             font-size: 0.9em;
         }
         
-         
+        /* Keyboard accessibility focus styles */
         button:focus {
             outline: 2px solid #4a9eff;
             outline-offset: 2px;
@@ -533,7 +533,7 @@
             outline: 2px solid #4a9eff;
             outline-offset: 2px;
         }
-         
+        /* Pagination styles */
         .pagination-container {
             display: flex;
             justify-content: space-between;
@@ -591,7 +591,7 @@
             font-size: 0.9em;
             cursor: pointer;
         }
-         
+        /* Helper classes for common inline styles */
         .table-header {
             background-color: #6b6b6b;
             padding: 12px 15px;
@@ -639,11 +639,11 @@
             </tr>
             <tr>
                 <td class="metrics-label"><i class="bi bi-filetype-csv" style="margin-right: 8px;"></i>Input file</td>
-                <td class="metrics-value"><span id="inputFileMetrics">https://www.airtek.com.ve/geofeeds.csv</span></td>
+                <td class="metrics-value"><span id="inputFileMetrics">{{.Metadata.InputFile}}</span></td>
             </tr>
             <tr>
                 <td class="metrics-label"><i class="bi bi-calendar-event-fill" style="margin-right: 8px;"></i>Tuning timestamp</td>
-                <td class="metrics-value"><script>document.write(new Intl.DateTimeFormat("en", {dateStyle: "full", timeStyle: "long",}).format(new Date( 1773720806552 )))</script></td>
+                <td class="metrics-value"><script>document.write(new Intl.DateTimeFormat("en", {dateStyle: "full", timeStyle: "long",}).format(new Date({{.Metadata.Timestamp}})))</script></td>
             </tr>
         </table>
         
@@ -654,19 +654,19 @@
                 </tr>
                 <tr>
                     <td class="metrics-label"><i class="bi bi-list-ul" style="margin-right: 8px;"></i>Total entries</td>
-                    <td class="metrics-value"><span id="totalEntriesMetrics">30</span></td>
+                    <td class="metrics-value"><span id="totalEntriesMetrics">{{.Metadata.TotalEntries}}</span></td>
                 </tr>
                 <tr>
                     <td class="metrics-label"><i class="bi bi-diagram-3-fill" style="margin-right: 8px;"></i>IPv4 entries</td>
-                    <td class="metrics-value"><span id="ipv4EntriesMetrics">29</span></td>
+                    <td class="metrics-value"><span id="ipv4EntriesMetrics">{{.Metadata.IpV4Entries}}</span></td>
                 </tr>
                 <tr>
                     <td class="metrics-label"><i class="bi bi-diagram-3-fill" style="margin-right: 8px;"></i>IPv6 entries</td>
-                    <td class="metrics-value"><span id="ipv6EntriesMetrics">1</span></td>
+                    <td class="metrics-value"><span id="ipv6EntriesMetrics">{{.Metadata.IpV6Entries}}</span></td>
                 </tr>
                 <tr>
                     <td class="metrics-label"><i class="bi bi-exclamation-circle-fill" style="margin-right: 8px;"></i>Invalid entries</td>
-                    <td class="metrics-value"><span id="invalidEntriesMetrics">0</span></td>
+                    <td class="metrics-value"><span id="invalidEntriesMetrics">{{.Metadata.InvalidEntries}}</span></td>
                 </tr>
             </table>
             
@@ -676,19 +676,19 @@
                 </tr>
                 <tr>
                     <td class="metrics-label"><i class="bi bi-x-circle-fill" style="margin-right: 8px;"></i>Errors</td>
-                    <td class="metrics-value"><span id="errorCountMetrics">0</span></td>
+                    <td class="metrics-value"><span id="errorCountMetrics">{{.Metadata.Errors}}</span></td>
                 </tr>
                 <tr>
                     <td class="metrics-label"><i class="bi bi-exclamation-triangle-fill" style="margin-right: 8px;"></i>Warnings</td>
-                    <td class="metrics-value"><span id="warningCountMetrics">0</span></td>
+                    <td class="metrics-value"><span id="warningCountMetrics">{{.Metadata.Warnings}}</span></td>
                 </tr>
                 <tr>
                     <td class="metrics-label"><i class="bi bi-lightbulb-fill" style="margin-right: 8px;"></i>Suggestions</td>
-                    <td class="metrics-value"><span id="suggestionsMetrics">21</span></td>
+                    <td class="metrics-value"><span id="suggestionsMetrics">{{.Metadata.Suggestions}}</span></td>
                 </tr>
                 <tr>
                     <td class="metrics-label"><i class="bi bi-check-circle-fill" style="margin-right: 8px;"></i>OK </td>
-                    <td class="metrics-value"><span id="okCountMetrics">9</span></td>
+                    <td class="metrics-value"><span id="okCountMetrics">{{.Metadata.OK}}</span></td>
                 </tr>
             </table>
         </div>
@@ -706,15 +706,15 @@
                 </tr>
                 <tr>
                     <td class="metrics-label"><i class="bi bi-building-fill" style="margin-right: 8px;"></i>City-level accuracy</td>
-                    <td class="metrics-value"><span id="cityAccuracy">30</span></td>
+                    <td class="metrics-value"><span id="cityAccuracy">{{.Metadata.CityLevelAccuracy}}</span></td>
                     <td class="metrics-label"><i class="bi bi-map-fill" style="margin-right: 8px;"></i>Region-level accuracy</td>
-                    <td class="metrics-value"><span id="regionAccuracy">0</span></td>
+                    <td class="metrics-value"><span id="regionAccuracy">{{.Metadata.RegionLevelAccuracy}}</span></td>
                 </tr>
                 <tr>
                     <td class="metrics-label"><i class="bi bi-globe-americas" style="margin-right: 8px;"></i>Country-level accuracy</td>
-                    <td class="metrics-value"><span id="countryAccuracy">0</span></td>
+                    <td class="metrics-value"><span id="countryAccuracy">{{.Metadata.CountryLevelAccuracy}}</span></td>
                     <td class="metrics-label"><i class="bi bi-ban-fill" style="margin-right: 8px;"></i>Do-not-geolocate entries</td>
-                    <td class="metrics-value"><span id="doNotGeolocate">0</span></td>
+                    <td class="metrics-value"><span id="doNotGeolocate">{{.Metadata.DoNotGeolocate}}</span></td>
                 </tr>
             </table>
         </div>
@@ -802,37 +802,37 @@
                     </tr>
                 </thead>
                 <tbody id="entriesTableBody">
-            
+            {{range .Entries}}
             <tr
-             id="csv-r-1" 
+             id="csv-r-{{.Line}}" 
              class="expandable-row" 
-             data-geocoding-hint="" 
-             data-do-not-geolocate="false" 
-             data-has-warning="false" 
-             data-has-error="false" 
-             data-has-suggestion="false" 
-             data-tunable="false" 
-             data-tuned-country="VE" 
-             data-tuned-region="VE-V" 
-             data-tuned-city="Maracaibo"
-             data-h3-cells="[836752fffffffff]"
-             data-bounding-box="[-71.70222412951681 10.732667069111843 -71.51955546208649 10.551971715031819]">
+             data-geocoding-hint="{{.GeocodingHint}}" 
+             data-do-not-geolocate="{{.DoNotGeolocate}}" 
+             data-has-warning="{{.HasWarning}}" 
+             data-has-error="{{.HasError}}" 
+             data-has-suggestion="{{.HasSuggestion}}" 
+             data-tunable="{{.Tunable}}" 
+             data-tuned-country="{{.TunedEntry.CountryCode}}" 
+             data-tuned-region="{{.TunedEntry.RegionCode}}" 
+             data-tuned-city="{{.TunedEntry.Name}}"
+             data-h3-cells="{{.TunedEntry.H3Cells}}"
+             data-bounding-box="{{.TunedEntry.BoundingBox}}">
                 <td><input type="checkbox" class="row-checkbox" checked></td>
-                <td>1</td>
-                <td><span class="status-badge status-ok"><i class="bi bi-check-circle-fill"></i>OK</span></td>
-                <td><strong>190.124.28.0/22</strong></td>
-                <td>VE</td>
-                <td>VE-V</td>
-                <td>Maracaibo</td>
+                <td>{{.Line}}</td>
+                <td><span class="status-badge status-{{if eq .Status "ERROR"}}error{{else if eq .Status "WARNING"}}warning{{else if eq .Status "SUGGESTION"}}suggestion{{else}}ok{{end}}"><i class="bi {{if eq .Status "ERROR"}}bi-x-circle-fill{{else if eq .Status "WARNING"}}bi-exclamation-triangle-fill{{else if eq .Status "SUGGESTION"}}bi-lightbulb-fill{{else}}bi-check-circle-fill{{end}}"></i>{{.Status}}</span></td>
+                <td><strong>{{.IPPrefix}}</strong></td>
+                <td>{{.CountryCode}}</td>
+                <td>{{.RegionCode}}</td>
+                <td>{{.City}}</td>
             </tr>
             <tr class="expand-details-row previous-values-row">
                 <td></td>
                 <td></td>
                 <td></td>
                 <td><strong>Previous values:</strong></td>
-                <td class="previous-value"><span class="default-country">VE</span></td>
-                <td class="previous-value"><span class="default-region">VE-V</span></td>
-                <td class="previous-value"><span class="default-city">Maracaibo</span></td>
+                <td class="previous-value"><span class="default-country">{{.CountryCode}}</span></td>
+                <td class="previous-value"><span class="default-region">{{.RegionCode}}</span></td>
+                <td class="previous-value"><span class="default-city">{{.City}}</span></td>
             </tr>
             <tr class="expand-details-row issues-row">
                 <td></td>
@@ -842,1366 +842,19 @@
                         <strong>Issues:</strong>
                         <button class="tune-all-btn" onclick="handleTuneButtonClick(this)">Tune</button>
                     </div>
-                    
+                    {{range .Messages}}
+                    <div class="message-line" data-id="{{.ID}}">
+                        <span>{{.Text}}</span>
+                        <input type="checkbox"{{if .Checked}} checked{{else}} disabled{{end}}>
+                    </div>
+                    {{end}}
                 </td>
             </tr>
-            
-            <tr
-             id="csv-r-2" 
-             class="expandable-row" 
-             data-geocoding-hint="" 
-             data-do-not-geolocate="false" 
-             data-has-warning="false" 
-             data-has-error="false" 
-             data-has-suggestion="false" 
-             data-tunable="false" 
-             data-tuned-country="VE" 
-             data-tuned-region="VE-V" 
-             data-tuned-city="Maracaibo"
-             data-h3-cells="[836752fffffffff]"
-             data-bounding-box="[-71.70222412951681 10.732667069111843 -71.51955546208649 10.551971715031819]">
-                <td><input type="checkbox" class="row-checkbox" checked></td>
-                <td>2</td>
-                <td><span class="status-badge status-ok"><i class="bi bi-check-circle-fill"></i>OK</span></td>
-                <td><strong>186.148.192.0/22</strong></td>
-                <td>VE</td>
-                <td>VE-V</td>
-                <td>Maracaibo</td>
-            </tr>
-            <tr class="expand-details-row previous-values-row">
-                <td></td>
-                <td></td>
-                <td></td>
-                <td><strong>Previous values:</strong></td>
-                <td class="previous-value"><span class="default-country">VE</span></td>
-                <td class="previous-value"><span class="default-region">VE-V</span></td>
-                <td class="previous-value"><span class="default-city">Maracaibo</span></td>
-            </tr>
-            <tr class="expand-details-row issues-row">
-                <td></td>
-                <td></td>
-                <td colspan="5">
-                    <div class="issues-header">
-                        <strong>Issues:</strong>
-                        <button class="tune-all-btn" onclick="handleTuneButtonClick(this)">Tune</button>
-                    </div>
-                    
-                </td>
-            </tr>
-            
-            <tr
-             id="csv-r-3" 
-             class="expandable-row" 
-             data-geocoding-hint="" 
-             data-do-not-geolocate="false" 
-             data-has-warning="false" 
-             data-has-error="false" 
-             data-has-suggestion="true" 
-             data-tunable="false" 
-             data-tuned-country="VE" 
-             data-tuned-region="VE-V" 
-             data-tuned-city="Maracaibo"
-             data-h3-cells="[836752fffffffff]"
-             data-bounding-box="[-71.70222412951681 10.732667069111843 -71.51955546208649 10.551971715031819]">
-                <td><input type="checkbox" class="row-checkbox" checked></td>
-                <td>3</td>
-                <td><span class="status-badge status-suggestion"><i class="bi bi-lightbulb-fill"></i>SUGGESTION</span></td>
-                <td><strong>38.25.128.0/17</strong></td>
-                <td>VE</td>
-                <td>VE-V</td>
-                <td>Maracaibo</td>
-            </tr>
-            <tr class="expand-details-row previous-values-row">
-                <td></td>
-                <td></td>
-                <td></td>
-                <td><strong>Previous values:</strong></td>
-                <td class="previous-value"><span class="default-country">VE</span></td>
-                <td class="previous-value"><span class="default-region">VE-V</span></td>
-                <td class="previous-value"><span class="default-city">Maracaibo</span></td>
-            </tr>
-            <tr class="expand-details-row issues-row">
-                <td></td>
-                <td></td>
-                <td colspan="5">
-                    <div class="issues-header">
-                        <strong>Issues:</strong>
-                        <button class="tune-all-btn" onclick="handleTuneButtonClick(this)">Tune</button>
-                    </div>
-                    
-                    <div class="message-line" data-id="3101">
-                        <span>IPv4 prefix is unusually large and may indicate a typo</span>
-                        <input type="checkbox" disabled>
-                    </div>
-                    
-                </td>
-            </tr>
-            
-            <tr
-             id="csv-r-4" 
-             class="expandable-row" 
-             data-geocoding-hint="" 
-             data-do-not-geolocate="false" 
-             data-has-warning="false" 
-             data-has-error="false" 
-             data-has-suggestion="true" 
-             data-tunable="false" 
-             data-tuned-country="VE" 
-             data-tuned-region="VE-I" 
-             data-tuned-city="Coro"
-             data-h3-cells="[836755fffffffff]"
-             data-bounding-box="[-69.76988186039024 11.498120990832842 -69.58656163756731 11.31725854571961]">
-                <td><input type="checkbox" class="row-checkbox" checked></td>
-                <td>4</td>
-                <td><span class="status-badge status-suggestion"><i class="bi bi-lightbulb-fill"></i>SUGGESTION</span></td>
-                <td><strong>38.166.0.0/17</strong></td>
-                <td>VE</td>
-                <td>VE-I</td>
-                <td>Coro</td>
-            </tr>
-            <tr class="expand-details-row previous-values-row">
-                <td></td>
-                <td></td>
-                <td></td>
-                <td><strong>Previous values:</strong></td>
-                <td class="previous-value"><span class="default-country">VE</span></td>
-                <td class="previous-value"><span class="default-region">VE-I</span></td>
-                <td class="previous-value"><span class="default-city">Coro</span></td>
-            </tr>
-            <tr class="expand-details-row issues-row">
-                <td></td>
-                <td></td>
-                <td colspan="5">
-                    <div class="issues-header">
-                        <strong>Issues:</strong>
-                        <button class="tune-all-btn" onclick="handleTuneButtonClick(this)">Tune</button>
-                    </div>
-                    
-                    <div class="message-line" data-id="3101">
-                        <span>IPv4 prefix is unusually large and may indicate a typo</span>
-                        <input type="checkbox" disabled>
-                    </div>
-                    
-                </td>
-            </tr>
-            
-            <tr
-             id="csv-r-5" 
-             class="expandable-row" 
-             data-geocoding-hint="" 
-             data-do-not-geolocate="false" 
-             data-has-warning="false" 
-             data-has-error="false" 
-             data-has-suggestion="true" 
-             data-tunable="false" 
-             data-tuned-country="VE" 
-             data-tuned-region="VE-V" 
-             data-tuned-city="Maracaibo"
-             data-h3-cells="[836752fffffffff]"
-             data-bounding-box="[-71.70222412951681 10.732667069111843 -71.51955546208649 10.551971715031819]">
-                <td><input type="checkbox" class="row-checkbox" checked></td>
-                <td>5</td>
-                <td><span class="status-badge status-suggestion"><i class="bi bi-lightbulb-fill"></i>SUGGESTION</span></td>
-                <td><strong>38.166.128.0/18</strong></td>
-                <td>VE</td>
-                <td>VE-V</td>
-                <td>Maracaibo</td>
-            </tr>
-            <tr class="expand-details-row previous-values-row">
-                <td></td>
-                <td></td>
-                <td></td>
-                <td><strong>Previous values:</strong></td>
-                <td class="previous-value"><span class="default-country">VE</span></td>
-                <td class="previous-value"><span class="default-region">VE-V</span></td>
-                <td class="previous-value"><span class="default-city">Maracaibo</span></td>
-            </tr>
-            <tr class="expand-details-row issues-row">
-                <td></td>
-                <td></td>
-                <td colspan="5">
-                    <div class="issues-header">
-                        <strong>Issues:</strong>
-                        <button class="tune-all-btn" onclick="handleTuneButtonClick(this)">Tune</button>
-                    </div>
-                    
-                    <div class="message-line" data-id="3101">
-                        <span>IPv4 prefix is unusually large and may indicate a typo</span>
-                        <input type="checkbox" disabled>
-                    </div>
-                    
-                </td>
-            </tr>
-            
-            <tr
-             id="csv-r-6" 
-             class="expandable-row" 
-             data-geocoding-hint="" 
-             data-do-not-geolocate="false" 
-             data-has-warning="false" 
-             data-has-error="false" 
-             data-has-suggestion="true" 
-             data-tunable="false" 
-             data-tuned-country="VE" 
-             data-tuned-region="VE-V" 
-             data-tuned-city="Maracaibo"
-             data-h3-cells="[836752fffffffff]"
-             data-bounding-box="[-71.70222412951681 10.732667069111843 -71.51955546208649 10.551971715031819]">
-                <td><input type="checkbox" class="row-checkbox" checked></td>
-                <td>6</td>
-                <td><span class="status-badge status-suggestion"><i class="bi bi-lightbulb-fill"></i>SUGGESTION</span></td>
-                <td><strong>38.166.192.0/19</strong></td>
-                <td>VE</td>
-                <td>VE-V</td>
-                <td>Maracaibo</td>
-            </tr>
-            <tr class="expand-details-row previous-values-row">
-                <td></td>
-                <td></td>
-                <td></td>
-                <td><strong>Previous values:</strong></td>
-                <td class="previous-value"><span class="default-country">VE</span></td>
-                <td class="previous-value"><span class="default-region">VE-V</span></td>
-                <td class="previous-value"><span class="default-city">Maracaibo</span></td>
-            </tr>
-            <tr class="expand-details-row issues-row">
-                <td></td>
-                <td></td>
-                <td colspan="5">
-                    <div class="issues-header">
-                        <strong>Issues:</strong>
-                        <button class="tune-all-btn" onclick="handleTuneButtonClick(this)">Tune</button>
-                    </div>
-                    
-                    <div class="message-line" data-id="3101">
-                        <span>IPv4 prefix is unusually large and may indicate a typo</span>
-                        <input type="checkbox" disabled>
-                    </div>
-                    
-                </td>
-            </tr>
-            
-            <tr
-             id="csv-r-7" 
-             class="expandable-row" 
-             data-geocoding-hint="" 
-             data-do-not-geolocate="false" 
-             data-has-warning="false" 
-             data-has-error="false" 
-             data-has-suggestion="true" 
-             data-tunable="false" 
-             data-tuned-country="VE" 
-             data-tuned-region="VE-V" 
-             data-tuned-city="La Villa del Rosario"
-             data-h3-cells="[83662cfffffffff]"
-             data-bounding-box="[-72.40467032900737 10.416143574650334 -72.22219832258581 10.23545574835695]">
-                <td><input type="checkbox" class="row-checkbox" checked></td>
-                <td>7</td>
-                <td><span class="status-badge status-suggestion"><i class="bi bi-lightbulb-fill"></i>SUGGESTION</span></td>
-                <td><strong>38.166.224.0/19</strong></td>
-                <td>VE</td>
-                <td>VE-V</td>
-                <td>La Villa del Rosario</td>
-            </tr>
-            <tr class="expand-details-row previous-values-row">
-                <td></td>
-                <td></td>
-                <td></td>
-                <td><strong>Previous values:</strong></td>
-                <td class="previous-value"><span class="default-country">VE</span></td>
-                <td class="previous-value"><span class="default-region">VE-V</span></td>
-                <td class="previous-value"><span class="default-city">La Villa del Rosario</span></td>
-            </tr>
-            <tr class="expand-details-row issues-row">
-                <td></td>
-                <td></td>
-                <td colspan="5">
-                    <div class="issues-header">
-                        <strong>Issues:</strong>
-                        <button class="tune-all-btn" onclick="handleTuneButtonClick(this)">Tune</button>
-                    </div>
-                    
-                    <div class="message-line" data-id="3101">
-                        <span>IPv4 prefix is unusually large and may indicate a typo</span>
-                        <input type="checkbox" disabled>
-                    </div>
-                    
-                </td>
-            </tr>
-            
-            <tr
-             id="csv-r-8" 
-             class="expandable-row" 
-             data-geocoding-hint="" 
-             data-do-not-geolocate="false" 
-             data-has-warning="false" 
-             data-has-error="false" 
-             data-has-suggestion="true" 
-             data-tunable="false" 
-             data-tuned-country="VE" 
-             data-tuned-region="VE-V" 
-             data-tuned-city="Maracaibo"
-             data-h3-cells="[836752fffffffff]"
-             data-bounding-box="[-71.70222412951681 10.732667069111843 -71.51955546208649 10.551971715031819]">
-                <td><input type="checkbox" class="row-checkbox" checked></td>
-                <td>8</td>
-                <td><span class="status-badge status-suggestion"><i class="bi bi-lightbulb-fill"></i>SUGGESTION</span></td>
-                <td><strong>38.171.0.0/16</strong></td>
-                <td>VE</td>
-                <td>VE-V</td>
-                <td>Maracaibo</td>
-            </tr>
-            <tr class="expand-details-row previous-values-row">
-                <td></td>
-                <td></td>
-                <td></td>
-                <td><strong>Previous values:</strong></td>
-                <td class="previous-value"><span class="default-country">VE</span></td>
-                <td class="previous-value"><span class="default-region">VE-V</span></td>
-                <td class="previous-value"><span class="default-city">Maracaibo</span></td>
-            </tr>
-            <tr class="expand-details-row issues-row">
-                <td></td>
-                <td></td>
-                <td colspan="5">
-                    <div class="issues-header">
-                        <strong>Issues:</strong>
-                        <button class="tune-all-btn" onclick="handleTuneButtonClick(this)">Tune</button>
-                    </div>
-                    
-                    <div class="message-line" data-id="3101">
-                        <span>IPv4 prefix is unusually large and may indicate a typo</span>
-                        <input type="checkbox" disabled>
-                    </div>
-                    
-                </td>
-            </tr>
-            
-            <tr
-             id="csv-r-9" 
-             class="expandable-row" 
-             data-geocoding-hint="" 
-             data-do-not-geolocate="false" 
-             data-has-warning="false" 
-             data-has-error="false" 
-             data-has-suggestion="true" 
-             data-tunable="false" 
-             data-tuned-country="VE" 
-             data-tuned-region="VE-I" 
-             data-tuned-city="Coro"
-             data-h3-cells="[836755fffffffff]"
-             data-bounding-box="[-69.76988186039024 11.498120990832842 -69.58656163756731 11.31725854571961]">
-                <td><input type="checkbox" class="row-checkbox" checked></td>
-                <td>9</td>
-                <td><span class="status-badge status-suggestion"><i class="bi bi-lightbulb-fill"></i>SUGGESTION</span></td>
-                <td><strong>38.222.0.0/17</strong></td>
-                <td>VE</td>
-                <td>VE-I</td>
-                <td>Coro</td>
-            </tr>
-            <tr class="expand-details-row previous-values-row">
-                <td></td>
-                <td></td>
-                <td></td>
-                <td><strong>Previous values:</strong></td>
-                <td class="previous-value"><span class="default-country">VE</span></td>
-                <td class="previous-value"><span class="default-region">VE-I</span></td>
-                <td class="previous-value"><span class="default-city">Coro</span></td>
-            </tr>
-            <tr class="expand-details-row issues-row">
-                <td></td>
-                <td></td>
-                <td colspan="5">
-                    <div class="issues-header">
-                        <strong>Issues:</strong>
-                        <button class="tune-all-btn" onclick="handleTuneButtonClick(this)">Tune</button>
-                    </div>
-                    
-                    <div class="message-line" data-id="3101">
-                        <span>IPv4 prefix is unusually large and may indicate a typo</span>
-                        <input type="checkbox" disabled>
-                    </div>
-                    
-                </td>
-            </tr>
-            
-            <tr
-             id="csv-r-10" 
-             class="expandable-row" 
-             data-geocoding-hint="" 
-             data-do-not-geolocate="false" 
-             data-has-warning="false" 
-             data-has-error="false" 
-             data-has-suggestion="true" 
-             data-tunable="false" 
-             data-tuned-country="VE" 
-             data-tuned-region="VE-V" 
-             data-tuned-city="La Villa del Rosario"
-             data-h3-cells="[83662cfffffffff]"
-             data-bounding-box="[-72.40467032900737 10.416143574650334 -72.22219832258581 10.23545574835695]">
-                <td><input type="checkbox" class="row-checkbox" checked></td>
-                <td>10</td>
-                <td><span class="status-badge status-suggestion"><i class="bi bi-lightbulb-fill"></i>SUGGESTION</span></td>
-                <td><strong>38.222.128.0/18</strong></td>
-                <td>VE</td>
-                <td>VE-V</td>
-                <td>La Villa del Rosario</td>
-            </tr>
-            <tr class="expand-details-row previous-values-row">
-                <td></td>
-                <td></td>
-                <td></td>
-                <td><strong>Previous values:</strong></td>
-                <td class="previous-value"><span class="default-country">VE</span></td>
-                <td class="previous-value"><span class="default-region">VE-V</span></td>
-                <td class="previous-value"><span class="default-city">La Villa del Rosario</span></td>
-            </tr>
-            <tr class="expand-details-row issues-row">
-                <td></td>
-                <td></td>
-                <td colspan="5">
-                    <div class="issues-header">
-                        <strong>Issues:</strong>
-                        <button class="tune-all-btn" onclick="handleTuneButtonClick(this)">Tune</button>
-                    </div>
-                    
-                    <div class="message-line" data-id="3101">
-                        <span>IPv4 prefix is unusually large and may indicate a typo</span>
-                        <input type="checkbox" disabled>
-                    </div>
-                    
-                </td>
-            </tr>
-            
-            <tr
-             id="csv-r-11" 
-             class="expandable-row" 
-             data-geocoding-hint="" 
-             data-do-not-geolocate="false" 
-             data-has-warning="false" 
-             data-has-error="false" 
-             data-has-suggestion="true" 
-             data-tunable="false" 
-             data-tuned-country="VE" 
-             data-tuned-region="VE-V" 
-             data-tuned-city="Maracaibo"
-             data-h3-cells="[836752fffffffff]"
-             data-bounding-box="[-71.70222412951681 10.732667069111843 -71.51955546208649 10.551971715031819]">
-                <td><input type="checkbox" class="row-checkbox" checked></td>
-                <td>11</td>
-                <td><span class="status-badge status-suggestion"><i class="bi bi-lightbulb-fill"></i>SUGGESTION</span></td>
-                <td><strong>38.222.192.0/18</strong></td>
-                <td>VE</td>
-                <td>VE-V</td>
-                <td>Maracaibo</td>
-            </tr>
-            <tr class="expand-details-row previous-values-row">
-                <td></td>
-                <td></td>
-                <td></td>
-                <td><strong>Previous values:</strong></td>
-                <td class="previous-value"><span class="default-country">VE</span></td>
-                <td class="previous-value"><span class="default-region">VE-V</span></td>
-                <td class="previous-value"><span class="default-city">Maracaibo</span></td>
-            </tr>
-            <tr class="expand-details-row issues-row">
-                <td></td>
-                <td></td>
-                <td colspan="5">
-                    <div class="issues-header">
-                        <strong>Issues:</strong>
-                        <button class="tune-all-btn" onclick="handleTuneButtonClick(this)">Tune</button>
-                    </div>
-                    
-                    <div class="message-line" data-id="3101">
-                        <span>IPv4 prefix is unusually large and may indicate a typo</span>
-                        <input type="checkbox" disabled>
-                    </div>
-                    
-                </td>
-            </tr>
-            
-            <tr
-             id="csv-r-12" 
-             class="expandable-row" 
-             data-geocoding-hint="" 
-             data-do-not-geolocate="false" 
-             data-has-warning="false" 
-             data-has-error="false" 
-             data-has-suggestion="true" 
-             data-tunable="false" 
-             data-tuned-country="VE" 
-             data-tuned-region="VE-V" 
-             data-tuned-city="Maracaibo"
-             data-h3-cells="[836752fffffffff]"
-             data-bounding-box="[-71.70222412951681 10.732667069111843 -71.51955546208649 10.551971715031819]">
-                <td><input type="checkbox" class="row-checkbox" checked></td>
-                <td>12</td>
-                <td><span class="status-badge status-suggestion"><i class="bi bi-lightbulb-fill"></i>SUGGESTION</span></td>
-                <td><strong>206.0.224.0/19</strong></td>
-                <td>VE</td>
-                <td>VE-V</td>
-                <td>Maracaibo</td>
-            </tr>
-            <tr class="expand-details-row previous-values-row">
-                <td></td>
-                <td></td>
-                <td></td>
-                <td><strong>Previous values:</strong></td>
-                <td class="previous-value"><span class="default-country">VE</span></td>
-                <td class="previous-value"><span class="default-region">VE-V</span></td>
-                <td class="previous-value"><span class="default-city">Maracaibo</span></td>
-            </tr>
-            <tr class="expand-details-row issues-row">
-                <td></td>
-                <td></td>
-                <td colspan="5">
-                    <div class="issues-header">
-                        <strong>Issues:</strong>
-                        <button class="tune-all-btn" onclick="handleTuneButtonClick(this)">Tune</button>
-                    </div>
-                    
-                    <div class="message-line" data-id="3101">
-                        <span>IPv4 prefix is unusually large and may indicate a typo</span>
-                        <input type="checkbox" disabled>
-                    </div>
-                    
-                </td>
-            </tr>
-            
-            <tr
-             id="csv-r-13" 
-             class="expandable-row" 
-             data-geocoding-hint="" 
-             data-do-not-geolocate="false" 
-             data-has-warning="false" 
-             data-has-error="false" 
-             data-has-suggestion="true" 
-             data-tunable="false" 
-             data-tuned-country="VE" 
-             data-tuned-region="VE-V" 
-             data-tuned-city="Maracaibo"
-             data-h3-cells="[836752fffffffff]"
-             data-bounding-box="[-71.70222412951681 10.732667069111843 -71.51955546208649 10.551971715031819]">
-                <td><input type="checkbox" class="row-checkbox" checked></td>
-                <td>13</td>
-                <td><span class="status-badge status-suggestion"><i class="bi bi-lightbulb-fill"></i>SUGGESTION</span></td>
-                <td><strong>206.1.128.0/17</strong></td>
-                <td>VE</td>
-                <td>VE-V</td>
-                <td>Maracaibo</td>
-            </tr>
-            <tr class="expand-details-row previous-values-row">
-                <td></td>
-                <td></td>
-                <td></td>
-                <td><strong>Previous values:</strong></td>
-                <td class="previous-value"><span class="default-country">VE</span></td>
-                <td class="previous-value"><span class="default-region">VE-V</span></td>
-                <td class="previous-value"><span class="default-city">Maracaibo</span></td>
-            </tr>
-            <tr class="expand-details-row issues-row">
-                <td></td>
-                <td></td>
-                <td colspan="5">
-                    <div class="issues-header">
-                        <strong>Issues:</strong>
-                        <button class="tune-all-btn" onclick="handleTuneButtonClick(this)">Tune</button>
-                    </div>
-                    
-                    <div class="message-line" data-id="3101">
-                        <span>IPv4 prefix is unusually large and may indicate a typo</span>
-                        <input type="checkbox" disabled>
-                    </div>
-                    
-                </td>
-            </tr>
-            
-            <tr
-             id="csv-r-14" 
-             class="expandable-row" 
-             data-geocoding-hint="" 
-             data-do-not-geolocate="false" 
-             data-has-warning="false" 
-             data-has-error="false" 
-             data-has-suggestion="false" 
-             data-tunable="false" 
-             data-tuned-country="VE" 
-             data-tuned-region="VE-V" 
-             data-tuned-city="Maracaibo"
-             data-h3-cells="[836752fffffffff]"
-             data-bounding-box="[-71.70222412951681 10.732667069111843 -71.51955546208649 10.551971715031819]">
-                <td><input type="checkbox" class="row-checkbox" checked></td>
-                <td>14</td>
-                <td><span class="status-badge status-ok"><i class="bi bi-check-circle-fill"></i>OK</span></td>
-                <td><strong>206.62.160.0/24</strong></td>
-                <td>VE</td>
-                <td>VE-V</td>
-                <td>Maracaibo</td>
-            </tr>
-            <tr class="expand-details-row previous-values-row">
-                <td></td>
-                <td></td>
-                <td></td>
-                <td><strong>Previous values:</strong></td>
-                <td class="previous-value"><span class="default-country">VE</span></td>
-                <td class="previous-value"><span class="default-region">VE-V</span></td>
-                <td class="previous-value"><span class="default-city">Maracaibo</span></td>
-            </tr>
-            <tr class="expand-details-row issues-row">
-                <td></td>
-                <td></td>
-                <td colspan="5">
-                    <div class="issues-header">
-                        <strong>Issues:</strong>
-                        <button class="tune-all-btn" onclick="handleTuneButtonClick(this)">Tune</button>
-                    </div>
-                    
-                </td>
-            </tr>
-            
-            <tr
-             id="csv-r-15" 
-             class="expandable-row" 
-             data-geocoding-hint="" 
-             data-do-not-geolocate="false" 
-             data-has-warning="false" 
-             data-has-error="false" 
-             data-has-suggestion="false" 
-             data-tunable="false" 
-             data-tuned-country="CO" 
-             data-tuned-region="CO-LAG" 
-             data-tuned-city="Maicao"
-             data-h3-cells="[836752fffffffff]"
-             data-bounding-box="[-72.33105579826515 11.468702153843376 -72.14795547989975 11.288037797106862]">
-                <td><input type="checkbox" class="row-checkbox" checked></td>
-                <td>15</td>
-                <td><span class="status-badge status-ok"><i class="bi bi-check-circle-fill"></i>OK</span></td>
-                <td><strong>206.62.161.0/24</strong></td>
-                <td>CO</td>
-                <td>CO-LAG</td>
-                <td>Maicao</td>
-            </tr>
-            <tr class="expand-details-row previous-values-row">
-                <td></td>
-                <td></td>
-                <td></td>
-                <td><strong>Previous values:</strong></td>
-                <td class="previous-value"><span class="default-country">CO</span></td>
-                <td class="previous-value"><span class="default-region">CO-LAG</span></td>
-                <td class="previous-value"><span class="default-city">Maicao</span></td>
-            </tr>
-            <tr class="expand-details-row issues-row">
-                <td></td>
-                <td></td>
-                <td colspan="5">
-                    <div class="issues-header">
-                        <strong>Issues:</strong>
-                        <button class="tune-all-btn" onclick="handleTuneButtonClick(this)">Tune</button>
-                    </div>
-                    
-                </td>
-            </tr>
-            
-            <tr
-             id="csv-r-16" 
-             class="expandable-row" 
-             data-geocoding-hint="" 
-             data-do-not-geolocate="false" 
-             data-has-warning="false" 
-             data-has-error="false" 
-             data-has-suggestion="false" 
-             data-tunable="false" 
-             data-tuned-country="VE" 
-             data-tuned-region="VE-V" 
-             data-tuned-city="Maracaibo"
-             data-h3-cells="[836752fffffffff]"
-             data-bounding-box="[-71.70222412951681 10.732667069111843 -71.51955546208649 10.551971715031819]">
-                <td><input type="checkbox" class="row-checkbox" checked></td>
-                <td>16</td>
-                <td><span class="status-badge status-ok"><i class="bi bi-check-circle-fill"></i>OK</span></td>
-                <td><strong>206.62.162.0/23</strong></td>
-                <td>VE</td>
-                <td>VE-V</td>
-                <td>Maracaibo</td>
-            </tr>
-            <tr class="expand-details-row previous-values-row">
-                <td></td>
-                <td></td>
-                <td></td>
-                <td><strong>Previous values:</strong></td>
-                <td class="previous-value"><span class="default-country">VE</span></td>
-                <td class="previous-value"><span class="default-region">VE-V</span></td>
-                <td class="previous-value"><span class="default-city">Maracaibo</span></td>
-            </tr>
-            <tr class="expand-details-row issues-row">
-                <td></td>
-                <td></td>
-                <td colspan="5">
-                    <div class="issues-header">
-                        <strong>Issues:</strong>
-                        <button class="tune-all-btn" onclick="handleTuneButtonClick(this)">Tune</button>
-                    </div>
-                    
-                </td>
-            </tr>
-            
-            <tr
-             id="csv-r-17" 
-             class="expandable-row" 
-             data-geocoding-hint="" 
-             data-do-not-geolocate="false" 
-             data-has-warning="false" 
-             data-has-error="false" 
-             data-has-suggestion="false" 
-             data-tunable="false" 
-             data-tuned-country="VE" 
-             data-tuned-region="VE-V" 
-             data-tuned-city="Maracaibo"
-             data-h3-cells="[836752fffffffff]"
-             data-bounding-box="[-71.70222412951681 10.732667069111843 -71.51955546208649 10.551971715031819]">
-                <td><input type="checkbox" class="row-checkbox" checked></td>
-                <td>17</td>
-                <td><span class="status-badge status-ok"><i class="bi bi-check-circle-fill"></i>OK</span></td>
-                <td><strong>206.62.164.0/22</strong></td>
-                <td>VE</td>
-                <td>VE-V</td>
-                <td>Maracaibo</td>
-            </tr>
-            <tr class="expand-details-row previous-values-row">
-                <td></td>
-                <td></td>
-                <td></td>
-                <td><strong>Previous values:</strong></td>
-                <td class="previous-value"><span class="default-country">VE</span></td>
-                <td class="previous-value"><span class="default-region">VE-V</span></td>
-                <td class="previous-value"><span class="default-city">Maracaibo</span></td>
-            </tr>
-            <tr class="expand-details-row issues-row">
-                <td></td>
-                <td></td>
-                <td colspan="5">
-                    <div class="issues-header">
-                        <strong>Issues:</strong>
-                        <button class="tune-all-btn" onclick="handleTuneButtonClick(this)">Tune</button>
-                    </div>
-                    
-                </td>
-            </tr>
-            
-            <tr
-             id="csv-r-18" 
-             class="expandable-row" 
-             data-geocoding-hint="" 
-             data-do-not-geolocate="false" 
-             data-has-warning="false" 
-             data-has-error="false" 
-             data-has-suggestion="false" 
-             data-tunable="false" 
-             data-tuned-country="VE" 
-             data-tuned-region="VE-V" 
-             data-tuned-city="Maracaibo"
-             data-h3-cells="[836752fffffffff]"
-             data-bounding-box="[-71.70222412951681 10.732667069111843 -71.51955546208649 10.551971715031819]">
-                <td><input type="checkbox" class="row-checkbox" checked></td>
-                <td>18</td>
-                <td><span class="status-badge status-ok"><i class="bi bi-check-circle-fill"></i>OK</span></td>
-                <td><strong>206.62.168.0/22</strong></td>
-                <td>VE</td>
-                <td>VE-V</td>
-                <td>Maracaibo</td>
-            </tr>
-            <tr class="expand-details-row previous-values-row">
-                <td></td>
-                <td></td>
-                <td></td>
-                <td><strong>Previous values:</strong></td>
-                <td class="previous-value"><span class="default-country">VE</span></td>
-                <td class="previous-value"><span class="default-region">VE-V</span></td>
-                <td class="previous-value"><span class="default-city">Maracaibo</span></td>
-            </tr>
-            <tr class="expand-details-row issues-row">
-                <td></td>
-                <td></td>
-                <td colspan="5">
-                    <div class="issues-header">
-                        <strong>Issues:</strong>
-                        <button class="tune-all-btn" onclick="handleTuneButtonClick(this)">Tune</button>
-                    </div>
-                    
-                </td>
-            </tr>
-            
-            <tr
-             id="csv-r-19" 
-             class="expandable-row" 
-             data-geocoding-hint="" 
-             data-do-not-geolocate="false" 
-             data-has-warning="false" 
-             data-has-error="false" 
-             data-has-suggestion="false" 
-             data-tunable="false" 
-             data-tuned-country="VE" 
-             data-tuned-region="VE-V" 
-             data-tuned-city="Maracaibo"
-             data-h3-cells="[836752fffffffff]"
-             data-bounding-box="[-71.70222412951681 10.732667069111843 -71.51955546208649 10.551971715031819]">
-                <td><input type="checkbox" class="row-checkbox" checked></td>
-                <td>19</td>
-                <td><span class="status-badge status-ok"><i class="bi bi-check-circle-fill"></i>OK</span></td>
-                <td><strong>206.62.172.0/22</strong></td>
-                <td>VE</td>
-                <td>VE-V</td>
-                <td>Maracaibo</td>
-            </tr>
-            <tr class="expand-details-row previous-values-row">
-                <td></td>
-                <td></td>
-                <td></td>
-                <td><strong>Previous values:</strong></td>
-                <td class="previous-value"><span class="default-country">VE</span></td>
-                <td class="previous-value"><span class="default-region">VE-V</span></td>
-                <td class="previous-value"><span class="default-city">Maracaibo</span></td>
-            </tr>
-            <tr class="expand-details-row issues-row">
-                <td></td>
-                <td></td>
-                <td colspan="5">
-                    <div class="issues-header">
-                        <strong>Issues:</strong>
-                        <button class="tune-all-btn" onclick="handleTuneButtonClick(this)">Tune</button>
-                    </div>
-                    
-                </td>
-            </tr>
-            
-            <tr
-             id="csv-r-20" 
-             class="expandable-row" 
-             data-geocoding-hint="" 
-             data-do-not-geolocate="false" 
-             data-has-warning="false" 
-             data-has-error="false" 
-             data-has-suggestion="true" 
-             data-tunable="false" 
-             data-tuned-country="VE" 
-             data-tuned-region="VE-V" 
-             data-tuned-city="Maracaibo"
-             data-h3-cells="[836752fffffffff]"
-             data-bounding-box="[-71.70222412951681 10.732667069111843 -71.51955546208649 10.551971715031819]">
-                <td><input type="checkbox" class="row-checkbox" checked></td>
-                <td>20</td>
-                <td><span class="status-badge status-suggestion"><i class="bi bi-lightbulb-fill"></i>SUGGESTION</span></td>
-                <td><strong>206.62.176.0/20</strong></td>
-                <td>VE</td>
-                <td>VE-V</td>
-                <td>Maracaibo</td>
-            </tr>
-            <tr class="expand-details-row previous-values-row">
-                <td></td>
-                <td></td>
-                <td></td>
-                <td><strong>Previous values:</strong></td>
-                <td class="previous-value"><span class="default-country">VE</span></td>
-                <td class="previous-value"><span class="default-region">VE-V</span></td>
-                <td class="previous-value"><span class="default-city">Maracaibo</span></td>
-            </tr>
-            <tr class="expand-details-row issues-row">
-                <td></td>
-                <td></td>
-                <td colspan="5">
-                    <div class="issues-header">
-                        <strong>Issues:</strong>
-                        <button class="tune-all-btn" onclick="handleTuneButtonClick(this)">Tune</button>
-                    </div>
-                    
-                    <div class="message-line" data-id="3101">
-                        <span>IPv4 prefix is unusually large and may indicate a typo</span>
-                        <input type="checkbox" disabled>
-                    </div>
-                    
-                </td>
-            </tr>
-            
-            <tr
-             id="csv-r-21" 
-             class="expandable-row" 
-             data-geocoding-hint="" 
-             data-do-not-geolocate="false" 
-             data-has-warning="false" 
-             data-has-error="false" 
-             data-has-suggestion="false" 
-             data-tunable="false" 
-             data-tuned-country="VE" 
-             data-tuned-region="VE-V" 
-             data-tuned-city="Maracaibo"
-             data-h3-cells="[836752fffffffff]"
-             data-bounding-box="[-71.70222412951681 10.732667069111843 -71.51955546208649 10.551971715031819]">
-                <td><input type="checkbox" class="row-checkbox" checked></td>
-                <td>21</td>
-                <td><span class="status-badge status-ok"><i class="bi bi-check-circle-fill"></i>OK</span></td>
-                <td><strong>168.232.102.0/23</strong></td>
-                <td>VE</td>
-                <td>VE-V</td>
-                <td>Maracaibo</td>
-            </tr>
-            <tr class="expand-details-row previous-values-row">
-                <td></td>
-                <td></td>
-                <td></td>
-                <td><strong>Previous values:</strong></td>
-                <td class="previous-value"><span class="default-country">VE</span></td>
-                <td class="previous-value"><span class="default-region">VE-V</span></td>
-                <td class="previous-value"><span class="default-city">Maracaibo</span></td>
-            </tr>
-            <tr class="expand-details-row issues-row">
-                <td></td>
-                <td></td>
-                <td colspan="5">
-                    <div class="issues-header">
-                        <strong>Issues:</strong>
-                        <button class="tune-all-btn" onclick="handleTuneButtonClick(this)">Tune</button>
-                    </div>
-                    
-                </td>
-            </tr>
-            
-            <tr
-             id="csv-r-22" 
-             class="expandable-row" 
-             data-geocoding-hint="" 
-             data-do-not-geolocate="false" 
-             data-has-warning="false" 
-             data-has-error="false" 
-             data-has-suggestion="true" 
-             data-tunable="false" 
-             data-tuned-country="VE" 
-             data-tuned-region="VE-I" 
-             data-tuned-city="Coro"
-             data-h3-cells="[836755fffffffff]"
-             data-bounding-box="[-69.76988186039024 11.498120990832842 -69.58656163756731 11.31725854571961]">
-                <td><input type="checkbox" class="row-checkbox" checked></td>
-                <td>22</td>
-                <td><span class="status-badge status-suggestion"><i class="bi bi-lightbulb-fill"></i>SUGGESTION</span></td>
-                <td><strong>156.247.128.0/17</strong></td>
-                <td>VE</td>
-                <td>VE-I</td>
-                <td>Coro</td>
-            </tr>
-            <tr class="expand-details-row previous-values-row">
-                <td></td>
-                <td></td>
-                <td></td>
-                <td><strong>Previous values:</strong></td>
-                <td class="previous-value"><span class="default-country">VE</span></td>
-                <td class="previous-value"><span class="default-region">VE-I</span></td>
-                <td class="previous-value"><span class="default-city">Coro</span></td>
-            </tr>
-            <tr class="expand-details-row issues-row">
-                <td></td>
-                <td></td>
-                <td colspan="5">
-                    <div class="issues-header">
-                        <strong>Issues:</strong>
-                        <button class="tune-all-btn" onclick="handleTuneButtonClick(this)">Tune</button>
-                    </div>
-                    
-                    <div class="message-line" data-id="3101">
-                        <span>IPv4 prefix is unusually large and may indicate a typo</span>
-                        <input type="checkbox" disabled>
-                    </div>
-                    
-                </td>
-            </tr>
-            
-            <tr
-             id="csv-r-23" 
-             class="expandable-row" 
-             data-geocoding-hint="" 
-             data-do-not-geolocate="false" 
-             data-has-warning="false" 
-             data-has-error="false" 
-             data-has-suggestion="true" 
-             data-tunable="false" 
-             data-tuned-country="VE" 
-             data-tuned-region="VE-V" 
-             data-tuned-city="Maracaibo"
-             data-h3-cells="[836752fffffffff]"
-             data-bounding-box="[-71.70222412951681 10.732667069111843 -71.51955546208649 10.551971715031819]">
-                <td><input type="checkbox" class="row-checkbox" checked></td>
-                <td>23</td>
-                <td><span class="status-badge status-suggestion"><i class="bi bi-lightbulb-fill"></i>SUGGESTION</span></td>
-                <td><strong>156.255.128.0/17</strong></td>
-                <td>VE</td>
-                <td>VE-V</td>
-                <td>Maracaibo</td>
-            </tr>
-            <tr class="expand-details-row previous-values-row">
-                <td></td>
-                <td></td>
-                <td></td>
-                <td><strong>Previous values:</strong></td>
-                <td class="previous-value"><span class="default-country">VE</span></td>
-                <td class="previous-value"><span class="default-region">VE-V</span></td>
-                <td class="previous-value"><span class="default-city">Maracaibo</span></td>
-            </tr>
-            <tr class="expand-details-row issues-row">
-                <td></td>
-                <td></td>
-                <td colspan="5">
-                    <div class="issues-header">
-                        <strong>Issues:</strong>
-                        <button class="tune-all-btn" onclick="handleTuneButtonClick(this)">Tune</button>
-                    </div>
-                    
-                    <div class="message-line" data-id="3101">
-                        <span>IPv4 prefix is unusually large and may indicate a typo</span>
-                        <input type="checkbox" disabled>
-                    </div>
-                    
-                </td>
-            </tr>
-            
-            <tr
-             id="csv-r-24" 
-             class="expandable-row" 
-             data-geocoding-hint="" 
-             data-do-not-geolocate="false" 
-             data-has-warning="false" 
-             data-has-error="false" 
-             data-has-suggestion="true" 
-             data-tunable="false" 
-             data-tuned-country="VE" 
-             data-tuned-region="VE-V" 
-             data-tuned-city="Maracaibo"
-             data-h3-cells="[836752fffffffff]"
-             data-bounding-box="[-71.70222412951681 10.732667069111843 -71.51955546208649 10.551971715031819]">
-                <td><input type="checkbox" class="row-checkbox" checked></td>
-                <td>24</td>
-                <td><span class="status-badge status-suggestion"><i class="bi bi-lightbulb-fill"></i>SUGGESTION</span></td>
-                <td><strong>2803:d700::/32</strong></td>
-                <td>VE</td>
-                <td>VE-V</td>
-                <td>Maracaibo</td>
-            </tr>
-            <tr class="expand-details-row previous-values-row">
-                <td></td>
-                <td></td>
-                <td></td>
-                <td><strong>Previous values:</strong></td>
-                <td class="previous-value"><span class="default-country">VE</span></td>
-                <td class="previous-value"><span class="default-region">VE-V</span></td>
-                <td class="previous-value"><span class="default-city">Maracaibo</span></td>
-            </tr>
-            <tr class="expand-details-row issues-row">
-                <td></td>
-                <td></td>
-                <td colspan="5">
-                    <div class="issues-header">
-                        <strong>Issues:</strong>
-                        <button class="tune-all-btn" onclick="handleTuneButtonClick(this)">Tune</button>
-                    </div>
-                    
-                    <div class="message-line" data-id="3102">
-                        <span>IPv6 prefix is unusually large and may indicate a typo</span>
-                        <input type="checkbox" disabled>
-                    </div>
-                    
-                </td>
-            </tr>
-            
-            <tr
-             id="csv-r-25" 
-             class="expandable-row" 
-             data-geocoding-hint="" 
-             data-do-not-geolocate="false" 
-             data-has-warning="false" 
-             data-has-error="false" 
-             data-has-suggestion="true" 
-             data-tunable="false" 
-             data-tuned-country="VE" 
-             data-tuned-region="VE-V" 
-             data-tuned-city="La Villa del Rosario"
-             data-h3-cells="[83662cfffffffff]"
-             data-bounding-box="[-72.40467032900737 10.416143574650334 -72.22219832258581 10.23545574835695]">
-                <td><input type="checkbox" class="row-checkbox" checked></td>
-                <td>25</td>
-                <td><span class="status-badge status-suggestion"><i class="bi bi-lightbulb-fill"></i>SUGGESTION</span></td>
-                <td><strong>154.216.192.0/18</strong></td>
-                <td>VE</td>
-                <td>VE-V</td>
-                <td>La Villa del Rosario</td>
-            </tr>
-            <tr class="expand-details-row previous-values-row">
-                <td></td>
-                <td></td>
-                <td></td>
-                <td><strong>Previous values:</strong></td>
-                <td class="previous-value"><span class="default-country">VE</span></td>
-                <td class="previous-value"><span class="default-region">VE-V</span></td>
-                <td class="previous-value"><span class="default-city">La Villa del Rosario</span></td>
-            </tr>
-            <tr class="expand-details-row issues-row">
-                <td></td>
-                <td></td>
-                <td colspan="5">
-                    <div class="issues-header">
-                        <strong>Issues:</strong>
-                        <button class="tune-all-btn" onclick="handleTuneButtonClick(this)">Tune</button>
-                    </div>
-                    
-                    <div class="message-line" data-id="3101">
-                        <span>IPv4 prefix is unusually large and may indicate a typo</span>
-                        <input type="checkbox" disabled>
-                    </div>
-                    
-                </td>
-            </tr>
-            
-            <tr
-             id="csv-r-26" 
-             class="expandable-row" 
-             data-geocoding-hint="" 
-             data-do-not-geolocate="false" 
-             data-has-warning="false" 
-             data-has-error="false" 
-             data-has-suggestion="true" 
-             data-tunable="false" 
-             data-tuned-country="VE" 
-             data-tuned-region="VE-V" 
-             data-tuned-city="Maracaibo"
-             data-h3-cells="[836752fffffffff]"
-             data-bounding-box="[-71.70222412951681 10.732667069111843 -71.51955546208649 10.551971715031819]">
-                <td><input type="checkbox" class="row-checkbox" checked></td>
-                <td>26</td>
-                <td><span class="status-badge status-suggestion"><i class="bi bi-lightbulb-fill"></i>SUGGESTION</span></td>
-                <td><strong>154.218.192.0/18</strong></td>
-                <td>VE</td>
-                <td>VE-V</td>
-                <td>Maracaibo</td>
-            </tr>
-            <tr class="expand-details-row previous-values-row">
-                <td></td>
-                <td></td>
-                <td></td>
-                <td><strong>Previous values:</strong></td>
-                <td class="previous-value"><span class="default-country">VE</span></td>
-                <td class="previous-value"><span class="default-region">VE-V</span></td>
-                <td class="previous-value"><span class="default-city">Maracaibo</span></td>
-            </tr>
-            <tr class="expand-details-row issues-row">
-                <td></td>
-                <td></td>
-                <td colspan="5">
-                    <div class="issues-header">
-                        <strong>Issues:</strong>
-                        <button class="tune-all-btn" onclick="handleTuneButtonClick(this)">Tune</button>
-                    </div>
-                    
-                    <div class="message-line" data-id="3101">
-                        <span>IPv4 prefix is unusually large and may indicate a typo</span>
-                        <input type="checkbox" disabled>
-                    </div>
-                    
-                </td>
-            </tr>
-            
-            <tr
-             id="csv-r-27" 
-             class="expandable-row" 
-             data-geocoding-hint="" 
-             data-do-not-geolocate="false" 
-             data-has-warning="false" 
-             data-has-error="false" 
-             data-has-suggestion="true" 
-             data-tunable="false" 
-             data-tuned-country="VE" 
-             data-tuned-region="VE-V" 
-             data-tuned-city="Maracaibo"
-             data-h3-cells="[836752fffffffff]"
-             data-bounding-box="[-71.70222412951681 10.732667069111843 -71.51955546208649 10.551971715031819]">
-                <td><input type="checkbox" class="row-checkbox" checked></td>
-                <td>27</td>
-                <td><span class="status-badge status-suggestion"><i class="bi bi-lightbulb-fill"></i>SUGGESTION</span></td>
-                <td><strong>156.231.192.0/18</strong></td>
-                <td>VE</td>
-                <td>VE-V</td>
-                <td>Maracaibo</td>
-            </tr>
-            <tr class="expand-details-row previous-values-row">
-                <td></td>
-                <td></td>
-                <td></td>
-                <td><strong>Previous values:</strong></td>
-                <td class="previous-value"><span class="default-country">VE</span></td>
-                <td class="previous-value"><span class="default-region">VE-V</span></td>
-                <td class="previous-value"><span class="default-city">Maracaibo</span></td>
-            </tr>
-            <tr class="expand-details-row issues-row">
-                <td></td>
-                <td></td>
-                <td colspan="5">
-                    <div class="issues-header">
-                        <strong>Issues:</strong>
-                        <button class="tune-all-btn" onclick="handleTuneButtonClick(this)">Tune</button>
-                    </div>
-                    
-                    <div class="message-line" data-id="3101">
-                        <span>IPv4 prefix is unusually large and may indicate a typo</span>
-                        <input type="checkbox" disabled>
-                    </div>
-                    
-                </td>
-            </tr>
-            
-            <tr
-             id="csv-r-28" 
-             class="expandable-row" 
-             data-geocoding-hint="" 
-             data-do-not-geolocate="false" 
-             data-has-warning="false" 
-             data-has-error="false" 
-             data-has-suggestion="true" 
-             data-tunable="false" 
-             data-tuned-country="VE" 
-             data-tuned-region="VE-V" 
-             data-tuned-city="Maracaibo"
-             data-h3-cells="[836752fffffffff]"
-             data-bounding-box="[-71.70222412951681 10.732667069111843 -71.51955546208649 10.551971715031819]">
-                <td><input type="checkbox" class="row-checkbox" checked></td>
-                <td>28</td>
-                <td><span class="status-badge status-suggestion"><i class="bi bi-lightbulb-fill"></i>SUGGESTION</span></td>
-                <td><strong>156.236.128.0/18</strong></td>
-                <td>VE</td>
-                <td>VE-V</td>
-                <td>Maracaibo</td>
-            </tr>
-            <tr class="expand-details-row previous-values-row">
-                <td></td>
-                <td></td>
-                <td></td>
-                <td><strong>Previous values:</strong></td>
-                <td class="previous-value"><span class="default-country">VE</span></td>
-                <td class="previous-value"><span class="default-region">VE-V</span></td>
-                <td class="previous-value"><span class="default-city">Maracaibo</span></td>
-            </tr>
-            <tr class="expand-details-row issues-row">
-                <td></td>
-                <td></td>
-                <td colspan="5">
-                    <div class="issues-header">
-                        <strong>Issues:</strong>
-                        <button class="tune-all-btn" onclick="handleTuneButtonClick(this)">Tune</button>
-                    </div>
-                    
-                    <div class="message-line" data-id="3101">
-                        <span>IPv4 prefix is unusually large and may indicate a typo</span>
-                        <input type="checkbox" disabled>
-                    </div>
-                    
-                </td>
-            </tr>
-            
-            <tr
-             id="csv-r-29" 
-             class="expandable-row" 
-             data-geocoding-hint="" 
-             data-do-not-geolocate="false" 
-             data-has-warning="false" 
-             data-has-error="false" 
-             data-has-suggestion="true" 
-             data-tunable="false" 
-             data-tuned-country="VE" 
-             data-tuned-region="VE-V" 
-             data-tuned-city="Maracaibo"
-             data-h3-cells="[836752fffffffff]"
-             data-bounding-box="[-71.70222412951681 10.732667069111843 -71.51955546208649 10.551971715031819]">
-                <td><input type="checkbox" class="row-checkbox" checked></td>
-                <td>29</td>
-                <td><span class="status-badge status-suggestion"><i class="bi bi-lightbulb-fill"></i>SUGGESTION</span></td>
-                <td><strong>156.255.160.0/19</strong></td>
-                <td>VE</td>
-                <td>VE-V</td>
-                <td>Maracaibo</td>
-            </tr>
-            <tr class="expand-details-row previous-values-row">
-                <td></td>
-                <td></td>
-                <td></td>
-                <td><strong>Previous values:</strong></td>
-                <td class="previous-value"><span class="default-country">VE</span></td>
-                <td class="previous-value"><span class="default-region">VE-V</span></td>
-                <td class="previous-value"><span class="default-city">Maracaibo</span></td>
-            </tr>
-            <tr class="expand-details-row issues-row">
-                <td></td>
-                <td></td>
-                <td colspan="5">
-                    <div class="issues-header">
-                        <strong>Issues:</strong>
-                        <button class="tune-all-btn" onclick="handleTuneButtonClick(this)">Tune</button>
-                    </div>
-                    
-                    <div class="message-line" data-id="3101">
-                        <span>IPv4 prefix is unusually large and may indicate a typo</span>
-                        <input type="checkbox" disabled>
-                    </div>
-                    
-                </td>
-            </tr>
-            
-            <tr
-             id="csv-r-30" 
-             class="expandable-row" 
-             data-geocoding-hint="" 
-             data-do-not-geolocate="false" 
-             data-has-warning="false" 
-             data-has-error="false" 
-             data-has-suggestion="true" 
-             data-tunable="false" 
-             data-tuned-country="VE" 
-             data-tuned-region="VE-V" 
-             data-tuned-city="Maracaibo"
-             data-h3-cells="[836752fffffffff]"
-             data-bounding-box="[-71.70222412951681 10.732667069111843 -71.51955546208649 10.551971715031819]">
-                <td><input type="checkbox" class="row-checkbox" checked></td>
-                <td>30</td>
-                <td><span class="status-badge status-suggestion"><i class="bi bi-lightbulb-fill"></i>SUGGESTION</span></td>
-                <td><strong>156.255.192.0/18</strong></td>
-                <td>VE</td>
-                <td>VE-V</td>
-                <td>Maracaibo</td>
-            </tr>
-            <tr class="expand-details-row previous-values-row">
-                <td></td>
-                <td></td>
-                <td></td>
-                <td><strong>Previous values:</strong></td>
-                <td class="previous-value"><span class="default-country">VE</span></td>
-                <td class="previous-value"><span class="default-region">VE-V</span></td>
-                <td class="previous-value"><span class="default-city">Maracaibo</span></td>
-            </tr>
-            <tr class="expand-details-row issues-row">
-                <td></td>
-                <td></td>
-                <td colspan="5">
-                    <div class="issues-header">
-                        <strong>Issues:</strong>
-                        <button class="tune-all-btn" onclick="handleTuneButtonClick(this)">Tune</button>
-                    </div>
-                    
-                    <div class="message-line" data-id="3101">
-                        <span>IPv4 prefix is unusually large and may indicate a typo</span>
-                        <input type="checkbox" disabled>
-                    </div>
-                    
-                </td>
-            </tr>
-            
+            {{end}}
         </tbody>
             </table>
  
-            
+            <!-- Pagination Controls -->
             <div class="pagination-container">
                 <div class="pagination-info">
                     <span id="paginationInfo">Showing 0-0 of 0 rows</span>
@@ -2264,9 +917,11 @@
     </div>
 
     <script>
-        
-
-        
+        /**
+         * Table cell indices for accessing column data
+         * @type {Object<string, number>}
+         */
+        // Constants
         const CELL_INDEX = {
             CHECKBOX: 0,
             LINE: 1,
@@ -2278,30 +933,34 @@
             MESSAGES: 7
         };
         
-        
-
+        /**
+         * Timing delays for UI interactions (in milliseconds)
+         * @type {Object<string, number>}
+         */
         const TIMING = {
             MAP_INIT_DELAY: 100,
             MODAL_FOCUS_DELAY: 150,
             MAP_RESIZE_DELAY: 200
         };
 
-        
-
-        
-         
+        /**
+         * Global state variables for modal and map management
+         * @type {Object}
+         */
+        // Global state
+        /** @type {Object<string, L.Map>} Maps indexed by mapId */
         let maps = {};
         
-         
+        /** @type {HTMLButtonElement|null} Currently active tune button reference */
         let currentTuningButton = null;
         
-         
+        /** @type {number} Currently selected match index in modal */
         let selectedMatchIndex = 0;
         
-         
+        /** @type {Array<HTMLElement>} Array of match item elements in modal */
         let matchItems = [];
         
-         
+        /** @type {boolean} Flag indicating if modal is currently open */
         let isModalOpen = false;
 
         
@@ -2310,17 +969,19 @@
         let currentMapMode = 'bbox';
         let summaryRowData = [];
 
-        
+        /**
+         * Stores CSV comment lines by line number for download functionality
+         * @type {Object<number, string>}
+         */
+        // Comment map: stores CSV comments by line number 
+        const commentMap = JSON.parse('{{.Comments}}');
 
-        
-        const commentMap = JSON.parse('{}');
-
-        
+        // Modal elements
         const modal = document.getElementById('locationModal');
         const modalContent = document.querySelector('.modal-content');
         const closeBtn = document.querySelector('.close');
 
-        
+        // Modal functions
         closeBtn.onclick = function() {
             closeModal();
         };
@@ -2338,8 +999,10 @@
             }
         };
 
-        
-
+        /**
+         * Closes the location matches modal and cleans up resources
+         * @returns {void}
+         */
         function closeModal() {
             if (!isModalOpen) return;
             
@@ -2357,7 +1020,7 @@
             matchItems = [];
         }
 
-        
+        // Modal keyboard navigation
         modal.addEventListener('keydown', function(event) {
             if (!isModalOpen) return;
             
@@ -2407,8 +1070,11 @@
             }
         });
 
-        
-
+        /**
+         * Navigates between location match items with arrow keys
+         * @param {number} direction - Navigate direction: positive (right/down) or negative (left/up)
+         * @returns {void}
+         */
         function navigateMatches(direction) {
             if (matchItems.length === 0) return;
             
@@ -2424,8 +1090,11 @@
             }
         }
 
-        
-
+        /**
+         * Zooms the currently selected map in or out
+         * @param {number} direction - Zoom direction: positive to zoom in, negative to zoom out
+         * @returns {void}
+         */
         function zoomCurrentMap(direction) {
             const mapId = `map-${selectedMatchIndex}`;
             const map = maps[mapId];
@@ -2435,12 +1104,18 @@
             }
         }
 
-        
-
+        /**
+         * API endpoint for place search functionality
+         * @type {string}
+         */
         const API_ENDPOINT = 'https://mcp.fastah.ai/rest/geofeeds/place-search';
 
-        
-
+        /**
+         * Fetches geolocation matches from the API for given location data
+         * @async
+         * @param {Array<Object>} rows - Array of row objects with location data (countryCode, regionCode, cityName)
+         * @returns {Promise<{results: Array<Object>}|null>} API response with matches or null on error
+         */
         async function fetchPlaceMatches(rows) {
             const MAX_BATCH_SIZE = 1000;
             let allResults = [];
@@ -2483,8 +1158,11 @@
             return { results: allResults };
         }
 
-        
-
+        /**
+         * Prepares geofeed row data for API request
+         * @param {HTMLTableRowElement} dataRow - The table row element to extract data from
+         * @returns {Object|null} Object with countryCode, regionCode, cityName, maxResults and searchMode, or null if required data missing
+         */
         function prepareRowForApi(dataRow) {
             const cells = dataRow.querySelectorAll('td');
             if (cells.length <= CELL_INDEX.STATUS) return null;
@@ -2506,8 +1184,12 @@
             };
         }
 
-        
-
+        /**
+         * Handles tune button click - fetches location matches for selected issues
+         * @async
+         * @param {HTMLButtonElement} button - The tune button that was clicked
+         * @returns {Promise<void>}
+         */
         async function handleTuneButtonClick(button) {
             currentTuningButton = button;
             
@@ -2529,7 +1211,7 @@
             
             const detailsRow = button.closest('tr');
             
-            
+            // Find the data row - it's before the expand-details-rows
             let dataRow = detailsRow.previousElementSibling;
             while (dataRow && dataRow.classList.contains('expand-details-row')) {
                 dataRow = dataRow.previousElementSibling;
@@ -2562,8 +1244,12 @@
             }
         }
 
-        
-
+        /**
+         * Displays the location matches popup modal with maps and selectable options
+         * @param {Array<Object>} matches - Array of location match objects from API
+         * @param {Array<Object>} [selectedIssues=[]] - Array of selected issues for tracking
+         * @returns {void}
+         */
         function showLocationPopup(matches, selectedIssues = []) {
             if (!matches || matches.length === 0) {
                 return;
@@ -2584,7 +1270,7 @@
                 }
                 const mapId = `map-${index}`;
                 
-                
+                // Determine primary location text: city > region > country
                 let primaryLocation = match.name;
                 let locationType = 'City';
                 
@@ -2598,7 +1284,7 @@
                     locationType = 'Country';
                 }
                 
-                
+                // Build secondary info (show what's available)
                 let secondaryInfo = [];
                 if (match.name && locationType !== 'City') {
                     secondaryInfo.push(`City: ${match.name}`);
@@ -2641,8 +1327,11 @@
             }, TIMING.MODAL_FOCUS_DELAY);
         }
 
-        
-
+        /**
+         * Selects a location match and updates the corresponding table row
+         * @param {Object} match - Match object with countryCode, regionCode, name, and boundingBox
+         * @returns {void}
+         */
         function selectLocationMatch(match) {
             if (!currentTuningButton) {
                 console.error('No tuning button reference found');
@@ -2651,7 +1340,7 @@
             
             const detailsRow = currentTuningButton.closest('tr');
             
-            
+            // Find the data row - it's before the expand-details-rows
             let dataRow = detailsRow.previousElementSibling;
             while (dataRow && dataRow.classList.contains('expand-details-row')) {
                 dataRow = dataRow.previousElementSibling;
@@ -2666,8 +1355,12 @@
             closeModal();
         }
         
-        
-
+        /**
+         * Updates a table row with selected match data and stores original values
+         * @param {HTMLTableRowElement} dataRow - The table row to update
+         * @param {Object} match - Match object with countryCode, regionCode, and name
+         * @returns {void}
+         */
         function updateRowWithMatchData(dataRow, match) {
             const cells = dataRow.querySelectorAll('td');
             const currentCountry = cells[CELL_INDEX.COUNTRY].textContent;
@@ -2684,7 +1377,7 @@
             cells[CELL_INDEX.REGION].textContent = match.regionCode;
             cells[CELL_INDEX.CITY].textContent = match.name;
             
-            
+            // Find the previous values row (it's the first expand-details-row after the data row)
             const previousValuesRow = dataRow.nextElementSibling;
             if (previousValuesRow && previousValuesRow.classList.contains('previous-values-row')) {
                 previousValuesRow.classList.add('show');
@@ -2699,8 +1392,12 @@
             }
         }
 
-        
-
+        /**
+         * Initializes a Leaflet map with location boundary and marker for a match
+         * @param {string} mapId - The DOM element ID where map will render
+         * @param {Object} match - Match object with name, boundingBox, regionCode, countryCode
+         * @returns {void}
+         */
         function initializeMapForMatch(mapId, match) {
             try {
                 const mapInstance = L.map(mapId, {
@@ -2769,8 +1466,12 @@
             }
         }
 
-        
-
+        /**
+         * Sets the report mode between 'viewing' and 'tuning'
+         * Tuning mode shows checkboxes and expands rows with issues
+         * @param {string} mode - 'viewing' or 'tuning'
+         * @returns {void}
+         */
         function setMode(mode) {
             const toggle = document.getElementById('modeToggle');
             const viewingText = document.getElementById('viewingText');
@@ -2782,7 +1483,7 @@
                 viewingText.classList.remove('active');
                 tuningText.classList.add('active');
                 
-                
+                // Only expand rows with issues
                 const expandableRows = document.querySelectorAll('.expandable-row');
                 expandableRows.forEach(row => {
                     const hasError = row.getAttribute('data-has-error') === 'true';
@@ -2792,7 +1493,7 @@
                     if (hasError || hasWarning || hasSuggestion) {
                         let detailRow = row.nextElementSibling;
                         while (detailRow && detailRow.classList.contains('expand-details-row')) {
-                            
+                            // Only show issues-row, not previous-values-row
                             if (detailRow.classList.contains('issues-row')) {
                                 detailRow.classList.add('show');
                             }
@@ -2810,19 +1511,24 @@
                 });
             }
             
-            
+            // Refresh pagination after mode change
             updatePagination();
         }
 
-        
-
+        /**
+         * Toggles between viewing and tuning modes
+         * @returns {void}
+         */
         function toggleMode() {
             const isTuning = document.body.classList.contains('tuning-mode');
             setMode(isTuning ? 'viewing' : 'tuning');
         }
 
-        
-
+        /**
+         * Escapes HTML special characters to prevent XSS attacks
+         * @param {string} text - Text to escape
+         * @returns {string} Escaped HTML text
+         */
         function escapeHtml(text) {
             const map = {
                 '&': '&amp;',
@@ -2834,8 +1540,11 @@
             return text.replace(/[&<>"']/g, m => map[m]);
         }
         
-        
-
+        /**
+         * Filters the entries table based on current filter input values
+         * Resets to page 1 and updates pagination
+         * @returns {void}
+         */
         function filterTable() {
             const countryFilter = document.getElementById('filterCountry').value.toLowerCase();
             const regionFilter = document.getElementById('filterRegion').value.toLowerCase();
@@ -2845,7 +1554,7 @@
             
             const allExpandableRows = document.querySelectorAll('.expandable-row');
             
-            
+            // Filter rows and update allRows array
             allRows = Array.from(allExpandableRows).filter(row => {
                 const cells = row.querySelectorAll('td');
                 if (cells.length <= CELL_INDEX.STATUS) return false;
@@ -2867,30 +1576,32 @@
                 );
             });
             
-            
+            // Reset to page 1 and update pagination
             currentPage = 1;
             updatePagination();
         }
         
-        
-
-        
-         
+        /**
+         * Pagination state and configuration
+         * @type {Object}
+         */
+        // Pagination state
+        /** @type {number} Current page number (1-indexed) */
         let currentPage = 1;
         
-         
+        /** @type {number} Number of rows to display per page */
         let rowsPerPage = 100;
         
-         
+        /** @type {Array<HTMLTableRowElement>} Array of expandable rows after filtering */
         let allRows = [];
         
-        
+        // Initialize on page load
         window.addEventListener('DOMContentLoaded', function() {
-            
+            // Initialize pagination
             allRows = Array.from(document.querySelectorAll('.expandable-row'));
             initializePagination();
             
-            
+            // Setup select all checkbox
             const selectAllCheckbox = document.getElementById('selectAll');
             const rowCheckboxes = document.querySelectorAll('.row-checkbox');
             
@@ -2900,18 +1611,18 @@
                 });
             });
             
-            
+            // Update select all checkbox when individual checkboxes change
             rowCheckboxes.forEach(checkbox => {
                 checkbox.addEventListener('click', function(e) {
-                    e.stopPropagation(); 
+                    e.stopPropagation(); // Prevent row expansion when clicking checkbox
                 });
                 checkbox.addEventListener('keydown', function(e) {
                     if (e.key === ' ' || e.key === 'Enter') {
-                        e.stopPropagation(); 
+                        e.stopPropagation(); // Prevent row expansion when using keyboard on checkbox
                     }
                 });
                 checkbox.addEventListener('change', function(e) {
-                    e.stopPropagation(); 
+                    e.stopPropagation(); // Prevent row expansion when clicking checkbox
                     const allChecked = Array.from(rowCheckboxes).every(cb => cb.checked);
                     const noneChecked = Array.from(rowCheckboxes).every(cb => !cb.checked);
                     selectAllCheckbox.checked = allChecked;
@@ -2919,26 +1630,26 @@
                 });
             });
             
-            
+            // Setup expandable rows
             const expandableRows = document.querySelectorAll('.expandable-row');
             expandableRows.forEach(row => {
                 const hasError = row.getAttribute('data-has-error') === 'true';
                 const hasWarning = row.getAttribute('data-has-warning') === 'true';
                 const hasSuggestion = row.getAttribute('data-has-suggestion') === 'true';
                 
-                
+                // Only make rows with issues focusable
                 if (hasError || hasWarning || hasSuggestion) {
                     row.setAttribute('tabindex', '0');
                     
-                    
+                    // Click handler
                     row.addEventListener('click', function(e) {
-                        
+                        // Don't expand if clicking on checkbox
                         if (e.target.classList.contains('row-checkbox')) {
                             return;
                         }
                         let detailRow = this.nextElementSibling;
                         let expanding = false;
-                        
+                        // First pass: check if we are expanding (issues-row will be shown)
                         while (detailRow && detailRow.classList.contains('expand-details-row')) {
                             if (detailRow.classList.contains('issues-row')) {
                                 expanding = !detailRow.classList.contains('show');
@@ -2949,30 +1660,30 @@
                         detailRow = this.nextElementSibling;
                         while (detailRow && detailRow.classList.contains('expand-details-row')) {
                             if (detailRow.classList.contains('issues-row')) {
-                                
+                                // Always toggle issues-row
                                 detailRow.classList.toggle('show');
                             } else if (detailRow.classList.contains('previous-values-row')) {
                                 if (expanding) {
-                                    
+                                    // Show previous-values-row if this row has original data (was tuned)
                                     if (row.hasAttribute('data-original-country') || 
                                         row.hasAttribute('data-original-region') || 
                                         row.hasAttribute('data-original-city')) {
                                         detailRow.classList.add('show');
                                     }
                                 } else {
-                                    
+                                    // If collapsing, hide previous-values-row
                                     detailRow.classList.remove('show');
                                 }
                             }
                             detailRow = detailRow.nextElementSibling;
                         }
-                        
+                        // Refresh pagination to show/hide the toggled detail rows
                         updatePagination();
                     });
                     
-                    
+                    // Keyboard handler
                     row.addEventListener('keydown', function(e) {
-                        
+                        // Don't handle if focus is on checkbox
                         if (document.activeElement.classList.contains('row-checkbox')) {
                             return;
                         }
@@ -2980,7 +1691,7 @@
                             e.preventDefault();
                             let detailRow = this.nextElementSibling;
                             let expanding = false;
-                            
+                            // First pass: check if we are expanding (issues-row will be shown)
                             while (detailRow && detailRow.classList.contains('expand-details-row')) {
                                 if (detailRow.classList.contains('issues-row')) {
                                     expanding = !detailRow.classList.contains('show');
@@ -2991,24 +1702,24 @@
                             detailRow = this.nextElementSibling;
                             while (detailRow && detailRow.classList.contains('expand-details-row')) {
                                 if (detailRow.classList.contains('issues-row')) {
-                                    
+                                    // Always toggle issues-row
                                     detailRow.classList.toggle('show');
                                 } else if (detailRow.classList.contains('previous-values-row')) {
                                     if (expanding) {
-                                        
+                                        // Show previous-values-row if this row has original data (was tuned)
                                         if (row.hasAttribute('data-original-country') || 
                                             row.hasAttribute('data-original-region') || 
                                             row.hasAttribute('data-original-city')) {
                                             detailRow.classList.add('show');
                                         }
                                     } else {
-                                        
+                                        // If collapsing, hide previous-values-row
                                         detailRow.classList.remove('show');
                                     }
                                 }
                                 detailRow = detailRow.nextElementSibling;
                             }
-                            
+                            // Refresh pagination to show/hide the toggled detail rows
                             updatePagination();
                         }
                     });
@@ -3017,31 +1728,31 @@
                 }
             });
             
-            
+            // Toggle Expand All button
             let isExpanded = false;
             document.getElementById('toggleExpandAll').addEventListener('click', function() {
                 const expandableRows = document.querySelectorAll('.expandable-row');
                 const button = document.getElementById('toggleExpandAll');
                 
                 if (!isExpanded) {
-                    
+                    // Show all
                     expandableRows.forEach(row => {
                         const checkbox = row.querySelector('.row-checkbox');
-                        if (!checkbox || !checkbox.checked) return; 
+                        if (!checkbox || !checkbox.checked) return; // Only work on checked rows
                         
                         const hasError = row.getAttribute('data-has-error') === 'true';
                         const hasWarning = row.getAttribute('data-has-warning') === 'true';
                         const hasSuggestion = row.getAttribute('data-has-suggestion') === 'true';
                         
-                        
+                        // Only expand rows with issues
                         if (hasError || hasWarning || hasSuggestion) {
                             let detailRow = row.nextElementSibling;
                             while (detailRow && detailRow.classList.contains('expand-details-row')) {
-                                
+                                // Show issues-row always
                                 if (detailRow.classList.contains('issues-row')) {
                                     detailRow.classList.add('show');
                                 } else if (detailRow.classList.contains('previous-values-row')) {
-                                    
+                                    // Show previous-values-row if this row has original data (was tuned)
                                     if (row.hasAttribute('data-original-country') || 
                                         row.hasAttribute('data-original-region') || 
                                         row.hasAttribute('data-original-city')) {
@@ -3055,10 +1766,10 @@
                     button.innerHTML = '<i class="bi bi-arrows-collapse" style="margin-right: 5px;"></i>Collapse Rows';
                     isExpanded = true;
                 } else {
-                    
+                    // Collapse all
                     expandableRows.forEach(row => {
                         const checkbox = row.querySelector('.row-checkbox');
-                        if (!checkbox || !checkbox.checked) return; 
+                        if (!checkbox || !checkbox.checked) return; // Only work on checked rows
                         
                         let detailRow = row.nextElementSibling;
                         while (detailRow && detailRow.classList.contains('expand-details-row')) {
@@ -3070,11 +1781,11 @@
                     isExpanded = false;
                 }
                 
-                
+                // Refresh pagination to show expanded rows correctly
                 updatePagination();
             });
             
-            
+            // Toggle Filters button
             document.getElementById('toggleFilters').addEventListener('click', function() {
                 const filterRow = document.getElementById('filterRow');
                 const button = document.getElementById('toggleFilters');
@@ -3088,7 +1799,7 @@
                 }
             });
             
-            
+            // Tune All button
             document.getElementById('tuneAll').addEventListener('click', async function() {
                 const expandableRows = document.querySelectorAll('.expandable-row');
                 
@@ -3099,7 +1810,7 @@
                     const checkbox = dataRow.querySelector('.row-checkbox');
                     if (!checkbox || !checkbox.checked) {
                         skippedCount++;
-                        return; 
+                        return; // Only work on checked rows
                     }
                     
                     const isTunable = dataRow.getAttribute('data-tunable') === 'true';
@@ -3133,7 +1844,7 @@
                     if (tunedRegion) cells[CELL_INDEX.REGION].textContent = tunedRegion;
                     if (tunedCity) cells[CELL_INDEX.CITY].textContent = tunedCity;
                     
-                    
+                    // Find the previous values row
                     const previousValuesRow = dataRow.nextElementSibling;
                     if (previousValuesRow && previousValuesRow.classList.contains('previous-values-row')) {
                         previousValuesRow.classList.add('show');
@@ -3150,20 +1861,20 @@
                     updatedCount++;
                 });
                 
-                
+                // Refresh pagination to update displayed values
                 updatePagination();
                 
                 alert(`Successfully updated ${updatedCount} rows (${skippedCount} rows skipped - not tunable or no tuned values available)`);
             });
             
-            
+            // Add filter event listeners
             document.getElementById('filterCountry').addEventListener('input', filterTable);
             document.getElementById('filterRegion').addEventListener('input', filterTable);
             document.getElementById('filterCity').addEventListener('input', filterTable);
             document.getElementById('filterStatus').addEventListener('change', filterTable);
             document.getElementById('filterIpPrefix').addEventListener('input', filterTable);
             
-            
+            // Reset filters button
             document.getElementById('resetFilters').addEventListener('click', function() {
                 document.getElementById('filterCountry').value = '';
                 document.getElementById('filterRegion').value = '';
@@ -3171,18 +1882,18 @@
                 document.getElementById('filterStatus').value = '';
                 document.getElementById('filterIpPrefix').value = '';
                 
-                
+                // Reset to all rows and update pagination
                 allRows = Array.from(document.querySelectorAll('.expandable-row'));
                 currentPage = 1;
                 updatePagination();
             });
             
-            
+            // Download CSV button
             document.getElementById('downloadCSV').addEventListener('click', function() {
                 const rows = document.querySelectorAll('.expandable-row');
                 const rowDataMap = {};
                 
-                
+                // Collect all data rows with their line numbers
                 rows.forEach(row => {
                     const cells = row.querySelectorAll('td');
                     if (cells.length > CELL_INDEX.CITY) {
@@ -3196,23 +1907,23 @@
                     }
                 });
                 
-                
+                // Build CSV content with comments in the correct positions
                 const csvLines = [];
                 
-                
+                // Find max line number
                 const allLineNumbers = Object.keys(rowDataMap).map(n => parseInt(n));
                 const maxLine = Math.max(...allLineNumbers);
                 
-                
+                // Iterate through all line numbers from 1 to maxLine
                 for (let lineNum = 1; lineNum <= maxLine; lineNum++) {
                     if (lineNum in commentMap) {
-                        
+                        // This line is a comment
                         csvLines.push(commentMap[lineNum]);
                     } else if (rowDataMap[lineNum]) {
-                        
+                        // This line is a data row
                         const row = rowDataMap[lineNum];
                         const csvRow = row.map(cell => {
-                            
+                            // Escape quotes and wrap in quotes if contains comma, quote, or newline
                             const cellStr = String(cell);
                             if (cellStr.includes(',') || cellStr.includes('"') || cellStr.includes('\n')) {
                                 return '"' + cellStr.replace(/"/g, '""') + '"';
@@ -3221,17 +1932,17 @@
                         }).join(',');
                         csvLines.push(csvRow);
                     }
-                    
+                    // If neither comment nor data, skip the line (maintains original CSV structure)
                 }
                 
                 const csvContent = csvLines.join('\n');
                 
-                
+                // Create download link
                 const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
                 const link = document.createElement('a');
                 const url = URL.createObjectURL(blob);
                 
-                
+                // Get filename from inputFileMetrics, ensure it has .csv extension
                 let filename =
                     document.getElementById('inputFileMetrics')
                         .textContent
@@ -3250,7 +1961,7 @@
                 document.body.removeChild(link);
             });
             
-            
+            // Pagination event listeners
             document.getElementById('pageSize').addEventListener('change', function() {
                 const value = this.value;
                 if (value === 'all') {
@@ -3290,8 +2001,10 @@
             initSummaryMap();
         });
         
-        
-
+        /**
+         * Initializes pagination on page load
+         * @returns {void}
+         */
         function initializePagination() {
             updatePagination();
         }
@@ -3313,7 +2026,7 @@
                     maxZoom: 19
                 }).addTo(summaryMapInstance);
                 summaryLayerGroup = L.layerGroup().addTo(summaryMapInstance);
-                
+                // Parse and cache all row data once
                 summaryRowData = [];
                 const expandableRows = document.querySelectorAll('.expandable-row');
                 expandableRows.forEach(row => {
@@ -3358,7 +2071,7 @@
             const toggle = document.getElementById('mapModeToggle');
             const bboxText = document.getElementById('mapModeBboxText');
             const h3Text   = document.getElementById('mapModeH3Text');
-            
+            // If called with no argument, act as a toggle
             if (mode === undefined) {
                 mode = currentMapMode === 'bbox' ? 'h3' : 'bbox';
             }
@@ -3399,13 +2112,13 @@
                     summaryLayerGroup.addLayer(cm);
                     tempBoundsLayers.push(L.rectangle(lb));
                 } else {
-                    
+                    // H3 cells mode
                     const raw = data.h3cells.replace(/[\[\]]/g, '').trim();
                     if (!raw) return;
                     const cellIds = raw.split(/[\s,]+/).filter(Boolean);
                     cellIds.forEach(cellId => {
                         try {
-                            const boundary = h3.cellToBoundary(cellId); 
+                            const boundary = h3.cellToBoundary(cellId); // returns [[lat,lng],...]
                             const poly = L.polygon(boundary, {
                                 color: data.color, weight: 2, opacity: 0.9,
                                 fillColor: data.color, fillOpacity: 0.35
@@ -3427,12 +2140,15 @@
         }
         
         
-        
-
+        /**
+         * Updates pagination display for current page
+         * Shows/hides rows based on current page and rowsPerPage
+         * @returns {void}
+         */
         function updatePagination() {
             const totalPages = Math.max(1, Math.ceil(allRows.length / rowsPerPage));
             
-            
+            // Ensure currentPage is within valid range
             if (currentPage > totalPages) {
                 currentPage = totalPages;
             }
@@ -3443,11 +2159,11 @@
             const startIndex = (currentPage - 1) * rowsPerPage;
             const endIndex = Math.min(startIndex + rowsPerPage, allRows.length);
             
-            
+            // Hide ALL expandable rows first (not just filtered ones)
             const allExpandableRows = document.querySelectorAll('.expandable-row');
             allExpandableRows.forEach(row => {
                 row.style.display = 'none';
-                
+                // Hide associated detail rows
                 let nextRow = row.nextElementSibling;
                 while (nextRow && nextRow.classList.contains('expand-details-row')) {
                     nextRow.style.display = 'none';
@@ -3455,11 +2171,11 @@
                 }
             });
             
-            
+            // Show rows for current page
             for (let i = startIndex; i < endIndex; i++) {
                 const row = allRows[i];
                 row.style.display = '';
-                
+                // Show associated detail rows if they have 'show' class
                 let nextRow = row.nextElementSibling;
                 while (nextRow && nextRow.classList.contains('expand-details-row')) {
                     if (nextRow.classList.contains('show')) {
@@ -3469,7 +2185,7 @@
                 }
             }
             
-            
+            // Update pagination info
             if (allRows.length === 0) {
                 document.getElementById('paginationInfo').textContent = 'Showing 0 of 0 rows';
             } else {
@@ -3477,33 +2193,36 @@
                     `Showing ${startIndex + 1}-${endIndex} of ${allRows.length} rows`;
             }
             
-            
+            // Update button states
             document.getElementById('firstPage').disabled = currentPage === 1 || allRows.length === 0;
             document.getElementById('prevPage').disabled = currentPage === 1 || allRows.length === 0;
             document.getElementById('nextPage').disabled = currentPage === totalPages || allRows.length === 0;
             document.getElementById('lastPage').disabled = currentPage === totalPages || allRows.length === 0;
             
-            
+            // Update page numbers
             updatePageNumbers(totalPages);
         }
         
-        
-
+        /**
+         * Updates page number buttons display with ellipsis for large page counts
+         * @param {number} totalPages - Total number of pages available
+         * @returns {void}
+         */
         function updatePageNumbers(totalPages) {
             const pageNumbersContainer = document.getElementById('pageNumbers');
             pageNumbersContainer.innerHTML = '';
             
-            
+            // Show max 5 page numbers with ellipsis
             const maxVisible = 5;
             let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
             let endPage = Math.min(totalPages, startPage + maxVisible - 1);
             
-            
+            // Adjust if we're near the end
             if (endPage - startPage < maxVisible - 1) {
                 startPage = Math.max(1, endPage - maxVisible + 1);
             }
             
-            
+            // Add first page and ellipsis if needed
             if (startPage > 1) {
                 addPageButton(1);
                 if (startPage > 2) {
@@ -3515,12 +2234,12 @@
                 }
             }
             
-            
+            // Add page numbers
             for (let i = startPage; i <= endPage; i++) {
                 addPageButton(i);
             }
             
-            
+            // Add ellipsis and last page if needed
             if (endPage < totalPages) {
                 if (endPage < totalPages - 1) {
                     const ellipsis = document.createElement('span');
@@ -3533,8 +2252,11 @@
             }
         }
         
-        
-
+        /**
+         * Creates and adds a page number button to pagination controls
+         * @param {number} pageNum - Page number for the button
+         * @returns {void}
+         */
         function addPageButton(pageNum) {
             const pageNumbersContainer = document.getElementById('pageNumbers');
             const btn = document.createElement('button');
