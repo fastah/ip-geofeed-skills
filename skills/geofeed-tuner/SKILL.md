@@ -524,7 +524,15 @@ Rules:
     }
 ```
 - Server: `https://mcp.fastah.ai/mcp`
-- Tool: `rfc8805-row-place-search`
+- Tool and its Schema: before the first `tools/call`, the agent MUST send a `tools/list` request to read the input and output schema for **`rfc8805-row-place-search`**.
+  Use the discovered schema as the authoritative source for field names, types, and constraints.
+- The following is an illustrative example only; always defer to the schema returned by `tools/list`:
+
+  ```json
+  [
+      {"rowKey": "550e8400-...", "countryCode":"CA", ...},
+      {"rowKey": "690e9301-...", "countryCode":"ZZ", ...}
+  ]
 - Open [./run/data/mcp-server-payload.json](./run/data/mcp-server-payload.json) and send all deduplicated entries with their rowKeys.
 - If there are more than 1000 deduplicated entries after deduplication, split into multiple requests of 1000 entries each.
 - The server will respond with the same `rowKey` field in each response for mapping back.
