@@ -1,11 +1,10 @@
 ---
 name: geofeed-tuner
 description: >
-  Use this skill whenever the user mentions IP geolocation feeds, RFC 8805, geofeeds, inetnum,
-  inet6num, CIDR subnets, or wants help creating, tuning, validating, or publishing a
-  self-published IP geolocation feed in CSV format. Also trigger when the user is a network
+  Use this skill whenever the user mentions IP geolocation feeds, RFC 8805, geofeeds, or wants help creating, tuning, validating, or publishing a
+  self-published IP geolocation feed in CSV format. Intended user audience is a network
   operator, ISP, mobile carrier, cloud provider, hosting company, IXP, or satellite provider
-  asking about IP geolocation accuracy, prefix mapping, or WHOIS geofeed attributes.
+  asking about IP geolocation accuracy, or geofeed authoring best practices.
   Helps create, refine, and improve CSV-format IP geolocation feeds with opinionated
   recommendations beyond RFC 8805 compliance. Do NOT use for private or internal IP address
   management — applies only to publicly routable IP addresses.
