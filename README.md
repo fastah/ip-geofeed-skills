@@ -60,7 +60,7 @@ These are automatically suggested via the included [extensions hint](.vscode/ext
 
 Install the skill directly from GitHub:
 ```shell
-amp install github.com/fastah/ip-geofeed-skills/geofeed-tuner
+amp skill add --overwrite https://github.com/fastah/ip-geofeed-skills.git 
 ```
 Then invoke it with:
 ```
