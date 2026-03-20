@@ -78,6 +78,7 @@ func ProvideTuningRecommendations(entry *Entry, ctx *ValidationContext) {
 // callPlaceSearchAPI makes an HTTP POST request to the place-search API
 func callPlaceSearchAPI(request PlaceSearchRequest) ([]PlaceSearchResult, error) {
 	const apiURL = "https://mcp.fastah.ai/rest/geofeeds/place-search"
+	// const apiURL = "http://127.0.0.1:3000/rest/geofeeds/place-search"
 
 	// Marshal the request to JSON
 	requestBody, err := json.Marshal(request)
@@ -185,13 +186,16 @@ func GetEntriesFromServer(entry_rows []parser.Row, ctx *ValidationContext) ([]En
 		// Process results and populate tuned fields
 		for _, result := range results {
 			// If there's a match, use it to populate tuned fields
-			if len(result.Matches) > 0 {
+			if len(result.Matches) > 0 && !result.IsExplicitlyDoNotGeolocate {
 				match := result.Matches[0]
+
+				if hasIssue := CheckForIsuues(match.CountryCode, match.RegionCode, ctx); hasIssue {
+					errEntries = append(errEntries, entries[deDuplicateUUIDMap[result.RowKey][0]])
+					continue
+				}
 				for _, entryIdx := range deDuplicateUUIDMap[result.RowKey] {
 					entries[entryIdx].TunedEntry = match
 				}
-			} else if hasIssue := CheckForIsuues(&entry_rows[deDuplicateUUIDMap[result.RowKey][0]], ctx); hasIssue {
-				errEntries = append(errEntries, entries[deDuplicateUUIDMap[result.RowKey][0]])
 			}
 
 		}
