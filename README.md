@@ -43,9 +43,6 @@ Hey chat, help me get started with the "Geofeed Tuner" agent skill from the SKIL
 
 AI [Agent Skills](https://agentskills.io/home) is an open standard that works across multiple AI tools to make domain-specific knowledge easier to share - which in this repository's case is IP Geolocation feed tuning and improvement. 
 
-## Troubleshooting
-
-1. VS Code - turn ON the experimental Agent Skills flag ([config](.vscode/settings.json)).
 
 ## Recommended Extensions
 
@@ -59,9 +56,7 @@ These are automatically suggested via the included [extensions hint](.vscode/ext
 | [Rainbow CSV](https://marketplace.visualstudio.com/items?itemName=mechatroner.rainbow-csv) | mechatroner | CSV syntax highlighting |
 | [PowerShell](https://marketplace.visualstudio.com/items?itemName=ms-vscode.PowerShell) | Microsoft | [Windows only] Modern scripting system |
 
-## Advanced usage
-
-### Amp
+## Usage with `Amp`
 
 Install the skill directly from GitHub:
 ```shell
@@ -74,6 +69,10 @@ Then invoke it with:
 
 Or simply ask Amp to tune a geofeed and it will auto-select the skill.
 
-### GitHub CoPilot CLI
+### Use with `GitHub CoPilot CLI`
 
 You can use [CoPilot's CLI mode](https://github.com/features/copilot/cli) to work with [Agent Skills](https://docs.github.com/en/copilot/concepts/agents/about-copilot-cli#customizing-github-copilot-cli). 
+
+## Troubleshooting
+
+1. Make sure you have Python 3 working in Agent-accessible shell: `python3 --version` should yield say `3.14.x` or higher. 
