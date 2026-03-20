@@ -7,6 +7,8 @@ import (
 	"net/http"
 
 	"ip-geofeed/internal/parser"
+
+	"github.com/google/uuid"
 )
 
 // PlaceSearchRequest represents the request to the place-search API
@@ -16,10 +18,10 @@ type PlaceSearchRequest struct {
 
 // PlaceSearchRow represents a single row in the place search request
 type PlaceSearchRow struct {
+	RowKey      string `json:"rowKey"`
 	CountryCode string `json:"countryCode"`
 	RegionCode  string `json:"regionCode"`
 	CityName    string `json:"cityName"`
-	MaxResults  int    `json:"maxResults,omitempty"`
 	SearchMode  string `json:"searchMode,omitempty"`
 }
 
@@ -33,6 +35,7 @@ type PlaceSearchResult struct {
 	Matches                    []Location `json:"matches"`
 	IsExplicitlyDoNotGeolocate bool       `json:"isExplicitlyDoNotGeolocate"`
 	Message                    string     `json:"message"`
+	RowKey                     string     `json:"rowKey"`
 }
 
 // Location represents a geographic location match
@@ -69,70 +72,6 @@ func ProvideTuningRecommendations(entry *Entry, ctx *ValidationContext) {
 	if entry.CountryCode == "" && entry.RegionCode == "" && entry.City == "" {
 		entry.AddStatusMessage(SuggestConfirmDoNotGeolocate)
 		entry.DoNotGeolocate = true
-	}
-}
-
-func TuneEntries(entries []Entry) {
-	const maxBatchSize = 1000 // API limit
-
-	// Build the batch request
-	var rows []PlaceSearchRow
-	var entryIndices []int // Track which entries correspond to which rows
-
-	for i, entry := range entries {
-		// Skip entries that should not be tuned or geolocated
-		if !entry.Tunable || entry.CountryCode == "" || entry.CountryCode == "ZZ" {
-			continue
-		}
-
-		rows = append(rows, PlaceSearchRow{
-			CountryCode: entry.CountryCode,
-			RegionCode:  entry.RegionCode,
-			CityName:    entry.City,
-			MaxResults:  1, // We only need the best match
-			SearchMode:  "auto",
-		})
-		entryIndices = append(entryIndices, i)
-	}
-
-	// If no entries to process, return early
-	if len(rows) == 0 {
-		return
-	}
-
-	// Process in batches of up to 1000 rows
-	for batchStart := 0; batchStart < len(rows); batchStart += maxBatchSize {
-		batchEnd := batchStart + maxBatchSize
-		if batchEnd > len(rows) {
-			batchEnd = len(rows)
-		}
-
-		batchRows := rows[batchStart:batchEnd]
-		batchIndices := entryIndices[batchStart:batchEnd]
-
-		// Call the place-search API for this batch
-		request := PlaceSearchRequest{Rows: batchRows}
-		results, err := callPlaceSearchAPI(request)
-		if err != nil {
-			// Log error but don't fail - just skip tuning for this batch
-			fmt.Printf("Warning: Failed to call place-search API for batch %d-%d: %v\n", batchStart, batchEnd, err)
-			continue
-		}
-
-		// Process results and populate tuned fields
-		for i, result := range results {
-			if i >= len(batchIndices) {
-				break
-			}
-
-			entryIdx := batchIndices[i]
-
-			// If there's a match, use it to populate tuned fields
-			if len(result.Matches) > 0 {
-				match := result.Matches[0]
-				entries[entryIdx].TunedEntry = match
-			}
-		}
 	}
 }
 
@@ -183,21 +122,41 @@ func GetEntriesFromServer(entry_rows []parser.Row, ctx *ValidationContext) ([]En
 	// Build the batch request
 	entries := make([]Entry, 0, len(entry_rows))
 	var rows []PlaceSearchRow
-	var entryIndices []int // Track which entries correspond to which rows
 	errEntries := make([]Entry, 0)
+	deDuplicateMap := make(map[string][]int)
+	deDuplicateUUIDMap := make(map[string][]int)
 
 	for i, entry := range entry_rows {
-		rows = append(rows, PlaceSearchRow{
-			CountryCode: entry.CountryCode,
-			RegionCode:  entry.RegionCode,
-			CityName:    entry.City,
-			MaxResults:  1, // We only need the best match
-			SearchMode:  "auto",
-		})
-		entryIndices = append(entryIndices, i)
+		// If all geolocation fields are empty, set country code to "ZZ" to trigger do-not-geolocate logic in the API
+		if entry.CountryCode == "" && entry.RegionCode == "" && entry.City == "" {
+			entry.CountryCode = "ZZ"
+		}
+
+		key := fmt.Sprintf("%s|%s|%s", entry.CountryCode, entry.RegionCode, entry.City)
+		if _, exists := deDuplicateMap[key]; !exists {
+			deDuplicateMap[key] = []int{i}
+		} else {
+			deDuplicateMap[key] = append(deDuplicateMap[key], i)
+		}
 
 		entries = append(entries, Entry{
 			Row: entry,
+		})
+	}
+
+	for _, indices := range deDuplicateMap {
+		uuid := uuid.New().String()
+		deDuplicateUUIDMap[uuid] = indices
+	}
+
+	for key, indices := range deDuplicateUUIDMap {
+		sampleEntry := entry_rows[indices[0]]
+		rows = append(rows, PlaceSearchRow{
+			RowKey:      key,
+			CountryCode: sampleEntry.CountryCode,
+			RegionCode:  sampleEntry.RegionCode,
+			CityName:    sampleEntry.City,
+			SearchMode:  "auto",
 		})
 	}
 
@@ -212,9 +171,7 @@ func GetEntriesFromServer(entry_rows []parser.Row, ctx *ValidationContext) ([]En
 		if batchEnd > len(rows) {
 			batchEnd = len(rows)
 		}
-
 		batchRows := rows[batchStart:batchEnd]
-		batchIndices := entryIndices[batchStart:batchEnd]
 
 		// Call the place-search API for this batch
 		request := PlaceSearchRequest{Rows: batchRows}
@@ -226,19 +183,15 @@ func GetEntriesFromServer(entry_rows []parser.Row, ctx *ValidationContext) ([]En
 		}
 
 		// Process results and populate tuned fields
-		for i, result := range results {
-			if i >= len(batchIndices) {
-				break
-			}
-
-			entryIdx := batchIndices[i]
-
+		for _, result := range results {
 			// If there's a match, use it to populate tuned fields
 			if len(result.Matches) > 0 {
 				match := result.Matches[0]
-				entries[entryIdx].TunedEntry = match
-			} else if hasIssue := CheckForIsuues(entries[entryIdx].CountryCode, entries[entryIdx].RegionCode, ctx); hasIssue {
-				errEntries = append(errEntries, entries[entryIdx])
+				for _, entryIdx := range deDuplicateUUIDMap[result.RowKey] {
+					entries[entryIdx].TunedEntry = match
+				}
+			} else if hasIssue := CheckForIsuues(&entry_rows[deDuplicateUUIDMap[result.RowKey][0]], ctx); hasIssue {
+				errEntries = append(errEntries, entries[deDuplicateUUIDMap[result.RowKey][0]])
 			}
 
 		}

@@ -493,15 +493,15 @@ func ValidatePostalCode(entry *Entry) {
 	}
 }
 
-func CheckForIsuues(country, region string, ctx *ValidationContext) bool {
-	if country == "" {
+func CheckForIsuues(entry *parser.Row, ctx *ValidationContext) bool {
+	if entry.CountryCode == "" {
 		return false
 	}
-	if _, exists := ctx.Countries[country]; exists {
+	if _, exists := ctx.Countries[entry.CountryCode]; exists {
 		return true
 	}
 
-	if _, exists := ctx.Regions[region]; region != "" && exists {
+	if _, exists := ctx.Regions[entry.RegionCode]; entry.RegionCode != "" && exists {
 		return true
 	}
 
