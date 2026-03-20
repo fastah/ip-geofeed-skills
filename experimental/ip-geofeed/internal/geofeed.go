@@ -82,6 +82,15 @@ func GeofeedsValidation(path string, limitEntries int) error {
 func GeofeedValidation(path, outputPath string, limitEntries int) error {
 	fmt.Println("Processing Geofeed:", path)
 
+	// // Open file (create if not exists, append mode)
+	// file, err := os.OpenFile(os.ExpandEnv("$HOME/Documents/app.log"), os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// defer file.Close()
+
+	// log.SetOutput(file)
+
 	// Parse CSV
 	rows, comments, invalidEntries, err := parser.ParseCSV(path, limitEntries)
 	if err != nil {
@@ -95,6 +104,7 @@ func GeofeedValidation(path, outputPath string, limitEntries int) error {
 	}
 	for _, errEntry := range errEntries {
 		fmt.Printf("Error validating entry: %v, %s, %s, %s, %s\n", errEntry.Line, errEntry.IPPrefix, errEntry.CountryCode, errEntry.RegionCode, errEntry.City)
+		// log.Printf("Error validating entry: %v, %s, %s, %s, %s\n", errEntry.Line, errEntry.IPPrefix, errEntry.CountryCode, errEntry.RegionCode, errEntry.City)
 	}
 
 	// Metadata summary
