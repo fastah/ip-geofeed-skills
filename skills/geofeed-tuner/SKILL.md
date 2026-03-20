@@ -11,7 +11,7 @@ description: >
 license: Apache-2.0
 metadata:
   author: Sid Mathur <support@getfastah.com>
-  version: "0.4"
+  version: "0.0.9"
 compatibility: Requires Python 3
 ---
 
