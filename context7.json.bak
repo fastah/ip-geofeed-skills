@@ -1,0 +1,18 @@
+{
+  "$schema": "https://context7.com/schema/context7.json",
+  "projectTitle": "Geofeed Tuner by Fastah",
+  "description": "Helps create, refine, and improve CSV-format IP geolocation feeds with opinionated recommendations beyond RFC 8805 compliance.",
+  "folders": [],
+  "excludeFolders": [
+    "experimental"
+  ],
+  "excludeFiles": [],
+  "rules": [
+    "Refer to the SKILL.md file in the geofeed-tuner skill."
+  ],
+  "previousVersions": [
+    {
+      "tag": "v0.0.7"
+    }
+  ]
+}
