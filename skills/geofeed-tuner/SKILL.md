@@ -112,7 +112,7 @@ The key requirements from RFC 8805 that this skill enforces are summarized below
 | Column | Field         | Required | Notes                                                      |
 |--------|---------------|----------|------------------------------------------------------------|
 | 1      | `ip_prefix`   | Yes      | CIDR notation; IPv4 or IPv6; must be a network address     |
-| 2      | `alpha2code`  | No       | ISO 3166-1 alpha-2 country code; empty = do-not-geolocate |
+| 2      | `alpha2code`  | No       | ISO 3166-1 alpha-2 country code; empty or "ZZ" = do-not-geolocate |
 | 3      | `region`      | No       | ISO 3166-2 subdivision code (e.g., `US-CA`)               |
 | 4      | `city`        | No       | Free-text city name; no authoritative validation set       |
 | 5      | `postal_code` | No       | **Deprecated** — must be left empty or absent             |
@@ -124,7 +124,7 @@ The key requirements from RFC 8805 that this skill enforces are summarized below
 - Subnet host bits must not be set (i.e., `192.168.1.1/24` is invalid; use `192.168.1.0/24`).
 - Applies only to **globally routable** unicast addresses — not private, loopback, link-local, or multicast space.
 
-**Do-not-geolocate:** An entry with an empty `alpha2code` (and empty region/city) is an explicit signal that the operator does not want geolocation applied to that prefix.
+**Do-not-geolocate:** An entry with an empty `alpha2code` or case-insensitive `ZZ` (irrespective of values of region/city) is an explicit signal that the operator does not want geolocation applied to that prefix.
 
 **Postal codes deprecated (Section 2.1.1.5):** The fifth column must not contain postal or ZIP codes. They are too fine-grained for IP-range mapping and raise privacy concerns.
 
@@ -251,7 +251,7 @@ Field definitions:
   - `HasError`: `true` if any message has `Type` `"ERROR"`.
   - `HasWarning`: `true` if any message has `Type` `"WARNING"`.
   - `HasSuggestion`: `true` if any message has `Type` `"SUGGESTION"`.
-  - `DoNotGeolocate` (entry): `true` if `CountryCode`, `RegionCode`, and `City` are all empty — the entry is an explicit do-not-geolocate signal.
+  - `DoNotGeolocate` (entry): `true` if `CountryCode` is empty or `"ZZ"` — the entry is an explicit do-not-geolocate signal.
   - `GeocodingHint`: Always empty string `""` in Phase 3. Reserved for future use.
   - `Tunable`: `true` if **any** message in the entry has `Checked: true`. Computed as logical OR across all messages' `Checked` values. This flag drives the "Tune" button visibility in the report.
 
