@@ -2041,18 +2041,19 @@
                     if (hasError)        color = '#dc3545';
                     else if (hasWarning) color = '#fd7e14';
                     else if (hasSugg)    color = '#17a2b8';
-                    const lineNum  = cells[CELL_INDEX.LINE]      ? cells[CELL_INDEX.LINE].textContent.trim()      : '';
-                    const ipPrefix = cells[CELL_INDEX.IP_PREFIX] ? cells[CELL_INDEX.IP_PREFIX].textContent.trim() : '';
                     const country  = cells[CELL_INDEX.COUNTRY]   ? cells[CELL_INDEX.COUNTRY].textContent.trim()   : '';
                     const region   = cells[CELL_INDEX.REGION]    ? cells[CELL_INDEX.REGION].textContent.trim()    : '';
                     const city     = cells[CELL_INDEX.CITY]      ? cells[CELL_INDEX.CITY].textContent.trim()      : '';
-                    const status   = hasError ? 'ERROR' : hasWarning ? 'WARNING' : hasSugg ? 'SUGGESTION' : 'OK';
                     const parts    = [];
-                    if (ipPrefix) parts.push('<b>' + escapeHtml(ipPrefix) + '</b>');
-                    if (city)     parts.push(escapeHtml(city));
-                    if (region)   parts.push(escapeHtml(region));
-                    if (country)  parts.push(escapeHtml(country));
-                    if (lineNum)  parts.push('<span style="color:#888;font-size:0.9em;">Line ' + escapeHtml(lineNum) + ' &bull; ' + status + '</span>');
+                    if (city && region && country) {
+                        parts.push('<b>' + escapeHtml(city) + '</b>' + ' &bull; ' + escapeHtml(region) + ' &bull; ' + escapeHtml(country));
+                    } else if (city && country) {
+                        parts.push('<b>' + escapeHtml(city) + '</b>' + ' &bull; ' + escapeHtml(country));
+                    } else if (region && country) {
+                        parts.push('<b>' + escapeHtml(region) + '</b>' + ' &bull; ' + escapeHtml(country));
+                    } else if (country)  {
+                        parts.push('<b>' + escapeHtml(country) + '</b>');
+                    } 
                     summaryRowData.push({
                         rowId:    row.id,
                         bbox:     row.getAttribute('data-bounding-box') || '',
@@ -2094,12 +2095,32 @@
             if (!summaryMapInstance || !summaryLayerGroup) return;
             currentMapMode = mode;
             summaryLayerGroup.clearLayers();
+
+            // Determine which row IDs are visible on the current page
+            const startIndex = (currentPage - 1) * rowsPerPage;
+            const endIndex = Math.min(startIndex + rowsPerPage, allRows.length);
+            const visibleIds = new Set();
+            for (let i = startIndex; i < endIndex; i++) {
+                visibleIds.add(allRows[i].id);
+            }
+
             const tempBoundsLayers = [];
+            const seenBboxKeys = new Set(); // deduplicate identical bounding boxes / h3 cell sets
+
             summaryRowData.forEach(data => {
+                // Only render entries whose row is on the current page
+                if (!visibleIds.has(data.rowId)) return;
+
                 if (mode === 'bbox') {
                     const raw = data.bbox.replace(/[\[\]]/g, '').trim();
                     const pts = raw.split(/[\s,]+/).map(Number);
                     if (pts.length !== 4 || pts.some(v => isNaN(v))) return;
+
+                    // Skip duplicate bounding boxes
+                    const bboxKey = pts.join(',');
+                    if (seenBboxKeys.has(bboxKey)) return;
+                    seenBboxKeys.add(bboxKey);
+
                     const [west, north, east, south] = pts;
                     const lb = [[south, west], [north, east]];
                     const rect = L.rectangle(lb, {
@@ -2118,6 +2139,11 @@
                     // H3 cells mode
                     const raw = data.h3cells.replace(/[\[\]]/g, '').trim();
                     if (!raw) return;
+
+                    // Skip duplicate h3 cell sets
+                    if (seenBboxKeys.has(raw)) return;
+                    seenBboxKeys.add(raw);
+
                     const cellIds = raw.split(/[\s,]+/).filter(Boolean);
                     cellIds.forEach(cellId => {
                         try {
@@ -2204,6 +2230,9 @@
             
             // Update page numbers
             updatePageNumbers(totalPages);
+            
+            // Refresh the Geographic Coverage Map to show only current-page entries
+            renderSummaryMapLayers(currentMapMode);
         }
         
         /**
