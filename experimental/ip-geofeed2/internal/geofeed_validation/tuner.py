@@ -77,9 +77,9 @@ def get_entries_from_server(entry_rows: list[Row], ctx: ValidationContext) -> tu
         entries.append(Entry(
             line=row.line,
             ip_prefix=row.ip_prefix,
-            country_code=row.country_code,
-            region_code=row.region_code,
-            city=row.city,
+            country_code=country_code,
+            region_code=region_code,
+            city=city,
             postal_code=row.postal_code,
         ))
 
@@ -89,12 +89,9 @@ def get_entries_from_server(entry_rows: list[Row], ctx: ValidationContext) -> tu
 
     for uid, indices in deduplicate_uuid_map.items():
         sample = entry_rows[indices[0]]
-        country_code = sample.country_code
-        if not country_code and not sample.region_code and not sample.city:
-            country_code = "ZZ"
         rows.append(PlaceSearchRow(
             row_key=uid,
-            country_code=country_code,
+            country_code=sample.country_code,
             region_code=sample.region_code,
             city_name=sample.city,
             search_mode="auto",
