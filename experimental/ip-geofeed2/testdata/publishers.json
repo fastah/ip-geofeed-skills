@@ -1,0 +1,386 @@
+[
+  {
+    "geofeed": "https://geofeed.llnw.net/",
+    "inetnum": "2803:9310:0000:0000:0000:0000:0000:0000/32",
+    "source": "LACNIC",
+    "country": "CO",
+    "city": "Medelin"
+  },
+  {
+    "geofeed": "https://www.airtek.com.ve/geofeeds.csv",
+    "inetnum": "2803:d700:0000:0000:0000:0000:0000:0000/32",
+    "source": "LACNIC",
+    "country": "VE",
+    "city": "Maracaibo"
+  },
+  {
+    "geofeed": "https://web.dauphintelecom.com/geofeed.csv",
+    "inetnum": "2803:1740:0000:0000:0000:0000:0000:0000/32",
+    "source": "LACNIC",
+    "country": "GF",
+    "city": "CAYENNE"
+  },
+  {
+    "geofeed": "https://geo.davosys.net/coral.csv",
+    "inetnum": "190.185.88.0/21",
+    "source": "LACNIC",
+    "country": "SX",
+    "city": "Cole Bay"
+  },
+  {
+    "geofeed": "https://edgeuno.com/geofeed.csv",
+    "inetnum": "200.25.102.0/25",
+    "source": "LACNIC",
+    "country": "EC",
+    "city": "Quito"
+  },
+  {
+    "geofeed": "https://portal.ciriontechnologies.com/portal/assets/fonts/geofeedsCirion.csv",
+    "inetnum": "2001:13b4:1c00:0000:0000:0000:0000:0000/40",
+    "source": "LACNIC",
+    "country": "VE",
+    "city": "Caracas"
+  },
+  {
+    "geofeed": "https://www.nextnet.com.pe/geofeed.csv",
+    "inetnum": "2803:8810:0000:0000:0000:0000:0000:0000/32",
+    "source": "LACNIC",
+    "country": "PE",
+    "city": "Lima"
+  },
+  {
+    "geofeed": "https://www.apoapsis.cl/geofeed.csv",
+    "inetnum": "2803:30d0:0000:0000:0000:0000:0000:0000/32",
+    "source": "LACNIC",
+    "country": "CL",
+    "city": "Punta Arenas"
+  },
+  {
+    "geofeed": "https://geo-feed.mds-telecom.com/geo-feed-MDS.csv",
+    "inetnum": "2803:0f60:0000:0000:0000:0000:0000:0000/32",
+    "source": "LACNIC",
+    "country": "VE",
+    "city": "Caracas"
+  },
+  {
+    "geofeed": "https://fibramax.ec/geofeeds.csv",
+    "inetnum": "2803:81c0:0000:0000:0000:0000:0000:0000/32",
+    "source": "LACNIC",
+    "country": "EC",
+    "city": "Quito"
+  },
+  {
+    "geofeed": "https://www.vernet.lv/geofeed.csv",
+    "inetnum": "185.118.76.0 - 185.118.79.255",
+    "source": "RIPE",
+    "netname": "LV-VERNET-20150921",
+    "country": "LV",
+    "org": "ORG-VL1-RIPE",
+    "admin-c": "DUMY-RIPE",
+    "tech-c": "DUMY-RIPE",
+    "mnt-by": "RIPE-NCC-HM-MNT; LV-VERNET-HM-MNT"
+  },
+  {
+    "geofeed": "https://www.in-berlin.de/geofeed.csv",
+    "inetnum": "2a0a:4580::/29",
+    "source": "RIPE",
+    "netname": "DE-IN-BERLIN-20161115",
+    "country": "DE",
+    "org": "ORG-INBE3-RIPE",
+    "admin-c": "DUMY-RIPE",
+    "tech-c": "DUMY-RIPE",
+    "mnt-by": "RIPE-NCC-HM-MNT; IN-BERLIN-MNT"
+  },
+  {
+    "geofeed": "https://geofeed.bahnhof.net/geofeed.csv",
+    "inetnum": "2001:9b2:c000::/34",
+    "source": "RIPE",
+    "netname": "BAHNHOF-DE",
+    "country": "DE",
+    "admin-c": "DUMY-RIPE",
+    "tech-c": "DUMY-RIPE",
+    "mnt-by": "BAHNHOF-NCC"
+  },
+  {
+    "geofeed": "https://www.forcepoint.com/geofeed/rfc-8805.csv",
+    "inetnum": "85.115.38.0 - 85.115.38.255",
+    "source": "RIPE",
+    "netname": "Forcepoint-Cloud",
+    "country": "SE",
+    "admin-c": "DUMY-RIPE",
+    "tech-c": "DUMY-RIPE",
+    "mnt-by": "BST-NOC"
+  },
+  {
+    "geofeed": "https://resource.net.strath.ac.uk/geo/unistrath.csv",
+    "inetnum": "2001:630:41::/48",
+    "source": "RIPE",
+    "netname": "UNI-STRATHCLYDE",
+    "country": "GB",
+    "admin-c": "DUMY-RIPE",
+    "tech-c": "DUMY-RIPE",
+    "mnt-by": "JANET-HOSTMASTER"
+  },
+  {
+    "geofeed": "https://geolocation.gtt.net/gtt_geolocation.csv",
+    "inetnum": "2a00:1750::/32",
+    "source": "RIPE",
+    "netname": "US-GTTCOMMUNICATIONS-20091127",
+    "country": "DE",
+    "org": "ORG-GCI2-RIPE",
+    "admin-c": "DUMY-RIPE",
+    "tech-c": "DUMY-RIPE",
+    "mnt-by": "AS3257-ROOT-MNT; RIPE-NCC-HM-MNT"
+  },
+  {
+    "geofeed": "https://noc.ilan.net.il/GGC/iucc-geo-feed-for-google.csv",
+    "inetnum": "2001:bf8::/32",
+    "source": "RIPE",
+    "netname": "IL-IUCC-20030508",
+    "country": "IL",
+    "org": "ORG-IIIC1-RIPE",
+    "admin-c": "DUMY-RIPE",
+    "tech-c": "DUMY-RIPE",
+    "mnt-by": "RIPE-NCC-HM-MNT; AS378-MNT"
+  },
+  {
+    "geofeed": "https://media.bezeqint.net/geofeed.csv",
+    "inetnum": "84.111.144.0 - 84.111.207.255",
+    "source": "RIPE",
+    "netname": "IL-BEZEQ-INTERNATIONAL-20040510",
+    "country": "IL",
+    "org": "ORG-IL9-RIPE",
+    "admin-c": "DUMY-RIPE",
+    "tech-c": "DUMY-RIPE",
+    "mnt-by": "RIPE-NCC-HM-MNT; AS8551-MNT"
+  },
+  {
+    "geofeed": "http://geofeed.dk.telia.net/geofeed.csv",
+    "inetnum": "2001:2092::/32",
+    "source": "RIPE",
+    "netname": "DK-TELIANET",
+    "country": "DK",
+    "org": "ORG-TCA24-RIPE",
+    "admin-c": "DUMY-RIPE",
+    "tech-c": "DUMY-RIPE",
+    "mnt-by": "TELIANET-LIR"
+  },
+  {
+    "geofeed": "https://redcom.ru/geo/redcom-geo.csv",
+    "inetnum": "91.235.148.0 - 91.235.148.255",
+    "source": "RIPE",
+    "netname": "RU-REDCOM-20191111",
+    "country": "RU",
+    "org": "ORG-RA23-RIPE",
+    "admin-c": "DUMY-RIPE",
+    "tech-c": "DUMY-RIPE",
+    "mnt-by": "REDCOM-MNT; RIPE-NCC-HM-MNT"
+  },
+    {
+    "geofeed": "https://profitserver.net/geofeed.csv",
+    "inetnum": "45.197.133.0 - 45.197.133.255",
+    "source": "AFRINIC",
+    "netname": "Profit_Tech_LLP",
+    "country": "GB",
+    "admin-c": "CIS1-AFRINIC",
+    "tech-c": "CIS1-AFRINIC",
+    "mnt-by": "CIL1-MNT; LARUS-SERVICE-MNT"
+  },
+  {
+    "geofeed": "https://hostealo.es/geofeed.csv",
+    "inetnum": "45.198.55.0 - 45.198.55.255",
+    "source": "AFRINIC",
+    "netname": "AP_Interactive_Solutions",
+    "country": "ES",
+    "admin-c": "CIS1-AFRINIC",
+    "tech-c": "CIS1-AFRINIC",
+    "mnt-by": "CIL1-MNT; LARUS-SERVICE-MNT"
+  },
+  {
+    "geofeed": "https://blsync.com/geo/web.csv",
+    "inetnum": "156.246.31.0 - 156.246.31.255",
+    "source": "AFRINIC",
+    "netname": "IT_BLSYNC",
+    "country": "KE",
+    "admin-c": "CIS1-AFRINIC",
+    "tech-c": "CIS1-AFRINIC",
+    "mnt-by": "CIL1-MNT; LARUS-SERVICE-MNT"
+  },
+  {
+    "geofeed": "https://as204136.net/geofeed.csv",
+    "inetnum": "169.239.202.0 - 169.239.202.255",
+    "source": "AFRINIC",
+    "netname": "archive-team-and-friends",
+    "country": "ZA",
+    "admin-c": "BC11-AFRINIC",
+    "tech-c": "BC11-AFRINIC",
+    "mnt-by": "ZAPPIE-MNT; FUSL-MNT"
+  },
+  {
+    "geofeed": "https://geofeed.stemconnect.net/",
+    "inetnum": "41.180.140.0 - 41.180.143.255",
+    "source": "AFRINIC",
+    "netname": "Stemconnect-Ireland",
+    "country": "IE",
+    "admin-c": "MvD2-AFRINIC; AB57-AFRINIC",
+    "tech-c": "MvD2-AFRINIC; AB57-AFRINIC",
+    "mnt-by": "XDSL-AB01-MNT"
+  },
+  {
+    "geofeed": "https://geofeed.carolinastelecom.com/",
+    "inetnum": "154.16.83.0 - 154.16.83.255",
+    "source": "AFRINIC",
+    "netname": "NZ-Network",
+    "country": "TH",
+    "admin-c": "IIT8",
+    "tech-c": "IIT8",
+    "mnt-by": "NetStack-MNT; netutils-mnt"
+  },
+  {
+    "geofeed": "https://worldfirstmunication.com/geofeed.csv",
+    "inetnum": "165.49.70.0 - 165.49.70.255",
+    "source": "AFRINIC",
+    "netname": "Managed-70",
+    "country": "ZA",
+    "admin-c": "RM25-AFRINIC",
+    "tech-c": "RM25-AFRINIC",
+    "mnt-by": "WIRULINK-MNT; netutils-mnt"
+  },
+  {
+    "geofeed": "https://geo.as213481.net/geofeed-as213481.csv",
+    "inetnum": "2c0f:fc78::/32",
+    "source": "AFRINIC",
+    "netname": "HEVIS_CO_SYSTEMS_PTY_LTD",
+    "country": "ZA",
+    "org": "ORG-HCSL1-AFRINIC",
+    "admin-c": "HV2-AFRINIC; DP34-AFRINIC",
+    "tech-c": "JK19-AFRINIC; HV2-AFRINIC; DP34-AFRINIC; JP33-AFRINIC",
+    "mnt-by": "AFRINIC-HM-MNT"
+  },
+  {
+    "geofeed": "https://marwan.ma/geofeed.csv",
+    "inetnum": "2001:4310::/32",
+    "source": "AFRINIC",
+    "netname": "CNRST-V6",
+    "country": "MA",
+    "org": "ORG-CNpl1-AFRINIC",
+    "admin-c": "HB1439-AFRINIC; RM2528-AFRINIC",
+    "tech-c": "HB1439-AFRINIC; SAAO2-AFRINIC",
+    "mnt-by": "AFRINIC-HM-MNT"
+  },
+  {
+    "geofeed": "https://geofeed.nedcloud.co.za/geofeed.csv",
+    "inetnum": "163.199.0.0 - 163.199.255.255",
+    "source": "AFRINIC",
+    "netname": "Nedbank-SA",
+    "country": "ZA",
+    "org": "ORG-NBL1-AFRINIC",
+    "admin-c": "NI30-AFRINIC; IM29-AFRINIC; JLC1-AFRINIC",
+    "tech-c": "NI30-AFRINIC; IM29-AFRINIC; JLC1-AFRINIC",
+    "mnt-by": "AFRINIC-HM-MNT"
+  },
+  {
+    "geofeed": "https://geofeed.telstraglobal.net/geofeed.csv",
+    "inetnum": "2403:e800:f00::/40",
+    "source": "APNIC",
+    "netname": "TELSTRAGLOBAL",
+    "country": "TW",
+    "admin-c": "TI55-AP",
+    "tech-c": "TI54-AP",
+    "mnt-by": "MAINT-HK-TI"
+  },
+  {
+    "geofeed": "https://lg.as6453.net/geo/geofeed.csv",
+    "inetnum": "43.241.42.0 - 43.241.42.255",
+    "source": "APNIC",
+    "netname": "TATAC-M3H-CCBB",
+    "country": "AU",
+    "admin-c": "II33-AP",
+    "tech-c": "IA75-AP",
+    "mnt-by": "MAINT-AP-AS6453"
+  },
+  {
+    "geofeed": "https://www.f5.com/content/dam/f5/geofeed.txt",
+    "inetnum": "2404:75c0::/32",
+    "source": "APNIC",
+    "netname": "VOLTERRA-AP",
+    "country": "SG",
+    "org": "ORG-VI9-AP",
+    "admin-c": "FIA15-AP",
+    "tech-c": "FIA15-AP",
+    "mnt-by": "APNIC-HM"
+  },
+  {
+    "geofeed": "https://geoip.i3d.net/geofeed.csv",
+    "inetnum": "2402:c080::/31",
+    "source": "APNIC",
+    "netname": "I3DNET-AP",
+    "country": "JP",
+    "org": "ORG-IB1-AP",
+    "admin-c": "IBA6-AP",
+    "tech-c": "IBA6-AP",
+    "mnt-by": "APNIC-HM"
+  },
+  {
+    "geofeed": "https://geofeed.transatel.com/geoloc.csv",
+    "inetnum": "202.37.82.0 - 202.37.82.255",
+    "source": "APNIC",
+    "netname": "TRANSATEL-AP-901-SK2",
+    "country": "SK",
+    "admin-c": "LG1449-AP",
+    "tech-c": "LG1449-AP",
+    "mnt-by": "MAINT-TRANSATEL1-AP"
+  },
+  {
+    "geofeed": "https://geofeed.wiredisp.com/ripe-geofeed.csv",
+    "inetnum": "103.99.87.0 - 103.99.87.255",
+    "source": "APNIC",
+    "netname": "TRANSATEL-AP-901-SK2",
+    "country": "VN",
+    "admin-c": "JM2346-AP",
+    "tech-c": "JM2346-AP",
+    "mnt-by": "MAINT-CLOUDCORPPTY-AU"
+  },
+  {
+    "geofeed": "https://config.zscaler.com/downloads/geofeed.csv",
+    "inetnum": "2400:7aa0:2b00::/40",
+    "source": "APNIC",
+    "netname": "TRANSATEL-AP-901-SK2",
+    "country": "MY",
+    "admin-c": "ZAPL2-AP",
+    "tech-c": "ZAPL2-AP",
+    "mnt-by": "MAINT-ZSCALER-AU"
+  },
+  {
+    "geofeed": "https://www.retn.net/geofeed/geofeed_v4.csv",
+    "inetnum": "103.190.126.0 - 103.190.126.255",
+    "source": "APNIC",
+    "netname": "TRANSATEL-AP-901-SK2",
+    "country": "SG",
+    "org": "ORG-RPL27-AP",
+    "admin-c": "RPLA21-AP",
+    "tech-c": "RPLA21-AP",
+    "mnt-by": "APNIC-HM"
+  },
+  {
+    "geofeed": "https://serverfield.com.tw/geofeed/geofeed.csv",
+    "inetnum": "2401:f540:7::/48",
+    "source": "APNIC",
+    "netname": "TRANSATEL-AP-901-SK2",
+    "country": "TW",
+    "admin-c": "SCLA22-AP",
+    "tech-c": "SCLA22-AP",
+    "mnt-by": "MAINT-SCL-TW"
+  },
+  {
+    "geofeed": "https://geofeed.zenlayer.net/geofeed.csv",
+    "inetnum": "162.128.0.0 - 162.128.255.255",
+    "source": "APNIC",
+    "netname": "ZEN-SG",
+    "country": "SG",
+    "org": "ORG-ZPL6-AP",
+    "admin-c": "ZSPL3-AP",
+    "tech-c": "ZSPL3-AP",
+    "mnt-by": "APNIC-HM"
+  }
+]

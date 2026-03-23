@@ -1,0 +1,9 @@
+# Sample geofeed data for testing
+# IP Prefix,Country,Region,City
+
+              
+
+1.2.3.0/24,US,US-CA,San Francisco
+2.3.4.0/24,GB,GB-LND,London
+3.4.5.0/24,FR,FR-75,Paris
+3.4.5.0/24,TW,,Taipei
