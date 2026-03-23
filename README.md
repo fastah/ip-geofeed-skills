@@ -69,9 +69,16 @@ Then invoke it with:
 
 Or simply ask Amp to tune a geofeed and it will auto-select the skill.
 
-### Use with `GitHub CoPilot CLI`
+## Use with `GitHub CoPilot CLI`
 
 You can use [CoPilot's CLI mode](https://github.com/features/copilot/cli) to work with [Agent Skills](https://docs.github.com/en/copilot/concepts/agents/about-copilot-cli#customizing-github-copilot-cli). 
+
+## Install via `Context7` marketplace
+
+[Context7](https://context7.com/docs/overview) is a AI skills directory listing and supports installing into multiple AI agents using `npx`
+```
+npx ctx7 skills search Geofeed Tuner for RFC 8805 CSV feeds
+```
 
 ## Troubleshooting
 
