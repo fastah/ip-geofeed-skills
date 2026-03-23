@@ -840,7 +840,9 @@
                 <td colspan="5">
                     <div class="issues-header">
                         <strong>Issues:</strong>
+                        {{if .Tunable}}
                         <button class="tune-all-btn" onclick="handleTuneButtonClick(this)">Tune</button>
+                        {{end}}
                     </div>
                     {{range .Messages}}
                     <div class="message-line" data-id="{{.ID}}">
