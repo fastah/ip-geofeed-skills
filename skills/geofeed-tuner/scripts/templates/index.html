@@ -840,7 +840,9 @@
                 <td colspan="5">
                     <div class="issues-header">
                         <strong>Issues:</strong>
+                        {{if .Tunable}}
                         <button class="tune-all-btn" onclick="handleTuneButtonClick(this)">Tune</button>
+                        {{end}}
                     </div>
                     {{range .Messages}}
                     <div class="message-line" data-id="{{.ID}}">
@@ -1171,15 +1173,15 @@
             const regionCode = cells[CELL_INDEX.REGION].textContent.trim();
             const cityName = cells[CELL_INDEX.CITY].textContent.trim();
 
-            if (!countryCode || !cityName) {
+            if (!countryCode) {
                 return null;
             }
 
             return {
+                rowKey: crypto.randomUUID(),
                 countryCode: countryCode,
                 regionCode: regionCode || '',
-                cityName: cityName,
-                maxResults: 10,
+                cityName: cityName || '',
                 searchMode: 'auto'
             };
         }

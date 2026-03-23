@@ -6,14 +6,24 @@ import (
 	"html/template"
 	"os"
 	"path/filepath"
+	"runtime"
 
 	"ip-geofeed/internal/geofeed_validation"
 )
 
+// getSkillTemplateDir returns the directory for external skill templates
+func getSkillTemplateDir() string {
+	_, filename, _, _ := runtime.Caller(0)
+	pkgDir := filepath.Dir(filename)
+	// From internal/html_template go up to project root
+	return filepath.Join(pkgDir, "..", "..", "..", "..", "skills", "geofeed-tuner", "scripts", "templates")
+}
+
 // GenerateHTMLReport generates an HTML validation report from entries
 func GenerateHTMLReport(entries []geofeed_validation.Entry, comments map[int]string, metadata geofeed_validation.Metadata, path string) error {
 	// Parse the template file
-	tmpl, err := template.ParseFiles("internal/html_template/report.html")
+	templateFile := filepath.Join(getSkillTemplateDir(), "index.html")
+	tmpl, err := template.ParseFiles(templateFile)
 	if err != nil {
 		return fmt.Errorf("parsing template file: %w", err)
 	}
