@@ -1273,28 +1273,28 @@
                 const mapId = `map-${index}`;
                 
                 // Determine primary location text: city > region > country
-                let primaryLocation = match.name;
-                let locationType = 'City';
+                let primaryLocation = match.placeName;
+                let locationType = 'city';
                 
                 if (!primaryLocation || primaryLocation.trim() === '') {
-                    primaryLocation = match.regionCode;
-                    locationType = 'Region';
+                    primaryLocation = match.stateCode;
+                    locationType = 'region';
                 }
                 
                 if (!primaryLocation || primaryLocation.trim() === '') {
                     primaryLocation = match.countryCode;
-                    locationType = 'Country';
+                    locationType = 'country';
                 }
                 
                 // Build secondary info (show what's available)
                 let secondaryInfo = [];
-                if (match.name && locationType !== 'City') {
-                    secondaryInfo.push(`City: ${match.name}`);
+                if (match.placeName && locationType !== 'city') {
+                    secondaryInfo.push(`City: ${match.placeName}`);
                 }
-                if (match.regionCode && locationType !== 'Region') {
-                    secondaryInfo.push(`Region: ${match.regionCode}`);
+                if (match.stateCode && locationType !== 'region') {
+                    secondaryInfo.push(`Region: ${match.stateCode}`);
                 }
-                if (match.countryCode && locationType !== 'Country') {
+                if (match.countryCode && locationType !== 'country') {
                     secondaryInfo.push(`Country: ${match.countryCode}`);
                 }
                     
@@ -1376,8 +1376,8 @@
             }
             
             cells[CELL_INDEX.COUNTRY].textContent = match.countryCode;
-            cells[CELL_INDEX.REGION].textContent = match.regionCode;
-            cells[CELL_INDEX.CITY].textContent = match.name;
+            cells[CELL_INDEX.REGION].textContent = match.stateCode;
+            cells[CELL_INDEX.CITY].textContent = match.placeName;
             
             // Find the previous values row (it's the first expand-details-row after the data row)
             const previousValuesRow = dataRow.nextElementSibling;
@@ -1416,16 +1416,17 @@
                 const bbox = match.boundingBox;
                 
                 if (bbox && bbox.length === 4) {
-                    const centerLat = (bbox[0] + bbox[2]) / 2;
-                    const centerLng = (bbox[1] + bbox[3]) / 2;
+                    const [west, north, east, south] = bbox;
+                    const centerLat = (south + north) / 2;
+                    const centerLng = (west + east) / 2;
                     
-                    const isPoint = (bbox[0] === bbox[2] && bbox[1] === bbox[3]);
+                    const isPoint = (west === east && north === south);
                     
                     if (isPoint) {
                         const offset = 0.05;
                         const bounds = [
-                            [bbox[0] - offset, bbox[1] - offset], 
-                            [bbox[2] + offset, bbox[3] + offset]  
+                            [south - offset, west - offset], 
+                            [north + offset, east + offset]  
                         ];
                         
                         L.rectangle(bounds, {
@@ -1439,8 +1440,8 @@
                         mapInstance.fitBounds(bounds, { padding: [30, 30] });
                     } else {
                         const bounds = [
-                            [bbox[0], bbox[1]], 
-                            [bbox[2], bbox[3]]  
+                            [south, west], 
+                            [north, east]  
                         ];
 
                         L.rectangle(bounds, {
@@ -1455,7 +1456,7 @@
                     }
 
                     L.marker([centerLat, centerLng]).addTo(mapInstance)
-                        .bindPopup(`<b>${match.name}</b><br>${match.regionCode}`);
+                        .bindPopup(`<b>${match.placeName}</b><br>${match.stateCode}`);
                     
                     maps[mapId] = mapInstance;
                     
