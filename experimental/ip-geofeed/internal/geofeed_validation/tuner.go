@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"ip-geofeed/internal/parser"
 
@@ -129,7 +130,7 @@ func GetEntriesFromServer(entry_rows []parser.Row, ctx *ValidationContext) ([]En
 
 	for i, entry := range entry_rows {
 		// If all geolocation fields are empty, set country code to "ZZ" to trigger do-not-geolocate logic in the API
-		if entry.CountryCode == "" && entry.RegionCode == "" && entry.City == "" {
+		if entry.CountryCode == "" || strings.ToUpper(entry.CountryCode) == "ZZ" {
 			entry.CountryCode = "ZZ"
 		}
 
@@ -151,7 +152,7 @@ func GetEntriesFromServer(entry_rows []parser.Row, ctx *ValidationContext) ([]En
 	}
 
 	for key, indices := range deDuplicateUUIDMap {
-		sampleEntry := entry_rows[indices[0]]
+		sampleEntry := entries[indices[0]]
 		rows = append(rows, PlaceSearchRow{
 			RowKey:      key,
 			CountryCode: sampleEntry.CountryCode,
@@ -189,7 +190,7 @@ func GetEntriesFromServer(entry_rows []parser.Row, ctx *ValidationContext) ([]En
 			if len(result.Matches) > 0 && !result.IsExplicitlyDoNotGeolocate {
 				match := result.Matches[0]
 
-				if hasIssue := CheckForIsuues(match.CountryCode, match.RegionCode, ctx); hasIssue {
+				if hasIssue := CheckForIssues(match.CountryCode, match.RegionCode, ctx); hasIssue {
 					errEntries = append(errEntries, entries[deDuplicateUUIDMap[result.RowKey][0]])
 					continue
 				}

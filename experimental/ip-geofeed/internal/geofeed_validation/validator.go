@@ -417,7 +417,7 @@ func IsPrivateAddress(ip net.IP) bool {
 
 // ValidateCountryCode validates the ISO 3166-1 country code
 func ValidateCountryCode(entry *Entry, ctx *ValidationContext) {
-	if entry.CountryCode == "" {
+	if entry.CountryCode == "" || strings.ToUpper(entry.CountryCode) == "ZZ" {
 		return // Empty is allowed
 	}
 
@@ -493,7 +493,7 @@ func ValidatePostalCode(entry *Entry) {
 	}
 }
 
-func CheckForIsuues(countryCode, regionCode string, ctx *ValidationContext) bool {
+func CheckForIssues(countryCode, regionCode string, ctx *ValidationContext) bool {
 	if _, exists := ctx.Countries[countryCode]; countryCode != "" && !exists {
 		return true
 	}
