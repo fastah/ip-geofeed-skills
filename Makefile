@@ -132,7 +132,7 @@ awesome-copilot-submit: awesome-copilot-clone awesome-copilot-skill awesome-copi
 #   make awesome-copilot-plugin-submit   # full end-to-end
 #   make awesome-copilot-plugin          # copy plugin files only
 
-AC_PLUGIN_NAME           := fastah-inc-ip-geolocation-tools
+AC_PLUGIN_NAME           := fastah-ip-geo-tools
 AC_PLUGIN_SRC            := .github/plugin
 AC_PLUGIN_BRANCH         := add-$(AC_PLUGIN_NAME)-plugin
 AC_PLUGIN_PR_TITLE       := Add $(AC_PLUGIN_NAME) plugin for RFC 8805 IP geolocation feeds 🤖🤖🤖
