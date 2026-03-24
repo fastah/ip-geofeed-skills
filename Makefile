@@ -99,8 +99,6 @@ awesome-copilot-validate:
 	cd "$(AWESOME_COPILOT_DIR)" && bash scripts/fix-line-endings.sh
 	@echo "Validation and build complete."
 
-AC_PR_BODY_FILE          := pr-body.md
-
 ## awesome-copilot-commit: stage and commit the skill changes
 awesome-copilot-commit:
 	cd "$(AWESOME_COPILOT_DIR)" && git add -A
@@ -116,7 +114,6 @@ awesome-copilot-pr: awesome-copilot-commit
 		--base staged \
 		--head "punit-fastah:$(AC_BRANCH)" \
 		--title "$(AC_PR_TITLE)" \
-		--body-file "$(CURDIR)/$(AC_PR_BODY_FILE)" \
 		--web
 
 ## awesome-copilot-submit: full workflow — clone fork, add skill, create PR
@@ -176,7 +173,6 @@ awesome-copilot-plugin-pr: awesome-copilot-plugin-commit
 		--base staged \
 		--head "punit-fastah:$(AC_PLUGIN_BRANCH)" \
 		--title "$(AC_PLUGIN_PR_TITLE)" \
-		--body-file "$(CURDIR)/$(AC_PR_BODY_FILE)" \
 		--web
 
 ## awesome-copilot-plugin-submit: full workflow — clone fork, add plugin, create PR
