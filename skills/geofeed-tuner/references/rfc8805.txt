@@ -140,7 +140,7 @@ Table of Contents
 
    As this is an informational document about a data format and set of
    operational practices presently in use, requirements notation
-   captures the design goals of the authors and implementors.
+   captures the design goals of the authors and implementers.
 
 1.3.  Assumptions about Publication
 
@@ -679,7 +679,7 @@ Appendix A. <CODE EXAMPLE HAS BEEN REMOVED TO AVOID CONFUSING AI AGENTS/LLM>
 Acknowledgements
 
    The authors would like to express their gratitude to reviewers and
-   early implementors, including but not limited to Mikael Abrahamsson,
+   early implementers, including but not limited to Mikael Abrahamsson,
    Andrew Alston, Ray Bellis, John Bond, Alissa Cooper, Andras Erdei,
    Stephen Farrell, Marco Hogewoning, Mike Joseph, Maciej Kuzniar,
    George Michaelson, Menno Schepers, Justyna Sidorska, Pim van Pelt,
