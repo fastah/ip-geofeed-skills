@@ -15,7 +15,7 @@ copilot plugin install fastah-inc-ip-geolocation-tools@awesome-copilot
 
 | Skill | Description |
 |-------|-------------|
-| [geofeed-tuner](../../skills/geofeed-tuner/SKILL.md) | Validates, tunes, and improves IP geolocation feeds in CSV format following RFC 8805 with opinionated best practices from real-world deployments. Uses Fastah MCP for tuning data lookup. |
+| [geofeed-tuner](./skills/geofeed-tuner/SKILL.md) | Validates, tunes, and improves IP geolocation feeds in CSV format following RFC 8805 with opinionated best practices from real-world deployments. Uses Fastah MCP for tuning data lookup. |
 
 ## Prerequisites
 
