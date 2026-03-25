@@ -1,24 +1,40 @@
-.PHONY: check-deps update-iso-tables clean-runs clean-tuner-run clean-geofeed-run \
+.PHONY: check-deps check-iso-deps check-release-deps \
+       update-iso-tables clean-runs clean-tuner-run clean-geofeed-run \
+       version version-bump release \
        awesome-copilot-clone awesome-copilot-branch awesome-copilot-skill \
        awesome-copilot-validate awesome-copilot-commit awesome-copilot-pr \
-       awesome-copilot-submit \
+       awesome-copilot-submit awesome-copilot-update \
        awesome-copilot-plugin awesome-copilot-plugin-validate \
        awesome-copilot-plugin-commit awesome-copilot-plugin-pr \
-       awesome-copilot-plugin-submit
+       awesome-copilot-plugin-submit awesome-copilot-plugin-update
 
 ASSETS_DIR := skills/geofeed-tuner/assets
 
 # Source: https://github.com/pycountry/pycountry/tree/main/src/pycountry/databases
 PYCOUNTRY_BASE_URL := https://raw.githubusercontent.com/pycountry/pycountry/main/src/pycountry/databases
 
-## check-deps: verify required tools (curl, jq) are installed
-check-deps:
+## check-iso-deps: verify tools needed for ISO table updates (curl, jq)
+check-iso-deps:
 	@command -v curl >/dev/null 2>&1 || { echo "ERROR: curl is required. Install it and retry." >&2; exit 1; }
 	@command -v jq   >/dev/null 2>&1 || { echo "ERROR: jq is required. Install it and retry." >&2; exit 1; }
+	@echo "ISO deps OK."
+
+## check-release-deps: verify tools needed for version bump, release, and awesome-copilot workflows
+check-release-deps:
+	@command -v sed   >/dev/null 2>&1 || { echo "ERROR: sed is required. Install it and retry." >&2; exit 1; }
+	@command -v jq    >/dev/null 2>&1 || { echo "ERROR: jq is required. Install it and retry." >&2; exit 1; }
+	@command -v git   >/dev/null 2>&1 || { echo "ERROR: git is required. Install it and retry." >&2; exit 1; }
+	@command -v gh    >/dev/null 2>&1 || { echo "ERROR: gh (GitHub CLI) is required. Install it and retry." >&2; exit 1; }
+	@command -v rsync >/dev/null 2>&1 || { echo "ERROR: rsync is required. Install it and retry." >&2; exit 1; }
+	@command -v npm   >/dev/null 2>&1 || { echo "ERROR: npm is required. Install it and retry." >&2; exit 1; }
+	@echo "Release deps OK."
+
+## check-deps: verify all required tools are installed
+check-deps: check-iso-deps check-release-deps
 	@echo "All required tools are present."
 
 ## update-iso-tables: refresh ISO 3166-1 and 3166-2 tables from pycountry (run weekly or via CI cron)
-update-iso-tables: check-deps
+update-iso-tables: check-iso-deps
 	@echo "Updating $(ASSETS_DIR)/iso3166-1.json ..."
 	@tmp=$$(mktemp); trap 'rm -f "$$tmp"' EXIT; \
 	curl -fsSL "$(PYCOUNTRY_BASE_URL)/iso3166-1.json" \
@@ -45,6 +61,61 @@ clean-geofeed-run:
 	@find experimental/ip-geofeed/run -type f ! -name '.gitignore' -delete
 	@find experimental/ip-geofeed/run -mindepth 2 -type d -delete
 	@echo "Cleared files in experimental/ip-geofeed/run (kept first-level dirs)"
+
+# ─── version & release workflow ──────────────────────────────────────────
+# Version is tracked in three files:
+#   - skills/geofeed-tuner/SKILL.md          (YAML frontmatter)
+#   - .github/skills/geofeed-tuner/SKILL.md  (YAML frontmatter)
+#   - .github/plugin/plugin.json             (JSON)
+#
+# Usage:
+#   make version            # show current version
+#   make version-bump       # increment patch version (0.0.9 → 0.0.10)
+#   make release            # commit version bump, tag, push, create GitHub release
+#   make awesome-copilot-update        # bump + release + update skill in awesome-copilot
+#   make awesome-copilot-plugin-update # bump + release + update plugin in awesome-copilot
+
+SKILL_MD_FILE := skills/geofeed-tuner/SKILL.md
+PLUGIN_JSON    := .github/plugin/plugin.json
+
+# Read current version from the canonical SKILL.md
+CURRENT_VERSION = $(shell sed -n 's/^[[:space:]]*version:[[:space:]]*"\(.*\)"/\1/p' $(SKILL_MD_FILE) | head -1)
+
+## version: display the current version
+version:
+	@echo "$(CURRENT_VERSION)"
+
+## version-bump: increment the patch component of the version across all files
+version-bump:
+	@curr="$(CURRENT_VERSION)"; \
+	major=$$(echo "$$curr" | cut -d. -f1); \
+	minor=$$(echo "$$curr" | cut -d. -f2); \
+	patch=$$(echo "$$curr" | cut -d. -f3); \
+	new_patch=$$((patch + 1)); \
+	new_ver="$$major.$$minor.$$new_patch"; \
+	echo "Bumping version: $$curr → $$new_ver"; \
+	sed -i "s/version: \"$$curr\"/version: \"$$new_ver\"/" "$(SKILL_MD_FILE)"; \
+	echo "  Updated $(SKILL_MD_FILE)"; \
+	jq --arg v "$$new_ver" '.version = $$v' "$(PLUGIN_JSON)" > "$(PLUGIN_JSON).tmp" \
+		&& mv "$(PLUGIN_JSON).tmp" "$(PLUGIN_JSON)"; \
+	echo "  Updated $(PLUGIN_JSON)"; \
+	echo "Version is now $$new_ver"
+
+## release: commit the version bump, create a git tag, push, and create a GitHub release
+release: version-bump
+	@command -v gh >/dev/null 2>&1 || { echo "ERROR: gh (GitHub CLI) is required." >&2; exit 1; }
+	@ver="$(CURRENT_VERSION)"; \
+	git add $(SKILL_MD_FILE) $(PLUGIN_JSON); \
+	git diff --cached --quiet && echo "Nothing to commit — version files unchanged." || \
+		git commit -m "chore: bump version to $$ver"; \
+	git tag -a "v$$ver" -m "Release v$$ver" 2>/dev/null || { echo "Tag v$$ver already exists — skipping tag."; }; \
+	git push origin HEAD --follow-tags; \
+	echo "Creating GitHub release v$$ver …"; \
+	gh release create "v$$ver" \
+		--repo fastah/ip-geofeed-skills \
+		--title "v$$ver" \
+		--generate-notes \
+	|| echo "Release v$$ver may already exist."
 
 # ─── awesome-copilot contribution workflow ───────────────────────────────
 # Clones the fork, copies the geofeed-tuner skill, and opens a PR
@@ -119,6 +190,10 @@ awesome-copilot-pr: awesome-copilot-commit
 ## awesome-copilot-submit: full workflow — clone fork, add skill, create PR
 awesome-copilot-submit: awesome-copilot-clone awesome-copilot-skill awesome-copilot-validate awesome-copilot-pr
 
+## awesome-copilot-update: bump version, release, then submit updated skill to awesome-copilot
+awesome-copilot-update: release awesome-copilot-submit
+	@echo "Done — version bumped, released, and skill PR opened against awesome-copilot."
+
 # ─── awesome-copilot plugin contribution workflow ────────────────────────
 # Creates a plugin in the awesome-copilot fork that bundles the
 # already-merged geofeed-tuner skill.
@@ -145,9 +220,6 @@ awesome-copilot-plugin: awesome-copilot-plugin-branch
 	@echo "Copying $(AC_PLUGIN_SRC) → $(AWESOME_COPILOT_DIR)/plugins/$(AC_PLUGIN_NAME) …"
 	@mkdir -p "$(AWESOME_COPILOT_DIR)/plugins/$(AC_PLUGIN_NAME)/.github/plugin"
 	rsync -av "$(AC_PLUGIN_SRC)/plugin.json" "$(AWESOME_COPILOT_DIR)/plugins/$(AC_PLUGIN_NAME)/.github/plugin/plugin.json"
-	@echo "Copying $(AC_SKILL_SRC) → $(AWESOME_COPILOT_DIR)/plugins/$(AC_PLUGIN_NAME)/skills/$(AC_SKILL_NAME) …"
-	@mkdir -p "$(AWESOME_COPILOT_DIR)/plugins/$(AC_PLUGIN_NAME)/skills/$(AC_SKILL_NAME)"
-	rsync -av --delete --exclude='run/' "$(AC_SKILL_SRC)/" "$(AWESOME_COPILOT_DIR)/plugins/$(AC_PLUGIN_NAME)/skills/$(AC_SKILL_NAME)/"
 	@echo "Copying plugin README …"
 	rsync -av "README-PLUGIN.md" "$(AWESOME_COPILOT_DIR)/plugins/$(AC_PLUGIN_NAME)/README.md"
 
@@ -178,3 +250,9 @@ awesome-copilot-plugin-pr: awesome-copilot-plugin-commit
 ## awesome-copilot-plugin-submit: full workflow — clone fork, add plugin, create PR
 awesome-copilot-plugin-submit: awesome-copilot-clone awesome-copilot-plugin awesome-copilot-plugin-validate awesome-copilot-plugin-pr
 	@echo "Done — PR opened against github/awesome-copilot staged branch."
+
+## awesome-copilot-plugin-update: bump version, release, then submit updated plugin to awesome-copilot
+awesome-copilot-plugin-update: release awesome-copilot-plugin-submit
+	@echo "Done — version bumped, released, and plugin PR opened against awesome-copilot."
+
+
