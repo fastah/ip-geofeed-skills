@@ -115,6 +115,7 @@ release: version-bump
 		--repo fastah/ip-geofeed-skills \
 		--title "v$$ver" \
 		--generate-notes \
+		--prerelease \
 	|| echo "Release v$$ver may already exist."
 
 # ─── awesome-copilot contribution workflow ───────────────────────────────
