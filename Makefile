@@ -6,7 +6,8 @@
        awesome-copilot-submit awesome-copilot-update \
        awesome-copilot-plugin awesome-copilot-plugin-validate \
        awesome-copilot-plugin-commit awesome-copilot-plugin-pr \
-       awesome-copilot-plugin-submit awesome-copilot-plugin-update
+       awesome-copilot-plugin-submit awesome-copilot-plugin-update \
+       context7-refresh
 
 ASSETS_DIR := skills/geofeed-tuner/assets
 
@@ -255,5 +256,15 @@ awesome-copilot-plugin-submit: awesome-copilot-clone awesome-copilot-plugin awes
 ## awesome-copilot-plugin-update: bump version, release, then submit updated plugin to awesome-copilot
 awesome-copilot-plugin-update: release awesome-copilot-plugin-submit
 	@echo "Done — version bumped, released, and plugin PR opened against awesome-copilot."
+
+# ─── Context7 library refresh ───────────────────────────────────────────
+# Requires $CONTEXT7_API_SECRET env var to be set.
+## context7-refresh: notify Context7 to re-index the repository
+context7-refresh:
+	@[ -n "$$CONTEXT7_API_SECRET" ] || { echo "ERROR: CONTEXT7_API_SECRET is not set." >&2; exit 1; }
+	curl -s -X POST https://context7.com/api/v1/refresh \
+		-H "Content-Type: application/json" \
+		-H "Authorization: Bearer $$CONTEXT7_API_SECRET" \
+		-d '{"libraryName": "/fastah/ip-geofeed-skills"}' 
 
 
