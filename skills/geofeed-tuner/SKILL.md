@@ -574,9 +574,9 @@ Rules:
 
 #### Step 2: Invoke Fastah MCP Tool
 
-- An example `mcp.json` style configuration of Fastah MCP server is as follows:
+- An example configuration for the Fastah MCP server is as follows:
 ```json
-    "fastah-ip-geofeed": {
+    "fastahIpGeofeed": {
       "type": "http",
       "url": "https://mcp.fastah.ai/mcp"
     }
