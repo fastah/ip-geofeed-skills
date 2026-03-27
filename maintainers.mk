@@ -136,8 +136,8 @@ AWESOME_COPILOT_FORK     := https://github.com/punit-fastah/awesome-copilot.git
 AWESOME_COPILOT_UPSTREAM := https://github.com/github/awesome-copilot.git
 AC_SKILL_NAME            := geofeed-tuner
 AC_SKILL_SRC             := skills/$(AC_SKILL_NAME)
-AC_BRANCH                := add-$(AC_SKILL_NAME)-skill
-AC_PR_TITLE              := Add $(AC_SKILL_NAME) skill for RFC 8805 IP geolocation feeds 🤖🤖🤖
+AC_BRANCH                := update-$(AC_SKILL_NAME)-skill
+AC_PR_TITLE              := Update $(AC_SKILL_NAME) skill with latest changes from Fastah repo 🤖🤖🤖
 
 ## awesome-copilot-clone: clone fork (or refresh) and install deps
 awesome-copilot-clone:
@@ -176,7 +176,7 @@ awesome-copilot-validate:
 awesome-copilot-commit:
 	cd "$(AWESOME_COPILOT_DIR)" && git add -A
 	cd "$(AWESOME_COPILOT_DIR)" && { git diff --cached --quiet && echo "Nothing to commit." || \
-		git commit -m "Add $(AC_SKILL_NAME) skill for RFC 8805 IP geolocation feeds"; }
+		git commit -m "chore: update $(AC_SKILL_NAME) skill"; }
 
 ## awesome-copilot-pr: push branch and open PR targeting staged on upstream
 awesome-copilot-pr: awesome-copilot-commit
@@ -208,8 +208,8 @@ awesome-copilot-update: release awesome-copilot-submit
 
 AC_PLUGIN_NAME           := fastah-ip-geo-tools
 AC_PLUGIN_SRC            := .github/plugin
-AC_PLUGIN_BRANCH         := add-$(AC_PLUGIN_NAME)-plugin
-AC_PLUGIN_PR_TITLE       := Add $(AC_PLUGIN_NAME) plugin for RFC 8805 IP geolocation feeds 🤖🤖🤖
+AC_PLUGIN_BRANCH         := update-$(AC_PLUGIN_NAME)-plugin
+AC_PLUGIN_PR_TITLE       := Update $(AC_PLUGIN_NAME) plugin with latest changes from Fastah repo 🤖🤖🤖
 
 ## awesome-copilot-plugin-branch: create a feature branch from staged for plugin
 awesome-copilot-plugin-branch:
@@ -224,6 +224,8 @@ awesome-copilot-plugin: awesome-copilot-plugin-branch
 	rsync -av "$(AC_PLUGIN_SRC)/plugin.json" "$(AWESOME_COPILOT_DIR)/plugins/$(AC_PLUGIN_NAME)/.github/plugin/plugin.json"
 	@echo "Copying plugin README …"
 	rsync -av "README-PLUGIN.md" "$(AWESOME_COPILOT_DIR)/plugins/$(AC_PLUGIN_NAME)/README.md"
+	@echo "Copying plugin MCP configuration …"
+	rsync -av "mcp-plugin.json" "$(AWESOME_COPILOT_DIR)/plugins/$(AC_PLUGIN_NAME)/.mcp.json"
 
 ## awesome-copilot-plugin-validate: validate plugin, rebuild README, fix line endings
 awesome-copilot-plugin-validate:
@@ -236,7 +238,7 @@ awesome-copilot-plugin-validate:
 awesome-copilot-plugin-commit:
 	cd "$(AWESOME_COPILOT_DIR)" && git add -A
 	cd "$(AWESOME_COPILOT_DIR)" && { git diff --cached --quiet && echo "Nothing to commit." || \
-		git commit -m "Add $(AC_PLUGIN_NAME) plugin for RFC 8805 IP geolocation feeds"; }
+		git commit -m "chore: update $(AC_PLUGIN_NAME) plugin"; }
 
 ## awesome-copilot-plugin-pr: push branch and open PR targeting staged on upstream
 awesome-copilot-plugin-pr: awesome-copilot-plugin-commit
