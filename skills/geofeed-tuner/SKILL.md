@@ -184,6 +184,7 @@ JSON keys map directly to template placeholders like `{{.CountryCode}}`, `{{.Has
   "RegionLevelAccuracy": 0,
   "CountryLevelAccuracy": 0,
   "DoNotGeolocate": 0,
+  "OriginalCsvCols": 0,
 
   "Entries": [
     {
@@ -233,6 +234,7 @@ Field definitions:
 - `RegionLevelAccuracy`: Count of valid entries where `RegionCode` is non-empty and `City` is empty.
 - `CountryLevelAccuracy`: Count of valid entries where `CountryCode` is non-empty, `RegionCode` is empty, and `City` is empty.
 - `DoNotGeolocate` (metadata): Count of valid entries where `CountryCode`, `RegionCode`, and `City` are all empty.
+- `OriginalCsvCols`: The maximum number of columns seen across all valid data rows in the original CSV input (before padding). Used to preserve the original column structure when generating downloadable CSV output.
 
 **Entry fields:**
 - `Entries`: Array of objects, one per data row, with the following per-entry fields:
@@ -272,7 +274,7 @@ When adding messages to an entry, use the `ID`, `Type`, `Text`, and `Checked` va
 | `1303` | `ERROR`      | Region code does not match the specified country code                                          | `true`  | Region Code Analysis: mismatch         |
 | `1401` | `ERROR`      | Invalid city name: placeholder value is not allowed                                            | `false` | City Name Analysis: placeholder        |
 | `1402` | `ERROR`      | Invalid city name: abbreviated or code-based value detected                                    | `true`  | City Name Analysis: abbreviation       |
-| `2401` | `WARNING`    | City name formatting is inconsistent; consider normalizing the value                           | `true`  | City Name Analysis: formatting         |
+| `3401` | `SUGGESTION` | City name formatting is inconsistent; consider normalizing the value                           | `true`  | City Name Analysis: formatting         |
 | `1501` | `ERROR`      | Postal codes are deprecated by RFC 8805 and must be removed for privacy reasons                | `true`  | Postal Code Check                      |
 | `3301` | `SUGGESTION` | Region is usually unnecessary for small territories; consider removing the region value        | `true`  | Tuning: small territory region         |
 | `3402` | `SUGGESTION` | City-level granularity is usually unnecessary for small territories; consider removing the city value | `true`  | Tuning: small territory city           |
@@ -336,7 +338,7 @@ The goal is to ensure the file can be parsed reliably and normalized into a **co
   - If `pandas` is available, use it for CSV parsing.
   - Otherwise, fall back to Python's built-in `csv` module.
 
-  - Ensure the CSV contains **exactly 4 or 5 logical columns**.
+  - Ensure the CSV contains **1 to 5 logical columns**. Rows with fewer than 4 columns must be padded with empty strings to reach 4 columns.
   - Comment lines are allowed.
   - A header row **may or may not** be present.
   - If no header row exists, assume the implicit column order:
@@ -490,13 +492,13 @@ This phase runs after structural checks pass.
         - `MAA`
       - Message ID: `1402`
 
-  - **WARNING**
-    - Report the following conditions as **WARNING**:
+  - **SUGGESTION**
+    - Report the following conditions as **SUGGESTION**:
     - **Inconsistent casing or formatting**
       - Condition: City names with inconsistent casing, spacing, or formatting that may reduce data quality, for example:
         - `HongKong` vs `Hong Kong`
         - Mixed casing or unexpected script usage
-      - Message ID: `2401`
+      - Message ID: `3401`
 
 ##### Postal Code Check
   - RFC 8805 Section 2.1.1.5 explicitly **deprecates postal or ZIP codes**.
@@ -667,6 +669,7 @@ Replace each `{{.Metadata.X}}` placeholder in the template with the correspondin
 | `{{.Metadata.RegionLevelAccuracy}}`    | `RegionLevelAccuracy`             |
 | `{{.Metadata.CountryLevelAccuracy}}`   | `CountryLevelAccuracy`            |
 | `{{.Metadata.DoNotGeolocate}}`         | `DoNotGeolocate` (metadata)       |
+| `{{.Metadata.OriginalCsvCols}}`        | `OriginalCsvCols`                 |
 
 **Note on `{{.Metadata.Timestamp}}`:** This placeholder appears inside a JavaScript `new Date(...)` call. Replace it with the raw integer value (no HTML escaping needed for a numeric literal inside `<script>`). All other metadata values should be HTML-escaped since they appear inside HTML element text.
 
