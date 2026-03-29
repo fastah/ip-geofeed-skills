@@ -204,10 +204,14 @@ func ParseCSV(fileSource string, limit int) ([]Row, map[int]string, int, error) 
 			continue
 		}
 
-		// Only accept rows with 4 or 5 columns
-		if len(record) < 4 || len(record) > 5 {
+		// Accept rows with 1 to 5 columns, pad missing columns with empty strings
+		if len(record) < 1 || len(record) > 5 {
 			invalidEntries++
 			continue
+		}
+
+		for len(record) < 4 {
+			record = append(record, "")
 		}
 
 		row := Row{
