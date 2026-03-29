@@ -56,22 +56,22 @@ func ProvideTuningRecommendations(entry *Entry, ctx *ValidationContext) {
 
 	// Region specified for small territory
 	if isSmallTerritory && entry.RegionCode != "" {
-		entry.AddStatusMessage(SuggestRegionUnnecessarySmallTerritory)
+		entry.AddStatusMessage(RegionUnnecessarySmallTerritory)
 	}
 
 	// City specified for small territory
 	if isSmallTerritory && entry.City != "" {
-		entry.AddStatusMessage(SuggestCityUnnecessarySmallTerritory)
+		entry.AddStatusMessage(CityUnnecessarySmallTerritory)
 	}
 
 	// Missing region when city is specified (not for small territories)
 	if !isSmallTerritory && entry.City != "" && entry.RegionCode == "" {
-		entry.AddStatusMessage(SuggestRegionRecommendedWithCity)
+		entry.AddStatusMessage(RegionRecommendedWithCity)
 	}
 
 	// Unspecified geolocation
 	if entry.CountryCode == "" && entry.RegionCode == "" && entry.City == "" {
-		entry.AddStatusMessage(SuggestConfirmDoNotGeolocate)
+		entry.AddStatusMessage(ConfirmDoNotGeolocate)
 		entry.DoNotGeolocate = true
 	}
 }

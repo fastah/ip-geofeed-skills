@@ -337,14 +337,14 @@ func GetNetnameTablePath(netname string) string {
 // ValidateIPPrefix validates the IP prefix format and properties
 func ValidateIPPrefix(entry *Entry) {
 	if entry.IPPrefix == "" {
-		entry.AddStatusMessage(ErrIPPrefixEmpty)
+		entry.AddStatusMessage(IPPrefixEmpty)
 		return
 	}
 
 	// Try to parse as CIDR
 	_, ipNet, err := net.ParseCIDR(entry.IPPrefix)
 	if err != nil {
-		entry.AddStatusMessage(ErrIPPrefixInvalid)
+		entry.AddStatusMessage(IPPrefixInvalid)
 		return
 	}
 
@@ -358,7 +358,7 @@ func ValidateIPPrefix(entry *Entry) {
 
 	// Check if it's a public address
 	if IsPrivateAddress(ipNet.IP) {
-		entry.AddStatusMessage(ErrIPPrefixNonPublic)
+		entry.AddStatusMessage(IPPrefixNonPublic)
 		return
 	}
 
@@ -366,12 +366,12 @@ func ValidateIPPrefix(entry *Entry) {
 	if entry.IPVersion == "IPv4" {
 		ones, _ := ipNet.Mask.Size()
 		if ones < 22 {
-			entry.AddStatusMessage(SuggestIPv4PrefixLarge)
+			entry.AddStatusMessage(IPv4PrefixLarge)
 		}
 	} else { // IPv6
 		ones, _ := ipNet.Mask.Size()
 		if ones < 64 {
-			entry.AddStatusMessage(SuggestIPv6PrefixLarge)
+			entry.AddStatusMessage(IPv6PrefixLarge)
 		}
 	}
 }
@@ -422,7 +422,7 @@ func ValidateCountryCode(entry *Entry, ctx *ValidationContext) {
 	}
 
 	if _, exists := ctx.Countries[entry.CountryCode]; !exists {
-		entry.AddStatusMessage(ErrCountryCodeInvalid)
+		entry.AddStatusMessage(CountryCodeInvalid)
 	}
 }
 
@@ -435,13 +435,13 @@ func ValidateRegionCode(entry *Entry, ctx *ValidationContext) {
 	// Check format: COUNTRY-SUBDIVISION
 	regionPattern := regexp.MustCompile(`^[A-Z]{2}-[A-Z0-9]{1,3}$`)
 	if !regionPattern.MatchString(entry.RegionCode) {
-		entry.AddStatusMessage(ErrRegionCodeFormat)
+		entry.AddStatusMessage(RegionCodeFormat)
 		return
 	}
 
 	// Check if region exists in ISO 3166-2
 	if _, exists := ctx.Regions[entry.RegionCode]; !exists {
-		entry.AddStatusMessage(ErrRegionCodeInvalid)
+		entry.AddStatusMessage(RegionCodeInvalid)
 		return
 	}
 
@@ -449,7 +449,7 @@ func ValidateRegionCode(entry *Entry, ctx *ValidationContext) {
 	if entry.CountryCode != "" {
 		regionCountry := strings.Split(entry.RegionCode, "-")[0]
 		if regionCountry != entry.CountryCode {
-			entry.AddStatusMessage(ErrRegionCodeMismatch)
+			entry.AddStatusMessage(RegionCodeMismatch)
 		}
 	}
 }
@@ -465,7 +465,7 @@ func ValidateCityName(entry *Entry, ctx *ValidationContext) {
 	// Check for placeholder values
 	for _, placeholder := range placeholderValues {
 		if cityLower == placeholder {
-			entry.AddStatusMessage(ErrCityPlaceholder)
+			entry.AddStatusMessage(CityPlaceholder)
 			return
 		}
 	}
@@ -473,7 +473,7 @@ func ValidateCityName(entry *Entry, ctx *ValidationContext) {
 	// Check for abbreviated values
 	for _, abbrev := range abbreviatedValues {
 		if cityLower == abbrev {
-			entry.AddStatusMessage(ErrCityAbbreviated)
+			entry.AddStatusMessage(CityAbbreviated)
 			return
 		}
 	}
@@ -482,14 +482,14 @@ func ValidateCityName(entry *Entry, ctx *ValidationContext) {
 	if strings.Contains(entry.City, "  ") || // Double spaces
 		(strings.ToUpper(entry.City) == entry.City && len(entry.City) > 3) || // ALL CAPS
 		regexp.MustCompile(`[A-Z][a-z]+[A-Z]`).MatchString(entry.City) { // HongKong style
-		entry.AddStatusMessage(WarnCityFormattingBad)
+		entry.AddStatusMessage(CityFormattingBad)
 	}
 }
 
 // ValidatePostalCode checks that postal codes are not included (deprecated by RFC 8805)
 func ValidatePostalCode(entry *Entry) {
 	if entry.PostalCode != "" {
-		entry.AddStatusMessage(ErrPostalCodeDeprecated)
+		entry.AddStatusMessage(PostalCodeDeprecated)
 	}
 }
 
