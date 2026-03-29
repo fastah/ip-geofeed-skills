@@ -50,25 +50,50 @@ The following directories contain static distribution assets. **Do not create, m
 | `references/`  | RFC specifications and code snippets for reference         |
 | `scripts/`     | Executable code and HTML template files for reports        |
 
-### Working Directories (Generated Content)
+### Working Directory (`FASTAH_WORK_DIR`)
 
-All generated, temporary, and output files go in these directories:
+All generated, temporary, and output files go in a **cross-platform directory outside the project repository**. This directory is referred to as `FASTAH_WORK_DIR` throughout this document.
 
-| Directory       | Purpose                                              |
-|-----------------|------------------------------------------------------|
-| `run/`          | Working directory for all agent-generated content    |
-| `run/data/`     | Downloaded CSV files from remote URLs                |
-| `run/report/`   | Generated HTML tuning reports                        |
+#### Resolution Rules
+
+Resolve `FASTAH_WORK_DIR` using the following priority:
+
+| Platform       | Default Path                          |
+|----------------|---------------------------------------|
+| Linux / macOS  | `~/fastah`                            |
+| Windows        | `C:\Users\<user>\fastah`            |
+
+- Expand `~` to the user's home directory (e.g., via Python's `pathlib.Path.home()`).
+- Use `os.path.join` or `pathlib` for all path construction — never hardcode path separators.
+- The directory does **not** require root or admin privileges.
+
+```python
+import os
+from pathlib import Path
+
+FASTAH_WORK_DIR = Path.home() / "fastah"
+FASTAH_DATA_DIR = FASTAH_WORK_DIR / "data"
+FASTAH_REPORT_DIR = FASTAH_WORK_DIR / "report"
+
+FASTAH_DATA_DIR.mkdir(parents=True, exist_ok=True)
+FASTAH_REPORT_DIR.mkdir(parents=True, exist_ok=True)
+```
+
+#### Subdirectories
+
+| Directory                     | Purpose                                              |
+|-------------------------------|------------------------------------------------------|
+| `FASTAH_WORK_DIR/`            | Working directory for all agent-generated content    |
+| `FASTAH_WORK_DIR/data/`       | Downloaded CSV files and intermediate JSON data      |
+| `FASTAH_WORK_DIR/report/`     | Generated HTML tuning reports                        |
 
 ### File Management Rules
 
 1. **Never write to `assets/`, `references/`, or `scripts/`** — these are part of the skill distribution and must remain unchanged.
-2. **All downloaded input files** (from remote URLs) must be saved to `./run/data/`.
-3. **All generated HTML reports** must be saved to `./run/report/`.
-4. **All generated Python scripts** must be saved to `./run/`.
-5. The `run/` directory may be cleared between sessions; do not store permanent data there.
-6. **Working directory for execution:** All generated scripts in `./run/` must be executed with the **skill root directory** (the directory containing `SKILL.md`) as the current working directory, so that relative paths like `assets/iso3166-1.json` and `./run/data/report-data.json` resolve correctly. Do not `cd` into `./run/` before running scripts.
-
+2. **All downloaded input files** (from remote URLs) must be saved to `FASTAH_DATA_DIR`.
+3. **All generated HTML reports** must be saved to `FASTAH_REPORT_DIR`.
+4. **All generated Python scripts** must be saved to `FASTAH_WORK_DIR`.
+5. **Working directory for execution:** All generated scripts in `FASTAH_WORK_DIR` must be executed with the **skill root directory** (the directory containing `SKILL.md`) as the current working directory, so that relative paths like `assets/iso3166-1.json` resolve correctly. 
 
 ## Processing Pipeline: Sequential Phase Execution
 
@@ -137,7 +162,7 @@ The key requirements from RFC 8805 that this skill enforces are summarized below
   - A remote URL pointing to a CSV file
 
 - If the input is a **remote URL**:
-  - Attempt to download the CSV file to `./run/data/` before processing.
+  - Attempt to download the CSV file to `FASTAH_DATA_DIR` before processing.
   - On HTTP error (4xx, 5xx, timeout, or redirect loop), **stop immediately** and report to the user:
     `Feed URL is not reachable: HTTP {status_code}. Please verify the URL is publicly accessible.`
   - Do not proceed to Phase 3 with an incomplete or empty download.
@@ -157,7 +182,7 @@ The key requirements from RFC 8805 that this skill enforces are summarized below
 - Generate a **script** for this phase.
 - Do NOT combine this phase with others.
 - Do NOT precompute future-phase data.
-- Store the output as a JSON file at: [`./run/data/report-data.json`](./run/data/report-data.json)
+- Store the output as a JSON file at: `FASTAH_DATA_DIR/report-data.json`
 
 #### Schema Definition
 
@@ -357,7 +382,7 @@ The goal is to ensure the file can be parsed reliably and normalized into a **co
     - Remove comment rows where the **first column begins with `#`**.
     - This also removes a header row if it begins with `#`.
     - Create a map of comments using the **1-based line number** as the key and the full original line as the value. Also store blank lines.
-    - Store this map in a JSON file at: [`./run/data/comments.json`](./run/data/comments.json)
+    - Store this map in a JSON file at: `FASTAH_DATA_DIR/comments.json`
     - Example: `{ "4": "# It's OK for small city states to leave state ISO2 code unspecified" }`
 
 - **Notes**
@@ -545,7 +570,7 @@ Lookup all the `Entries` using Fastah's `rfc8805-row-place-search` tool.
 
 #### Step 1: Build Lookup Payload with Deduplication
 
-Load the dataset from: [./run/data/report-data.json](./run/data/report-data.json)
+Load the dataset from: `FASTAH_DATA_DIR/report-data.json`
 - Read the `Entries` array. Each entry will be used to build the MCP lookup payload.
 
 Reduce server requests by deduplicating identical entries:
@@ -571,7 +596,7 @@ Build request batches:
 - When reading responses, match each response `rowKey` field to the corresponding deduplication entry to retrieve all associated `entryIndices`.
 
 Rules:
-- Write payload to: [./run/data/mcp-server-payload.json](./run/data/mcp-server-payload.json)
+- Write payload to: `FASTAH_DATA_DIR/mcp-server-payload.json`
 - Exit the script after writing the payload.
 
 #### Step 2: Invoke Fastah MCP Tool
@@ -593,7 +618,7 @@ Rules:
       {"rowKey": "550e8400-...", "countryCode":"CA", ...},
       {"rowKey": "690e9301-...", "countryCode":"ZZ", ...}
   ]
-- Open [./run/data/mcp-server-payload.json](./run/data/mcp-server-payload.json) and send all deduplicated entries with their rowKeys.
+- Open `FASTAH_DATA_DIR/mcp-server-payload.json` and send all deduplicated entries with their rowKeys.
 - If there are more than 1000 deduplicated entries after deduplication, split into multiple requests of 1000 entries each.
 - The server will respond with the same `rowKey` field in each response for mapping back.
 - Do NOT use local data.
@@ -601,7 +626,7 @@ Rules:
 #### Step 3: Attach Tuned Data to Entries
 
 - Generate a new **script** for attaching tuned data.
-- Load both [./run/data/report-data.json](./run/data/report-data.json) and the deduplication map (held in memory from Step 1, or re-derived from the payload file).
+- Load both `FASTAH_DATA_DIR/report-data.json` and the deduplication map (held in memory from Step 1, or re-derived from the payload file).
 - For each response from the MCP server:
   - Extract the `rowKey` from the response.
   - Look up the `entryIndices` array associated with that `rowKey` from the deduplication map.
@@ -635,7 +660,7 @@ The `TunedEntry` field is a **single object** (not an array). It holds the best 
 
 Entries with no UUID match (i.e. the MCP server returned no response for their UUID) must receive an empty `TunedEntry: {}` object — never leave the field absent.
 
-- Write the dataset back to: [./run/data/report-data.json](./run/data/report-data.json)
+- Write the dataset back to: `FASTAH_DATA_DIR/report-data.json`
 - Rules:
   - Maintain all existing validation flags.
   - Do NOT create additional intermediate files.
@@ -643,9 +668,9 @@ Entries with no UUID match (i.e. the MCP server returned no response for their U
 
 ### Phase 5: Generate Tuning Report
 
-Generate a **self-contained HTML report** by rendering the template at `./scripts/templates/index.html` with data from `./run/data/report-data.json` and `./run/data/comments.json`.
+Generate a **self-contained HTML report** by rendering the template at `./scripts/templates/index.html` with data from `FASTAH_DATA_DIR/report-data.json` and `FASTAH_DATA_DIR/comments.json`.
 
-Write the completed report to `./run/report/geofeed-report.html`. After generating, attempt to open it in the system's default browser (e.g., `webbrowser.open()`). If running in a headless environment, CI pipeline, or remote container where no browser is available, skip the browser step and instead present the file path to the user so they can open or download it.
+Write the completed report to `FASTAH_REPORT_DIR/geofeed-report.html`. After generating, attempt to open it in the system's default browser (e.g., `webbrowser.open()`). If running in a headless environment, CI pipeline, or remote container where no browser is available, skip the browser step and instead present the file path to the user so they can open or download it.
 
 **The template uses Go `html/template` syntax** (`{{.Field}}`, `{{range}}`, `{{if eq}}`, etc.). Write a Python script that reads the template, builds a rendering context from the JSON data files, and processes the template placeholders to produce final HTML. Do not modify the template file itself — all processing happens in the Python script at render time.
 
@@ -680,7 +705,7 @@ Locate this pattern in the template:
 const commentMap = {{.Comments}};
 ```
 
-Replace `{{.Comments}}` with the serialized JSON object from `./run/data/comments.json`. The JSON is embedded directly as a JavaScript object literal (not inside a string), so no extra escaping is needed:
+Replace `{{.Comments}}` with the serialized JSON object from `FASTAH_DATA_DIR/comments.json`. The JSON is embedded directly as a JavaScript object literal (not inside a string), so no extra escaping is needed:
 
 ```python
 comments_json = json.dumps(comments)
@@ -863,5 +888,5 @@ Perform a final verification pass using concrete, checkable assertions before pr
 - On failure, add `"TunedEntry": {}` to any entry missing the key, then re-save `report-data.json`.
 
 **Check 6 — Report file is present and non-empty**
-- Confirm `./run/report/geofeed-report.html` was written and has a file size greater than zero bytes.
+- Confirm `FASTAH_REPORT_DIR/geofeed-report.html` was written and has a file size greater than zero bytes.
 - On failure, regenerate the report before presenting to the user.
