@@ -92,7 +92,7 @@ func GeofeedValidation(path, outputPath string, limitEntries int) error {
 	// log.SetOutput(file)
 
 	// Parse CSV
-	rows, comments, invalidEntries, err := parser.ParseCSV(path, limitEntries)
+	rows, comments, invalidEntries, originalCsvCols, err := parser.ParseCSV(path, limitEntries)
 	if err != nil {
 		return fmt.Errorf("error parsing CSV: %w", err)
 	}
@@ -108,7 +108,7 @@ func GeofeedValidation(path, outputPath string, limitEntries int) error {
 	}
 
 	// Metadata summary
-	metadata := geofeed_validation.GetMetadataFromEntries(entries, path, invalidEntries)
+	metadata := geofeed_validation.GetMetadataFromEntries(entries, path, invalidEntries, originalCsvCols)
 
 	// Generate HTML report
 	err = html_template.GenerateHTMLReport(entries, comments, metadata, outputPath)

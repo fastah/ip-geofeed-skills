@@ -720,7 +720,7 @@
         </div>
 
         <div style="overflow-x: auto;">
-            <table class="entries-table">
+            <table class="entries-table" data-original-csv-cols="{{.Metadata.OriginalCsvCols}}">
                 <colgroup>
                     <col style="width: 3%;">
                     <col style="width: 5%;">
@@ -1893,6 +1893,7 @@
             
             // Download CSV button
             document.getElementById('downloadCSV').addEventListener('click', function() {
+                const originalCsvCols = parseInt(document.querySelector('.entries-table').getAttribute('data-original-csv-cols')) || 4;
                 const rows = document.querySelectorAll('.expandable-row');
                 const rowDataMap = {};
                 
@@ -1933,7 +1934,8 @@
                             }
                             return cellStr;
                         }).join(',');
-                        csvLines.push(csvRow);
+                        // Append empty 5th column if original CSV had 5 columns
+                        csvLines.push(originalCsvCols === 5 ? csvRow + ',' : csvRow);
                     }
                     // If neither comment nor data, skip the line (maintains original CSV structure)
                 }

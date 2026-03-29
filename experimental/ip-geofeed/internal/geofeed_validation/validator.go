@@ -79,6 +79,7 @@ type Metadata struct {
 	RegionLevelAccuracy  int
 	CountryLevelAccuracy int
 	DoNotGeolocate       int
+	OriginalCsvCols      int
 }
 
 type Record struct {
@@ -193,11 +194,12 @@ func ValidateEntries(rows []parser.Row) ([]Entry, []Entry, error) {
 // 	return nil
 // }
 
-func GetMetadataFromEntries(entries []Entry, inputFile string, invalidEntries int) Metadata {
+func GetMetadataFromEntries(entries []Entry, inputFile string, invalidEntries int, originalCsvCols int) Metadata {
 	metadata := Metadata{
-		InputFile:      inputFile,
-		Timestamp:      time.Now().UnixMilli(),
-		InvalidEntries: invalidEntries,
+		InputFile:       inputFile,
+		Timestamp:       time.Now().UnixMilli(),
+		InvalidEntries:  invalidEntries,
+		OriginalCsvCols: originalCsvCols,
 	}
 
 	for _, entry := range entries {

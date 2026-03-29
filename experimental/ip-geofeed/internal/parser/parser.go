@@ -155,16 +155,16 @@ func resolveFilePath(fileSource string) (string, error) {
 }
 
 // ParseCSV reads and parses a CSV geofeed file from local path or URL
-func ParseCSV(fileSource string, limit int) ([]Row, map[int]string, int, error) {
+func ParseCSV(fileSource string, limit int) ([]Row, map[int]string, int, int, error) {
 	// Resolve file path (download from URL if necessary)
 	filepath, err := resolveFilePath(fileSource)
 	if err != nil {
-		return nil, nil, 0, fmt.Errorf("resolving file path: %w", err)
+		return nil, nil, 0, 0, fmt.Errorf("resolving file path: %w", err)
 	}
 
 	file, err := os.Open(filepath)
 	if err != nil {
-		return nil, nil, 0, err
+		return nil, nil, 0, 0, err
 	}
 	defer file.Close()
 
@@ -175,6 +175,7 @@ func ParseCSV(fileSource string, limit int) ([]Row, map[int]string, int, error) 
 	lineNum := 0
 	invalidEntries := 0
 	validEntries := 0
+	originalCSVCols := 0
 
 	for scanner.Scan() {
 		line := scanner.Text()
@@ -210,6 +211,11 @@ func ParseCSV(fileSource string, limit int) ([]Row, map[int]string, int, error) 
 			continue
 		}
 
+		// Track the maximum number of columns seen across all valid rows
+		if len(record) > originalCSVCols {
+			originalCSVCols = len(record)
+		}
+
 		for len(record) < 4 {
 			record = append(record, "")
 		}
@@ -229,7 +235,7 @@ func ParseCSV(fileSource string, limit int) ([]Row, map[int]string, int, error) 
 	}
 
 	if err := scanner.Err(); err != nil {
-		return nil, nil, 0, err
+		return nil, nil, 0, 0, err
 	}
-	return rows, comments, invalidEntries, nil
+	return rows, comments, invalidEntries, originalCSVCols, nil
 }
