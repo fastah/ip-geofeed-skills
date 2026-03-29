@@ -670,7 +670,17 @@ Entries with no UUID match (i.e. the MCP server returned no response for their U
 
 Generate a **self-contained HTML report** by rendering the template at `./scripts/templates/index.html` with data from `FASTAH_DATA_DIR/report-data.json` and `FASTAH_DATA_DIR/comments.json`.
 
-Write the completed report to `FASTAH_REPORT_DIR/geofeed-report.html`. After generating, attempt to open it in the system's default browser (e.g., `webbrowser.open()`). If running in a headless environment, CI pipeline, or remote container where no browser is available, skip the browser step and instead present the file path to the user so they can open or download it.
+Write the completed report to `FASTAH_REPORT_DIR/geofeed-report.html`. After generating, serve the report directory over HTTP and open it in the browser:
+
+1. Start a local Python HTTP server on **port 4242** serving the report directory:
+   ```bash
+   python3 -m http.server -d FASTAH_REPORT_DIR 4242
+   ```
+   Run this as a **background process** so it does not block subsequent steps.
+
+2. Open `http://127.0.0.1:4242/geofeed-report.html` in the system's default browser (e.g., `webbrowser.open("http://127.0.0.1:4242/geofeed-report.html")`).
+
+3. If running in a headless environment, CI pipeline, or remote container where no browser is available, skip the browser step and instead present the URL (`http://127.0.0.1:4242/geofeed-report.html`) and the file path to the user so they can open or download it.
 
 **The template uses Go `html/template` syntax** (`{{.Field}}`, `{{range}}`, `{{if eq}}`, etc.). Write a Python script that reads the template, builds a rendering context from the JSON data files, and processes the template placeholders to produce final HTML. Do not modify the template file itself — all processing happens in the Python script at render time.
 
