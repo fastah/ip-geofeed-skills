@@ -23,4 +23,4 @@ update-rest-from-openapi:
 
 clean-rest:
 	@rm -rf internal/geofeed-structs internal/rest/python_models
-	@echo "Cleaned generated REST client code and models."
+	@echo "Cleaned generated Go structs ."
