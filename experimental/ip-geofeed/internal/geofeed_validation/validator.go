@@ -61,7 +61,7 @@ type Entry struct {
 	DoNotGeolocate bool
 	GeocodingHint  string
 	Tunable        bool
-	TunedEntry     *geofeed_structs.Location
+	TunedEntry     geofeed_structs.Location
 }
 
 // Metadata represents summary information

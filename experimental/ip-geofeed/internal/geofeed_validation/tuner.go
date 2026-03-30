@@ -156,7 +156,7 @@ func GetEntriesFromServer(entry_rows []parser.Row, ctx *ValidationContext) ([]En
 					continue
 				}
 				for _, entryIdx := range deDuplicateUUIDMap[result.RowKey] {
-					entries[entryIdx].TunedEntry = &match
+					entries[entryIdx].TunedEntry = match
 				}
 			}
 
