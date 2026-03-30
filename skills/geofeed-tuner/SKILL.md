@@ -68,7 +68,6 @@ Resolve `FASTAH_WORK_DIR` using the following priority:
 - The directory does **not** require root or admin privileges.
 
 ```python
-import os
 from pathlib import Path
 
 FASTAH_WORK_DIR = Path.home() / "fastah"
