@@ -7,47 +7,11 @@ import (
 	"net/http"
 	"strings"
 
+	geofeed_structs "ip-geofeed/internal/geofeed-structs"
 	"ip-geofeed/internal/parser"
 
 	"github.com/google/uuid"
 )
-
-// PlaceSearchRequest represents the request to the place-search API
-type PlaceSearchRequest struct {
-	Rows []PlaceSearchRow `json:"rows"`
-}
-
-// PlaceSearchRow represents a single row in the place search request
-type PlaceSearchRow struct {
-	RowKey      string `json:"rowKey"`
-	CountryCode string `json:"countryCode"`
-	RegionCode  string `json:"regionCode"`
-	CityName    string `json:"cityName"`
-	SearchMode  string `json:"searchMode,omitempty"`
-}
-
-// PlaceSearchResponse represents the response from the place-search API
-type PlaceSearchResponse struct {
-	Results []PlaceSearchResult `json:"results"`
-}
-
-// PlaceSearchResult represents a single result for a place search
-type PlaceSearchResult struct {
-	Matches                    []Location `json:"matches"`
-	IsExplicitlyDoNotGeolocate bool       `json:"isExplicitlyDoNotGeolocate"`
-	Message                    string     `json:"message"`
-	RowKey                     string     `json:"rowKey"`
-}
-
-// Location represents a geographic location match
-type Location struct {
-	Name        string    `json:"placeName"`
-	CountryCode string    `json:"countryCode"`
-	RegionCode  string    `json:"stateCode"`
-	PlaceType   string    `json:"placeType"`
-	H3Cells     []string  `json:"h3Cells"`
-	BoundingBox []float64 `json:"boundingBox"`
-}
 
 // ProvideTuningRecommendations provides suggestions for optimizing geofeed entries
 func ProvideTuningRecommendations(entry *Entry, ctx *ValidationContext) {
@@ -77,7 +41,7 @@ func ProvideTuningRecommendations(entry *Entry, ctx *ValidationContext) {
 }
 
 // callPlaceSearchAPI makes an HTTP POST request to the place-search API
-func callPlaceSearchAPI(request PlaceSearchRequest) ([]PlaceSearchResult, error) {
+func callPlaceSearchAPI(request *geofeed_structs.InRfc8805RowPlaceSearchBatchParams) ([]geofeed_structs.OutRfc8805RowPlaceResults, error) {
 	const apiURL = "https://mcp.fastah.ai/rest/geofeeds/place-search"
 	// const apiURL = "http://127.0.0.1:3000/rest/geofeeds/place-search"
 
@@ -110,7 +74,7 @@ func callPlaceSearchAPI(request PlaceSearchRequest) ([]PlaceSearchResult, error)
 	}
 
 	// Parse the response
-	var response PlaceSearchResponse
+	response := geofeed_structs.NewGeofeedPlaceResultsBodyWithDefaults()
 	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
 		return nil, fmt.Errorf("decoding response: %w", err)
 	}
@@ -123,7 +87,7 @@ func GetEntriesFromServer(entry_rows []parser.Row, ctx *ValidationContext) ([]En
 
 	// Build the batch request
 	entries := make([]Entry, 0, len(entry_rows))
-	var rows []PlaceSearchRow
+	rows := geofeed_structs.NewInRfc8805RowPlaceSearchBatchParamsWithDefaults()
 	errEntries := make([]Entry, 0)
 	deDuplicateMap := make(map[string][]int)
 	deDuplicateUUIDMap := make(map[string][]int)
@@ -153,30 +117,27 @@ func GetEntriesFromServer(entry_rows []parser.Row, ctx *ValidationContext) ([]En
 
 	for key, indices := range deDuplicateUUIDMap {
 		sampleEntry := entries[indices[0]]
-		rows = append(rows, PlaceSearchRow{
-			RowKey:      key,
-			CountryCode: sampleEntry.CountryCode,
-			RegionCode:  sampleEntry.RegionCode,
-			CityName:    sampleEntry.City,
-			SearchMode:  "auto",
-		})
+		placeSearchRow := geofeed_structs.NewInRfc8805RowPlaceSearchParams(sampleEntry.CountryCode, key)
+		placeSearchRow.SetRegionCode(sampleEntry.RegionCode)
+		placeSearchRow.SetCityName(sampleEntry.City)
+		rows.Rows = append(rows.Rows, *placeSearchRow)
 	}
 
 	// If no entries to process, return early
-	if len(rows) == 0 {
+	if len(rows.Rows) == 0 {
 		return entries, errEntries
 	}
 
 	// Process in batches of up to 1000 rows
-	for batchStart := 0; batchStart < len(rows); batchStart += maxBatchSize {
+	for batchStart := 0; batchStart < len(rows.Rows); batchStart += maxBatchSize {
 		batchEnd := batchStart + maxBatchSize
-		if batchEnd > len(rows) {
-			batchEnd = len(rows)
+		if batchEnd > len(rows.Rows) {
+			batchEnd = len(rows.Rows)
 		}
-		batchRows := rows[batchStart:batchEnd]
+		batchRows := rows.Rows[batchStart:batchEnd]
 
 		// Call the place-search API for this batch
-		request := PlaceSearchRequest{Rows: batchRows}
+		request := geofeed_structs.NewInRfc8805RowPlaceSearchBatchParams(batchRows)
 		results, err := callPlaceSearchAPI(request)
 		if err != nil {
 			// Log error but don't fail - just skip tuning for this batch
@@ -190,12 +151,12 @@ func GetEntriesFromServer(entry_rows []parser.Row, ctx *ValidationContext) ([]En
 			if len(result.Matches) > 0 && !result.IsExplicitlyDoNotGeolocate {
 				match := result.Matches[0]
 
-				if hasIssue := CheckForIssues(match.CountryCode, match.RegionCode, ctx); hasIssue {
+				if hasIssue := CheckForIssues(match.CountryCode, match.StateCode, ctx); hasIssue {
 					errEntries = append(errEntries, entries[deDuplicateUUIDMap[result.RowKey][0]])
 					continue
 				}
 				for _, entryIdx := range deDuplicateUUIDMap[result.RowKey] {
-					entries[entryIdx].TunedEntry = match
+					entries[entryIdx].TunedEntry = &match
 				}
 			}
 
