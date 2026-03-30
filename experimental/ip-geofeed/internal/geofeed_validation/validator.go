@@ -3,6 +3,7 @@ package geofeed_validation
 import (
 	"encoding/json"
 	"fmt"
+	geofeed_structs "ip-geofeed/internal/geofeed-structs"
 	"ip-geofeed/internal/parser"
 	"net"
 	"os"
@@ -60,7 +61,7 @@ type Entry struct {
 	DoNotGeolocate bool
 	GeocodingHint  string
 	Tunable        bool
-	TunedEntry     Location
+	TunedEntry     *geofeed_structs.Location
 }
 
 // Metadata represents summary information

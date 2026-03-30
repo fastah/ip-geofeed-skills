@@ -636,9 +636,9 @@ Create the field on each affected entry if it does not exist. Remap the MCP API 
 
 ```json
 "TunedEntry": {
-  "Name": "",
+  "PlaceName": "",
   "CountryCode": "",
-  "RegionCode": "",
+  "StateCode": "",
   "PlaceType": "",
   "H3Cells": [],
   "BoundingBox": []
@@ -650,9 +650,9 @@ The `TunedEntry` field is a **single object** (not an array). It holds the best 
 **MCP response key → JSON key mapping**:
 | MCP API response key | JSON key                   |
 |----------------------|----------------------------|
-| `placeName`          | `Name`                     |
+| `placeName`          | `PlaceName`                |
 | `countryCode`        | `CountryCode`              |
-| `stateCode`          | `RegionCode`               |
+| `stateCode`          | `StateCode`               |
 | `placeType`          | `PlaceType`                |
 | `h3Cells`            | `H3Cells`                  |
 | `boundingBox`        | `BoundingBox`              |
