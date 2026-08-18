@@ -1,0 +1,73 @@
+{
+  "$defs": {
+    "McpRequestRow": {
+      "additionalProperties": false,
+      "properties": {
+        "city": {
+          "default": "",
+          "maxLength": 200,
+          "pattern": "^[^,\\r\\n]*$",
+          "title": "City",
+          "type": "string"
+        },
+        "country": {
+          "maxLength": 2,
+          "pattern": "^([A-Za-z]{2})?$",
+          "title": "Country",
+          "type": "string"
+        },
+        "region": {
+          "default": "",
+          "maxLength": 16,
+          "pattern": "^[^,\\r\\n]*$",
+          "title": "Region",
+          "type": "string"
+        },
+        "rowId": {
+          "maxLength": 128,
+          "minLength": 8,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{7,127}$",
+          "title": "Rowid",
+          "type": "string"
+        },
+        "searchMode": {
+          "$ref": "#/$defs/McpSearchMode",
+          "default": "auto"
+        }
+      },
+      "required": [
+        "rowId",
+        "country"
+      ],
+      "title": "McpRequestRow",
+      "type": "object"
+    },
+    "McpSearchMode": {
+      "enum": [
+        "auto",
+        "prefer_larger_area",
+        "prefer_larger_population_center"
+      ],
+      "title": "McpSearchMode",
+      "type": "string"
+    }
+  },
+  "$id": "https://schemas.fastah.net/netops/geofeed-quality/mcp-place-search-request-1.0.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "rows": {
+      "items": {
+        "$ref": "#/$defs/McpRequestRow"
+      },
+      "minItems": 1,
+      "title": "Rows",
+      "type": "array"
+    }
+  },
+  "required": [
+    "rows"
+  ],
+  "title": "McpRequestBatch",
+  "type": "object"
+}

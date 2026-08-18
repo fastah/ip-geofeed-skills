@@ -1,0 +1,259 @@
+Metadata-Version: 2.4
+Name: fastah-geofeed-quality
+Version: 0.4.0
+Summary: Local RFC 8805 geofeed analysis for Fastah NetOps Tools
+Requires-Python: >=3.13
+Description-Content-Type: text/markdown
+Requires-Dist: httpx<1,>=0.28
+Requires-Dist: jsonschema<5,>=4.23
+Requires-Dist: pycountry>=26.2.16
+Requires-Dist: pydantic<3,>=2.11
+Provides-Extra: dev
+Requires-Dist: mypy<2,>=1.15; extra == "dev"
+Requires-Dist: pytest<9,>=8.3; extra == "dev"
+Requires-Dist: ruff<1,>=0.11; extra == "dev"
+
+# Fastah geofeed quality analyzer
+
+The first schema-first vertical slice of `tuning-geofeeds`: a local RFC 8805
+CSV file becomes typed Pydantic models, deterministic findings and prefix
+relationships, versioned analysis JSON, optional authoritative RDAP evidence,
+host-mediated Fastah place-search evidence, and an explicit correction
+proposal/approval/export workflow. IR-only renderers produce Markdown, a
+portable HTML dashboard, and a privacy-allowlisted GeoJSON projection.
+
+RDAP is the only network stage implemented by the analyzer. Marketplace hosts
+or agents—not this package—discover, authenticate to, and invoke Fastah MCP.
+This implementation does not provide remote feed download. It now generates
+private Amp, Claude, OpenAI review, and public-export staging layouts without
+publishing them. See [`docs/`](docs/) for specifications.
+
+## Setup and checks
+
+Python 3.13 or newer is required. On Windows, we recommend installing Python
+through [Python Install Manager in the Microsoft Store](https://apps.microsoft.com/detail/9nq7512cxl7t?hl=en-US)
+so it receives automatic updates; other installation methods remain supported.
+
+```bash
+make setup
+make check             # Ruff, mypy, schema drift, pytest
+make schema-generate   # intentionally refresh schema/analysis.schema.json
+make schema-check      # fail when models and committed schema differ
+# Explicit, non-CI live smoke (contacts IANA and an authoritative RIR)
+make test-live-rdap
+```
+
+## Analyze and render
+
+```bash
+make analyze INPUT=tests/fixtures/valid.csv OUTPUT=/tmp/analysis.json
+make render INPUT=/tmp/analysis.json OUTPUT=/tmp/analysis.md
+make render-html INPUT=/tmp/analysis.json OUTPUT=/tmp/dashboard.html
+make export-geojson INPUT=/tmp/analysis.json OUTPUT=/tmp/analysis.geojson
+make mcp-export INPUT=/tmp/analysis.json BATCH_LIMIT=1000 OUTPUT_DIR=/tmp/mcp-requests
+make mcp-import INPUT=/tmp/analysis.json \
+  RESPONSES='/tmp/mcp-response-1.json' MAPPING=/tmp/mcp-requests/mapping.json \
+  BATCH_LIMIT=1000 \
+  OUTPUT=/tmp/analysis-with-mcp.json
+
+# Equivalent installed CLI
+geofeed-quality analyze feed.csv --output analysis.json
+geofeed-quality render analysis.json --output analysis.md
+geofeed-quality render-html analysis.json --output dashboard.html
+geofeed-quality export-geojson analysis.json --output analysis.geojson
+geofeed-quality schema check
+```
+
+## Explicit correction approval and CSV export
+
+Correction generation, human/host decisions, and export are separate. The
+initial conservative rules propose deterministic country/region case and
+whitespace normalization, deterministic removal of a populated deprecated
+postal-code value, and advisory best-first MCP country/region/city suggestions.
+MCP suggestions use `not_assessed`; rank, population weight, and radius are not
+confidence. RDAP never proposes a location change.
+
+```bash
+geofeed-quality propose-corrections analysis.json \
+  --output analysis-proposed.json --plan correction-plan.json
+
+# Read correction-plan.json, then name every explicit decision. No action is defaulted.
+geofeed-quality record-approval correction-plan.json \
+  --approver "review-session-7" --decided-at "2026-08-15T12:30:00Z" \
+  --approve proposal-0123456789abcdef --reject proposal-fedcba9876543210 \
+  --output correction-approval.json
+
+geofeed-quality export-csv analysis-proposed.json correction-approval.json \
+  --source feed.csv --output corrected.csv --final-analysis analysis-final.json
+```
+
+Export requires at least one explicit `approve` decision. Approval binds the
+source digest, analysis/schema identity, complete proposal-set digest,
+user/host-supplied approver label, and user/host-supplied timestamp. The
+exporter verifies the original source bytes, reanalyzes the candidate output,
+then writes a new CSV and finalized Analysis atomically without overwriting an
+existing path or source. Comments, blank lines, UTF-8 BOM/content, physical row
+order, authored four/five/extension-column shape, and CRLF/LF/CR delimiters are
+retained; only approved data rows are safely reserialized.
+
+## HTML and GeoJSON visualization
+
+Both visualization commands accept only a serialized, schema-valid Analysis
+IR. They never read CSV or invoke RDAP or MCP. The portable dashboard embeds
+the validated IR, privacy-filtered GeoJSON, local Sora font, Fastah logo, CSS,
+and JavaScript in one deterministic file. Without Mapbox configuration it
+makes no network requests and provides a searchable, paginated row table plus
+textual geographic evidence.
+
+Mapbox is an explicit enhancement. Put a restricted public `pk.*` token in a
+UTF-8 file, then select a `mapbox://styles/<owner>/<style>` or equivalent
+Mapbox Styles API URL:
+
+```bash
+geofeed-quality render-html analysis.json --output dashboard.html \
+  --mapbox-token-file /secure/path/mapbox-public-token.txt \
+  --mapbox-style mapbox://styles/mapbox/streets-v12
+```
+
+The configured dashboard necessarily contains that public token; the analyzer
+never writes it to Analysis JSON, GeoJSON, or Markdown and never logs it. Use
+URL restrictions and least-privilege scopes. A URL-restricted token requires
+serving the dashboard from an allowed HTTP(S) origin rather than opening it as
+`file://`. A missing token, blocked network, or style failure leaves the full
+offline dashboard and textual geography usable.
+
+Offline CSP is `default-src 'none'`, content hashes for inline scripts/data and
+CSS, `font-src data:`, `img-src data:`, and no connect/worker/frame/object/form
+targets. Mapbox mode additionally allows pinned GL JS script/style resources at
+`https://api.mapbox.com/mapbox-gl-js/v3.28.1/`, inline SDK-generated style,
+`worker-src blob:`, `img-src data: blob:`, and connections only to
+`https://api.mapbox.com` and `https://events.mapbox.com`. This follows the
+[Mapbox GL JS CSP guidance](https://docs.mapbox.com/mapbox-gl-js/guides/security-and-testing/);
+the renderer disables optional performance metrics collection.
+
+GeoJSON includes only existing best-match MCP points and bounding boxes. Its
+properties allowlist contains row ID, canonical prefix, advisory place/status,
+and finding summary fields. Creating this user-chosen artifact therefore
+discloses prefixes, but omits source URL/comments, publisher/RDAP identifiers,
+raw MCP messages, unapproved corrections, radius, rank, and population weight.
+Both outputs attribute GeoNames; Mapbox mode retains Mapbox GL JS attribution.
+
+Dashboard design sources are
+[`design/tokens/colors.css`](../../design/tokens/colors.css),
+[`design/tokens/typography.css`](../../design/tokens/typography.css),
+[`design/tokens/spacing.css`](../../design/tokens/spacing.css),
+[`design/tokens/radius.css`](../../design/tokens/radius.css),
+[`design/components/data/StatCard.jsx`](../../design/components/data/StatCard.jsx),
+[`design/components/core/Card.jsx`](../../design/components/core/Card.jsx),
+[`design/components/core/Badge.jsx`](../../design/components/core/Badge.jsx),
+[`design/assets/fonts/Sora-VariableFont_wght.ttf`](../../design/assets/fonts/Sora-VariableFont_wght.ttf),
+and [`design/assets/logos/fastah-lockup-ondark.svg`](../../design/assets/logos/fastah-lockup-ondark.svg).
+
+## Host-mediated Fastah MCP exchange
+
+The host discovers `rfc8805-row-place-search`, supplies its advertised batch
+limit, invokes each exported `{rows}` object, and captures the structured
+contract `1.0` response. Exported rows contain only opaque `rowId`, `country`,
+optional `region`, optional `city`, and `searchMode`. They contain no prefix,
+source metadata, publisher profile, or RDAP evidence. The host transport
+deduplicates only exact `(country, region, city, searchMode)` tuples in
+first-seen order. A versioned, integrity-bound `mapping.json` remains local and
+fans each representative response back to one observation per source row.
+
+```bash
+geofeed-quality mcp-export analysis.json \
+  --batch-limit 1000 --output-dir mcp-requests
+geofeed-quality mcp-import analysis.json mcp-response-1.json \
+  --mapping mcp-requests/mapping.json \
+  --batch-limit 1000 --output analysis-with-mcp.json
+```
+
+Use the limit reported by host discovery; 1,000 is only the current server
+value. Request files contain location tuples but no network identity and need
+no credential or persistent intermediary secret. Import validates the complete
+response contract and adds advisory observations/findings without changing
+source rows, base findings, or correction state. Matches remain best-first;
+rank, `populationWeightPercent`, and `approximateRadiusKm` are not confidence.
+
+## Optional authoritative RDAP evidence
+
+Base analysis remains offline unless `--rdap` is present. The optional profile
+is a JSON object containing any combination of `organization_name`, `asn`,
+`rdap_entity_handle`, `rir_organization_id`, and `domain`:
+
+```bash
+geofeed-quality analyze feed.csv --output analysis.json \
+  --rdap --publisher-profile publisher.json
+```
+
+The client downloads current IPv4 and IPv6 bootstrap data from IANA, selects
+the longest matching service, and contacts only credential-free HTTPS RIR
+endpoints. Defaults are 5-second connect and 10-second read timeouts, a 1 MiB
+response limit, three redirects, two workers, and 0.5 seconds between request
+starts per RIR. CLI flags prefixed `--rdap-` configure those operational
+bounds. The per-run in-memory cache is discarded on exit.
+
+The IR retains the returned network range/handle and only registrant entity
+handles, organization names, roles, and allowlisted public identifiers needed
+for comparison. It never retains full vCards, email addresses, phone numbers,
+authorization headers, or unrelated response fields. Assessments are exactly
+`consistent`, `conflicting`, `unverified`, or `unavailable`; none establishes
+legal ownership.
+
+`render` accepts only a serialized analysis IR. It does not accept CSV and does
+not import the parser or analyzer. Input JSON is schema-validated and parsed
+into the typed root model before rendering.
+
+## Current contract decisions
+
+- Schema version: `0.4.0`; enum version: `4`.
+- Finding categories are independent from severities (`error`, `warning`,
+  `info`).
+- Every physical line is retained. Initial UTF-8 BOM is accepted and recorded;
+  invalid UTF-8 is a typed feed-level error.
+- Single host addresses normalize to `/32` or `/128`. CIDR strings with host
+  bits set are retained but invalid under rule `RFC8805.PREFIX_HOST_BITS`.
+- Full-prefix public-routability is a Fastah quality policy, not RFC validity.
+- Exact/equal-prefix relationships use a deterministic star, and containment
+  links only immediate parents and carved children. This bounds graph growth
+  linearly at the supported 60,000-row limit.
+
+## Agent Skill and evaluations
+
+The canonical private Agent Skill is
+[`tuning-geofeeds/SKILL.md`](tuning-geofeeds/SKILL.md). It uses the bundled
+analyzer commands rather than generating parser or renderer code. Setup and
+interpretation details are progressively disclosed through its `references/`
+directory; canonical prompts, fixtures, deterministic code graders, and human
+dashboard feedback fields are under `evals/`.
+
+```bash
+make skill-validate       # metadata, references, release inventory, secrets, portable smoke
+make skill-eval           # 16 fixture cases; generated evidence remains gitignored
+make skill-release-check  # deterministic private portable release layout
+make skill-package-check  # host views, real Amp install, deterministic packaging
+```
+
+The checked-in `tuning-geofeeds/` directory is the development source and is
+not directly installable. In particular, pointing `amp skill add` at that
+directory copies only `SKILL.md`. Build the canonical repository-shaped bundle
+and point Amp at its parent root so all scripts, references, analyzer code,
+schemas, fixtures, and design assets survive installation:
+
+```bash
+make skill-package-build OUTPUT=/path/to/new/fastah-netops-tools-release
+amp skill add --target /path/to/isolated/skills \
+  /path/to/new/fastah-netops-tools-release/canonical
+
+# Explicit staging for the later fastah/ip-geofeed-skills export; no push occurs.
+make skill-public-stage OUTPUT=/path/to/new/public-stage
+```
+
+The release builder fails when output exists. `canonical/tuning-geofeeds/` is
+the single distributable skill bundle; Amp, Claude, and OpenAI views are exact
+copies tied to its digest. Claude uses `.claude-plugin/plugin.json`; OpenAI
+review material uses `.codex-plugin/plugin.json`, a tool-filtered `.mcp.json`,
+reviewer cases, CSP inventory, and a blocker-aware readiness report. The
+allowlisted trees are credential-free and include the exact Design Library
+font/logo. Public push and marketplace submission remain separately approved
+future actions.

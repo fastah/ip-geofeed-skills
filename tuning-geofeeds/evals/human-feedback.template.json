@@ -1,0 +1,20 @@
+{
+  "iteration": null,
+  "reviewer": null,
+  "reviewed_at": null,
+  "dashboard_reviews": [
+    {
+      "eval_slug": null,
+      "artifact": null,
+      "desktop_summary": null,
+      "narrow_summary": null,
+      "keyboard_and_focus": null,
+      "textual_chart_and_map_equivalents": null,
+      "authored_advisory_approved_distinction": null,
+      "long_text_and_empty_states": null,
+      "brand_and_attribution": null,
+      "actionable_feedback": null,
+      "verdict": null
+    }
+  ]
+}

@@ -1,0 +1,143 @@
+{
+  "$defs": {
+    "McpMappingBatch": {
+      "additionalProperties": false,
+      "properties": {
+        "batchNumber": {
+          "minimum": 1,
+          "title": "Batchnumber",
+          "type": "integer"
+        },
+        "representativeRowIds": {
+          "items": {
+            "maxLength": 128,
+            "minLength": 8,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{7,127}$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Representativerowids",
+          "type": "array"
+        },
+        "requestSha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Requestsha256",
+          "type": "string"
+        },
+        "targets": {
+          "items": {
+            "$ref": "#/$defs/McpMappingTarget"
+          },
+          "minItems": 1,
+          "title": "Targets",
+          "type": "array"
+        }
+      },
+      "required": [
+        "batchNumber",
+        "requestSha256",
+        "representativeRowIds",
+        "targets"
+      ],
+      "title": "McpMappingBatch",
+      "type": "object"
+    },
+    "McpMappingTarget": {
+      "additionalProperties": false,
+      "properties": {
+        "representativeRowId": {
+          "maxLength": 128,
+          "minLength": 8,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{7,127}$",
+          "title": "Representativerowid",
+          "type": "string"
+        },
+        "targetOpaqueRowIds": {
+          "items": {
+            "maxLength": 128,
+            "minLength": 8,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{7,127}$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Targetopaquerowids",
+          "type": "array"
+        },
+        "targetSourceRowIds": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Targetsourcerowids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "representativeRowId",
+        "targetSourceRowIds",
+        "targetOpaqueRowIds"
+      ],
+      "title": "McpMappingTarget",
+      "type": "object"
+    },
+    "McpSearchMode": {
+      "enum": [
+        "auto",
+        "prefer_larger_area",
+        "prefer_larger_population_center"
+      ],
+      "title": "McpSearchMode",
+      "type": "string"
+    }
+  },
+  "$id": "https://schemas.fastah.net/netops/geofeed-quality/mcp-request-mapping-1.0.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "analysisId": {
+      "title": "Analysisid",
+      "type": "string"
+    },
+    "batches": {
+      "items": {
+        "$ref": "#/$defs/McpMappingBatch"
+      },
+      "title": "Batches",
+      "type": "array"
+    },
+    "contractVersion": {
+      "const": "1.0",
+      "title": "Contractversion",
+      "type": "string"
+    },
+    "integritySha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Integritysha256",
+      "type": "string"
+    },
+    "mappingVersion": {
+      "const": "1.0",
+      "title": "Mappingversion",
+      "type": "string"
+    },
+    "searchMode": {
+      "$ref": "#/$defs/McpSearchMode"
+    },
+    "serverBatchLimit": {
+      "minimum": 1,
+      "title": "Serverbatchlimit",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "mappingVersion",
+    "analysisId",
+    "contractVersion",
+    "serverBatchLimit",
+    "searchMode",
+    "batches",
+    "integritySha256"
+  ],
+  "title": "McpRequestMapping",
+  "type": "object"
+}

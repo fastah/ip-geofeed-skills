@@ -1,0 +1,6 @@
+# malformed, policy, and deprecated-field cases
+8.8.8.7/24,US,US-CA,Host bits,
+10.0.0.0/8,US,US-CA,Private range,
+9.9.9.0/24,xx,XX-NOPE,Bad ISO,
+1.1.1.0/24,US,US-NY,New York,10001
+not-a-prefix,US,US-CA,Invalid prefix,
