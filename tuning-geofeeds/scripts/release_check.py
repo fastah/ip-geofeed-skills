@@ -57,6 +57,7 @@ def _copy_tree(source: Path, target: Path) -> None:
         relative = path.relative_to(source)
         if (
             "__pycache__" in relative.parts
+            or any(part.endswith(".egg-info") for part in relative.parts)
             or path.suffix == ".pyc"
             or relative.parts[:1] == ("workspace",)
         ):
@@ -119,8 +120,8 @@ def _validate_skill(skill: Path) -> None:
         raise ValueError("skill description must contain 1-1024 characters")
     if metadata.get("license") != "Apache-2.0":
         raise ValueError("skill license must be Apache-2.0")
-    if not 1 <= len(compatibility) <= 500 or "Python 3.13+" not in compatibility:
-        raise ValueError("compatibility must require Python 3.13+")
+    if not 1 <= len(compatibility) <= 500 or "Python 3.14+" not in compatibility:
+        raise ValueError("compatibility must require Python 3.14+")
     body = (skill / "SKILL.md").read_text(encoding="utf-8")
     if len(body.splitlines()) >= 500:
         raise ValueError("SKILL.md must remain below 500 lines")

@@ -1,2 +1,0 @@
-[console_scripts]
-geofeed-quality = geofeed_quality.cli:main

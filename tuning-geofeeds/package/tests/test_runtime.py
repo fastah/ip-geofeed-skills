@@ -12,19 +12,20 @@ from packaging.version import Version
 from geofeed_quality.runtime import MINIMUM_PYTHON, require_supported_python
 
 
-def test_runtime_floor_is_python_3_13() -> None:
-    assert MINIMUM_PYTHON == (3, 13)
-    require_supported_python((3, 13))
-    require_supported_python((3, 14))
-    with pytest.raises(RuntimeError, match=r"requires Python 3\.13 or newer"):
-        require_supported_python((3, 12))
+def test_runtime_floor_is_python_3_14() -> None:
+    assert MINIMUM_PYTHON == (3, 14)
+    require_supported_python(MINIMUM_PYTHON)
+    require_supported_python((MINIMUM_PYTHON[0], MINIMUM_PYTHON[1] + 1))
+    unsupported = (MINIMUM_PYTHON[0], MINIMUM_PYTHON[1] - 1)
+    with pytest.raises(RuntimeError, match=r"requires Python 3\.14 or newer"):
+        require_supported_python(unsupported)
 
 
 def test_package_metadata_matches_runtime_floor() -> None:
     metadata = tomllib.loads((Path(__file__).parents[1] / "pyproject.toml").read_text())
-    assert metadata["project"]["requires-python"] == ">=3.13"
-    assert metadata["tool"]["ruff"]["target-version"] == "py313"
-    assert metadata["tool"]["mypy"]["python_version"] == "3.13"
+    assert metadata["project"]["requires-python"] == ">=3.14"
+    assert metadata["tool"]["ruff"]["target-version"] == "py314"
+    assert metadata["tool"]["mypy"]["python_version"] == "3.14"
 
 
 def test_pycountry_dependency_floor_and_installed_version() -> None:

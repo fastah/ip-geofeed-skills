@@ -79,7 +79,7 @@ def test_public_root_is_generated_from_canonical_metadata(tmp_path: Path) -> Non
     readme = (tmp_path / "README.md").read_text(encoding="utf-8")
     for text in (
         "Fastah NetOps Tools helps you check a public IP geofeed",
-        "Python | 3.13 or newer",
+        "Python | 3.14 or newer",
         "Skill and plugin: `0.2.0`",
         "Analyzer and Analysis schema: `0.4.0` / `0.4.0`",
         "MCP response contract: `1.0`",
@@ -139,3 +139,19 @@ def test_canonical_public_license_exists_with_exact_apache_2_content() -> None:
     assert license_path.is_file()
     assert packager._digest(license_path) == APACHE_2_LICENSE_SHA256
     assert packager.PUBLIC_LICENSE_SHA256 == APACHE_2_LICENSE_SHA256
+
+
+def test_release_copy_excludes_generated_egg_info(tmp_path: Path) -> None:
+    packager = _packager()
+    source = tmp_path / "source"
+    target = tmp_path / "target"
+    (source / "package").mkdir(parents=True)
+    (source / "package" / "module.py").write_text("value = 1\n", encoding="utf-8")
+    generated = source / "package" / "example.egg-info"
+    generated.mkdir()
+    (generated / "PKG-INFO").write_text("Requires-Python: >=3.14\n", encoding="utf-8")
+
+    packager.release_check._copy_tree(source, target)
+
+    assert (target / "package" / "module.py").is_file()
+    assert not (target / "package" / "example.egg-info").exists()

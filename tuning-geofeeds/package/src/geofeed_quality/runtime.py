@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import sys
 
-MINIMUM_PYTHON = (3, 13)
+MINIMUM_PYTHON = (3, 14)
 
 
 def require_supported_python(version: tuple[int, int] | None = None) -> None:
