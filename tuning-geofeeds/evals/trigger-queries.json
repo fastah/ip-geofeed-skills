@@ -1,0 +1,122 @@
+[
+  {
+    "id": "train-positive-rfc",
+    "split": "train",
+    "query": "Can you validate ~/feeds/public-geofeed.csv against RFC 8805 and make a dashboard?",
+    "should_trigger": true
+  },
+  {
+    "id": "train-positive-prefixes",
+    "split": "train",
+    "query": "Our public IP location feed has overlapping and duplicate prefixes; help me untangle the carved blocks.",
+    "should_trigger": true
+  },
+  {
+    "id": "train-positive-geo",
+    "split": "train",
+    "query": "NetOps needs to improve the country, region, and city values we publish for our address space without changing anything silently.",
+    "should_trigger": true
+  },
+  {
+    "id": "train-positive-rdap",
+    "split": "train",
+    "query": "Check our geofeed against our ASN and RIR organization details, but tell me what RDAP discloses first.",
+    "should_trigger": true
+  },
+  {
+    "id": "train-positive-correction",
+    "split": "train",
+    "query": "Review this RFC8805 file and let me approve exact fixes before producing a corrected feed.",
+    "should_trigger": true
+  },
+  {
+    "id": "validation-positive-casual",
+    "split": "validation",
+    "query": "hey, can you sanity-check the public prefix-to-city csv our NOC publishes?",
+    "should_trigger": true
+  },
+  {
+    "id": "validation-positive-mcp",
+    "split": "validation",
+    "query": "Use Fastah place search to enrich unresolved rows in my public geofeed and keep partial failures visible.",
+    "should_trigger": true
+  },
+  {
+    "id": "validation-positive-zz",
+    "split": "validation",
+    "query": "Why are lowercase zz rows and parent/child prefixes behaving strangely in this geolocation feed?",
+    "should_trigger": true
+  },
+  {
+    "id": "validation-positive-artifacts",
+    "split": "validation",
+    "query": "Turn my RFC 8805 feed into a quality report, offline HTML, and GeoJSON for review.",
+    "should_trigger": true
+  },
+  {
+    "id": "validation-positive-safety",
+    "split": "validation",
+    "query": "Audit this public-IP geofeed locally; don't upload prefixes and don't apply any suggested edits until I approve them.",
+    "should_trigger": true
+  },
+  {
+    "id": "train-negative-ipam",
+    "split": "train",
+    "query": "Reallocate our private 10.20.0.0/16 IPAM blocks across office VLANs.",
+    "should_trigger": false
+  },
+  {
+    "id": "train-negative-generic-csv",
+    "split": "train",
+    "query": "Clean duplicate customer emails from ~/Downloads/customers.csv.",
+    "should_trigger": false
+  },
+  {
+    "id": "train-negative-maxmind",
+    "split": "train",
+    "query": "How do I query a MaxMind MMDB from Go?",
+    "should_trigger": false
+  },
+  {
+    "id": "train-negative-routing",
+    "split": "train",
+    "query": "Draft a BGP community policy for our transit providers.",
+    "should_trigger": false
+  },
+  {
+    "id": "train-negative-rdap-domain",
+    "split": "train",
+    "query": "Look up the RDAP registration for example.com and list its nameservers.",
+    "should_trigger": false
+  },
+  {
+    "id": "validation-negative-inventory",
+    "split": "validation",
+    "query": "Export all internal router management addresses from our CMDB to CSV.",
+    "should_trigger": false
+  },
+  {
+    "id": "validation-negative-spreadsheet",
+    "split": "validation",
+    "query": "Make a quarterly revenue chart from finance.csv.",
+    "should_trigger": false
+  },
+  {
+    "id": "validation-negative-geocoding",
+    "split": "validation",
+    "query": "Geocode these ten customer shipping addresses and optimize the delivery route.",
+    "should_trigger": false
+  },
+  {
+    "id": "validation-negative-firewall",
+    "split": "validation",
+    "query": "Review this public IP firewall allowlist and remove stale ports.",
+    "should_trigger": false
+  },
+  {
+    "id": "validation-negative-gis",
+    "split": "validation",
+    "query": "Convert a city-boundary shapefile to GeoJSON and simplify its polygons.",
+    "should_trigger": false
+  }
+]

@@ -1,0 +1,460 @@
+{
+  "bundle": "fastah-netops-tools-agent-skills",
+  "files": [
+    {
+      "bytes": 9829,
+      "path": "tuning-geofeeds/SKILL.md",
+      "sha256": "da8dea0d9e7c0b8e005013adb44e375902c3eef7c9ce35299c20961d0eeca523",
+      "source": "tuning-geofeeds/SKILL.md"
+    },
+    {
+      "bytes": 3198,
+      "path": "tuning-geofeeds/evals/README.md",
+      "sha256": "e57f1afe35e7187fa9471466c92ed63155c0116d1ff6435382e5461abf08e9dc",
+      "source": "tuning-geofeeds/evals/README.md"
+    },
+    {
+      "bytes": 10258,
+      "path": "tuning-geofeeds/evals/evals.json",
+      "sha256": "0acce48d28b20edace23d62923492968f3c9db3e087ce99717432f3ee646403a",
+      "source": "tuning-geofeeds/evals/evals.json"
+    },
+    {
+      "bytes": 63,
+      "path": "tuning-geofeeds/evals/files/generic-table.csv",
+      "sha256": "85613eab3ea848af48e5a0122673db25558a22be2d0a745a8af66c95a1397a5c",
+      "source": "tuning-geofeeds/evals/files/generic-table.csv"
+    },
+    {
+      "bytes": 218,
+      "path": "tuning-geofeeds/evals/files/malformed-quality.csv",
+      "sha256": "fcc6478705e662dbd77fac4482c491c624386759e60ce3f20e4439d0fcf3b830",
+      "source": "tuning-geofeeds/evals/files/malformed-quality.csv"
+    },
+    {
+      "bytes": 1671,
+      "path": "tuning-geofeeds/evals/files/mcp-response-v1.json",
+      "sha256": "46d832714fa9c5808eaa21df80323af72dc8e732290bd71ca3337f0d715a2a00",
+      "source": "tuning-geofeeds/evals/files/mcp-response-v1.json"
+    },
+    {
+      "bytes": 126,
+      "path": "tuning-geofeeds/evals/files/mixed-valid.csv",
+      "sha256": "167cf8ce897cb997a13f89757c03859950cca63b1010c7ad6af37f40fe5432ae",
+      "source": "tuning-geofeeds/evals/files/mixed-valid.csv"
+    },
+    {
+      "bytes": 38,
+      "path": "tuning-geofeeds/evals/files/private-url.txt",
+      "sha256": "72abf321dc38fb232fd1ca661b319fe8cc085a2d933deb647d0e85e201dc5f67",
+      "source": "tuning-geofeeds/evals/files/private-url.txt"
+    },
+    {
+      "bytes": 7367,
+      "path": "tuning-geofeeds/evals/files/public-cloudflare-starlink-sample.csv",
+      "sha256": "91f8190dec63e3a079f3eb47c408b7c61eb77e523151c8dcb21e2c0db7e85b49",
+      "source": "tuning-geofeeds/evals/files/public-cloudflare-starlink-sample.csv"
+    },
+    {
+      "bytes": 25427,
+      "path": "tuning-geofeeds/evals/files/public-cloudflare-starlink-sample.manifest.json",
+      "sha256": "763f0cf8e31865faa6266049a7dffe7b7efb3b0e8c857a6fe1cf85705c480bd3",
+      "source": "tuning-geofeeds/evals/files/public-cloudflare-starlink-sample.manifest.json"
+    },
+    {
+      "bytes": 119,
+      "path": "tuning-geofeeds/evals/files/publisher-profile.json",
+      "sha256": "2b10ee53ea961716d45101faac0d422b76525b2040faf419e19b0bbb59401415",
+      "source": "tuning-geofeeds/evals/files/publisher-profile.json"
+    },
+    {
+      "bytes": 140,
+      "path": "tuning-geofeeds/evals/files/relationships.csv",
+      "sha256": "8811e35cb17eb32206b219431aa8721c3ead88d6d889ff3811ecdd51a49f8fb4",
+      "source": "tuning-geofeeds/evals/files/relationships.csv"
+    },
+    {
+      "bytes": 492,
+      "path": "tuning-geofeeds/evals/human-feedback.template.json",
+      "sha256": "54e8f8f8b82c6841f94e8a47575b2c6d95c4f64bf0fcbc23bb8db376a679a9c8",
+      "source": "tuning-geofeeds/evals/human-feedback.template.json"
+    },
+    {
+      "bytes": 128,
+      "path": "tuning-geofeeds/evals/timing.template.json",
+      "sha256": "4c1e6a4f2ca0567eee74577ada1762ff5c16dd4d0f09aa6e6156d7644c429d14",
+      "source": "tuning-geofeeds/evals/timing.template.json"
+    },
+    {
+      "bytes": 3932,
+      "path": "tuning-geofeeds/evals/trigger-queries.json",
+      "sha256": "69df694f02eeac0c4912c027dc404acce0de16b3be884584d9b7ab32a832c037",
+      "source": "tuning-geofeeds/evals/trigger-queries.json"
+    },
+    {
+      "bytes": 5072,
+      "path": "tuning-geofeeds/package/Makefile",
+      "sha256": "5a27f0c109f58bc55772873e9ac07e03ae5a03d3da8e7a13bbca510786156ad7",
+      "source": "Makefile"
+    },
+    {
+      "bytes": 1143,
+      "path": "tuning-geofeeds/package/README.md",
+      "sha256": "d9c31b6d4937f7dd80666241939bb535728bcf30b63d98eb7a1b7be6c6e05036",
+      "source": "tuning-geofeeds/assets/package-README.md"
+    },
+    {
+      "bytes": 110224,
+      "path": "tuning-geofeeds/package/assets/design/assets/fonts/Sora-VariableFont_wght.ttf",
+      "sha256": "46fee4d09354bc092ae968cf65ad21ef68cdc66a364e2f113d4c2b3f7c59a9a6",
+      "source": "design/assets/fonts/Sora-VariableFont_wght.ttf"
+    },
+    {
+      "bytes": 4171,
+      "path": "tuning-geofeeds/package/assets/design/assets/logos/fastah-lockup-ondark.svg",
+      "sha256": "838ce00960fa451d077fd52f7fd051868d4fa6aab72d800dc72a07e2d7771294",
+      "source": "design/assets/logos/fastah-lockup-ondark.svg"
+    },
+    {
+      "bytes": 954,
+      "path": "tuning-geofeeds/package/pyproject.toml",
+      "sha256": "a54bdbdaff507f6dccd9d81366ad78e94b7c1521b79d39d293eb225cfadc6a6f",
+      "source": "pyproject.toml"
+    },
+    {
+      "bytes": 44808,
+      "path": "tuning-geofeeds/package/schema/analysis.schema.json",
+      "sha256": "0ec8883b551af0e94abcca4089ff603d4c54ec39c8f2db38885687e3c4ea41a6",
+      "source": "schema/analysis.schema.json"
+    },
+    {
+      "bytes": 2210,
+      "path": "tuning-geofeeds/package/schema/correction-approval.schema.json",
+      "sha256": "cf7008d5ba5465b9d6e35dd27a484772a58ad403c2c23129c5f4c160d626608f",
+      "source": "schema/correction-approval.schema.json"
+    },
+    {
+      "bytes": 3844,
+      "path": "tuning-geofeeds/package/schema/correction-plan.schema.json",
+      "sha256": "fc44bc83f8c57e823338ac6625c0c3edaa99ee1e961e02fdd8fa898430d67c0f",
+      "source": "schema/correction-plan.schema.json"
+    },
+    {
+      "bytes": 1693,
+      "path": "tuning-geofeeds/package/schema/mcp-place-search-request.schema.json",
+      "sha256": "503959f7aaf5de197c7633d51a913fa18033f242eaa4df7b1db3aa4dc6063640",
+      "source": "schema/mcp-place-search-request.schema.json"
+    },
+    {
+      "bytes": 6351,
+      "path": "tuning-geofeeds/package/schema/mcp-place-search-response.schema.json",
+      "sha256": "10d63152453484d75bb3aa643131880f80ab4bd4ca61b8f26abb30c957976955",
+      "source": "schema/mcp-place-search-response.schema.json"
+    },
+    {
+      "bytes": 3461,
+      "path": "tuning-geofeeds/package/schema/mcp-request-mapping.schema.json",
+      "sha256": "ae2a55cf69caec27ee08c0ec59a31f412d994900cccf356c7d59ecee460b2202",
+      "source": "schema/mcp-request-mapping.schema.json"
+    },
+    {
+      "bytes": 13119,
+      "path": "tuning-geofeeds/package/src/fastah_geofeed_quality.egg-info/PKG-INFO",
+      "sha256": "c432ba9e3f40ac4e8fa6376486eb77ebb4957978cf2ec04df27fb340af556591",
+      "source": "src/fastah_geofeed_quality.egg-info/PKG-INFO"
+    },
+    {
+      "bytes": 946,
+      "path": "tuning-geofeeds/package/src/fastah_geofeed_quality.egg-info/SOURCES.txt",
+      "sha256": "282c3ccb1c939bc1e47ed0d6fa8ff8dde2c93a21f7a1d0b4955154c952b1cde6",
+      "source": "src/fastah_geofeed_quality.egg-info/SOURCES.txt"
+    },
+    {
+      "bytes": 1,
+      "path": "tuning-geofeeds/package/src/fastah_geofeed_quality.egg-info/dependency_links.txt",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "source": "src/fastah_geofeed_quality.egg-info/dependency_links.txt"
+    },
+    {
+      "bytes": 61,
+      "path": "tuning-geofeeds/package/src/fastah_geofeed_quality.egg-info/entry_points.txt",
+      "sha256": "bde7ec58065dcd1ae463eb026cb42e39b61ff71052e778c31eb50b784db246d3",
+      "source": "src/fastah_geofeed_quality.egg-info/entry_points.txt"
+    },
+    {
+      "bytes": 122,
+      "path": "tuning-geofeeds/package/src/fastah_geofeed_quality.egg-info/requires.txt",
+      "sha256": "2800736925607661197b2a786eb098b23d3e04758f53ac1fab7068d81f9b7f8e",
+      "source": "src/fastah_geofeed_quality.egg-info/requires.txt"
+    },
+    {
+      "bytes": 16,
+      "path": "tuning-geofeeds/package/src/fastah_geofeed_quality.egg-info/top_level.txt",
+      "sha256": "93ab1fa9253a67223aafbeb873c624db71aeab8cc57e9393e89bd2685f50dcdb",
+      "source": "src/fastah_geofeed_quality.egg-info/top_level.txt"
+    },
+    {
+      "bytes": 723,
+      "path": "tuning-geofeeds/package/src/geofeed_quality/__init__.py",
+      "sha256": "ad0e99ea861997c1f86ba6ee428b54252ded94ae8cbac967dd0418b5616135f3",
+      "source": "src/geofeed_quality/__init__.py"
+    },
+    {
+      "bytes": 23090,
+      "path": "tuning-geofeeds/package/src/geofeed_quality/analyzer.py",
+      "sha256": "d289ddd9e5da0242a4e96d47724f572609743ccb802b4c494cbc8d08ddd08294",
+      "source": "src/geofeed_quality/analyzer.py"
+    },
+    {
+      "bytes": 14708,
+      "path": "tuning-geofeeds/package/src/geofeed_quality/cli.py",
+      "sha256": "0c30b832c946d2624e0c5a89429801a66e22bf27f281e4b3d795719cae686a6b",
+      "source": "src/geofeed_quality/cli.py"
+    },
+    {
+      "bytes": 19001,
+      "path": "tuning-geofeeds/package/src/geofeed_quality/corrections.py",
+      "sha256": "d54a285acc9c82a802c2a87cefb09dbcb57a33cf2f9e7e46ec157ffb536543cf",
+      "source": "src/geofeed_quality/corrections.py"
+    },
+    {
+      "bytes": 1129,
+      "path": "tuning-geofeeds/package/src/geofeed_quality/errors.py",
+      "sha256": "8df4b6b069df4d877ec1bc24b5d58602ab4aea732870d8015002ed8c780b74a0",
+      "source": "src/geofeed_quality/errors.py"
+    },
+    {
+      "bytes": 5589,
+      "path": "tuning-geofeeds/package/src/geofeed_quality/geojson_renderer.py",
+      "sha256": "507387c038db3be9d8e3c7009e4e34aebc1821a39655b257b2550e47dd60ae85",
+      "source": "src/geofeed_quality/geojson_renderer.py"
+    },
+    {
+      "bytes": 35336,
+      "path": "tuning-geofeeds/package/src/geofeed_quality/html_renderer.py",
+      "sha256": "38751d419b6e46cb6f678c906f2ba7acc7fd53e92d7a106e72b85300c6d3e122",
+      "source": "src/geofeed_quality/html_renderer.py"
+    },
+    {
+      "bytes": 26143,
+      "path": "tuning-geofeeds/package/src/geofeed_quality/mcp_exchange.py",
+      "sha256": "6ba700079c94014a99b963d5128c476b472e0cd2c5d1b924518fc3b9d40941bc",
+      "source": "src/geofeed_quality/mcp_exchange.py"
+    },
+    {
+      "bytes": 32877,
+      "path": "tuning-geofeeds/package/src/geofeed_quality/models.py",
+      "sha256": "8ded7f559ac82da14bdca568a550962d0fda6ba38cfb3adfb22752d202a5cd06",
+      "source": "src/geofeed_quality/models.py"
+    },
+    {
+      "bytes": 34836,
+      "path": "tuning-geofeeds/package/src/geofeed_quality/rdap.py",
+      "sha256": "8b17998d75d844ba15b53532bf3941699e148d19156550059739ee7a0a28cfba",
+      "source": "src/geofeed_quality/rdap.py"
+    },
+    {
+      "bytes": 4251,
+      "path": "tuning-geofeeds/package/src/geofeed_quality/renderer.py",
+      "sha256": "b9f9f34bb66367b6674e08ed62355ca000d7a0579a7d8d01e9c91d668b164977",
+      "source": "src/geofeed_quality/renderer.py"
+    },
+    {
+      "bytes": 472,
+      "path": "tuning-geofeeds/package/src/geofeed_quality/runtime.py",
+      "sha256": "ff469bfba3d5b5a05e090e7bdecfde5172e78a265b18af5aa68a191e50cfa9d1",
+      "source": "src/geofeed_quality/runtime.py"
+    },
+    {
+      "bytes": 5912,
+      "path": "tuning-geofeeds/package/src/geofeed_quality/schema.py",
+      "sha256": "4208b2cabd62e728dc7deddbbff1de7c46cc4907a98c91eb65f6702feff2efa6",
+      "source": "src/geofeed_quality/schema.py"
+    },
+    {
+      "bytes": 1671,
+      "path": "tuning-geofeeds/package/tests/fixtures/mcp-response-v1.json",
+      "sha256": "46d832714fa9c5808eaa21df80323af72dc8e732290bd71ca3337f0d715a2a00",
+      "source": "tests/fixtures/mcp-response-v1.json"
+    },
+    {
+      "bytes": 168,
+      "path": "tuning-geofeeds/package/tests/fixtures/relationships.csv",
+      "sha256": "760ad57ea61450197c14cdb2a5c23957843c5ed4cba4163601b2383a807e61ee",
+      "source": "tests/fixtures/relationships.csv"
+    },
+    {
+      "bytes": 126,
+      "path": "tuning-geofeeds/package/tests/fixtures/valid.csv",
+      "sha256": "167cf8ce897cb997a13f89757c03859950cca63b1010c7ad6af37f40fe5432ae",
+      "source": "tests/fixtures/valid.csv"
+    },
+    {
+      "bytes": 11555,
+      "path": "tuning-geofeeds/package/tests/test_analyzer.py",
+      "sha256": "cf113b67146cbe42a22d09e7034cf2fc673e731e688517d68973a9d06900a35e",
+      "source": "tests/test_analyzer.py"
+    },
+    {
+      "bytes": 10189,
+      "path": "tuning-geofeeds/package/tests/test_cli.py",
+      "sha256": "d38fd99d84da265a296779a11781b3f637bbbc549fb60e77e4073c94655fe3c8",
+      "source": "tests/test_cli.py"
+    },
+    {
+      "bytes": 16163,
+      "path": "tuning-geofeeds/package/tests/test_corrections.py",
+      "sha256": "b14c7533af1883d95e2ae4b55866a3540f0559ad516c75f12ffd47751898d327",
+      "source": "tests/test_corrections.py"
+    },
+    {
+      "bytes": 18036,
+      "path": "tuning-geofeeds/package/tests/test_mcp_exchange.py",
+      "sha256": "dacd98f45fe118da28337691f90774d743cdd858c1e1d381e6c24ee0a6859d1a",
+      "source": "tests/test_mcp_exchange.py"
+    },
+    {
+      "bytes": 4719,
+      "path": "tuning-geofeeds/package/tests/test_public_packaging.py",
+      "sha256": "461e1fb04c64eaf4eb68a1fa64b54d83c0f553c7b9e0954de8e7509bb7601136",
+      "source": "tests/test_public_packaging.py"
+    },
+    {
+      "bytes": 1828,
+      "path": "tuning-geofeeds/package/tests/test_public_sample_fixture.py",
+      "sha256": "5ebe0c82e06d0561cf82d4898fe1d42e7d11aad0c15219f315fc988c3bd624b6",
+      "source": "tests/test_public_sample_fixture.py"
+    },
+    {
+      "bytes": 16456,
+      "path": "tuning-geofeeds/package/tests/test_rdap.py",
+      "sha256": "ff2adc2720feac2f4783118f4199c76d1f748cc250b8209ea2a63969857840d7",
+      "source": "tests/test_rdap.py"
+    },
+    {
+      "bytes": 1786,
+      "path": "tuning-geofeeds/package/tests/test_runtime.py",
+      "sha256": "7c585025ce583fa2bae4e8f88b9a6d843cd108c04d8ca01ade27d430629b67b3",
+      "source": "tests/test_runtime.py"
+    },
+    {
+      "bytes": 4023,
+      "path": "tuning-geofeeds/package/tests/test_schema_and_renderer.py",
+      "sha256": "8ce1cd73a2d1d1728ffcaf53dfee9cbe2f0b7071061d3adf2e96625a5cbdd0a3",
+      "source": "tests/test_schema_and_renderer.py"
+    },
+    {
+      "bytes": 9113,
+      "path": "tuning-geofeeds/package/tests/test_visual_renderers.py",
+      "sha256": "eb29b3e9d572fe89351c7d2ef889ef0597b9221a57d11c9d894acc0241d6d865",
+      "source": "tests/test_visual_renderers.py"
+    },
+    {
+      "bytes": 2936,
+      "path": "tuning-geofeeds/references/interpretation.md",
+      "sha256": "e596328b1f609661493abefb32cf250d4e5c0d26ec6ed0377271611542f0a7d7",
+      "source": "tuning-geofeeds/references/interpretation.md"
+    },
+    {
+      "bytes": 2503,
+      "path": "tuning-geofeeds/references/setup.md",
+      "sha256": "b0d916ee1e591ddb426237d775fbab3f14ab13d90310786420c036fc12176016",
+      "source": "tuning-geofeeds/references/setup.md"
+    },
+    {
+      "bytes": 19283,
+      "path": "tuning-geofeeds/scripts/evaluate.py",
+      "sha256": "9d020e3368409778843a4c49ff8cbb62b7ce560994dd27d1079a9e4a007cb201",
+      "source": "tuning-geofeeds/scripts/evaluate.py"
+    },
+    {
+      "bytes": 1566,
+      "path": "tuning-geofeeds/scripts/geofeed_cli.py",
+      "sha256": "68b95acfacb5cb450500d497ed90d1b71af419bdfcbbfc752950d4cc92b5008f",
+      "source": "tuning-geofeeds/scripts/geofeed_cli.py"
+    },
+    {
+      "bytes": 14441,
+      "path": "tuning-geofeeds/scripts/release_check.py",
+      "sha256": "2d60b8126d28bbc0ebd793152d95c62044eae86a41bc8f3b27ecadb50e1354d5",
+      "source": "tuning-geofeeds/scripts/release_check.py"
+    },
+    {
+      "bytes": 13718,
+      "path": "tuning-geofeeds/scripts/verify_public_sample.py",
+      "sha256": "23f6a57179572c09cd2745c16732d9ff0ddb76ae73cfb20844a3a9ea28a45477",
+      "source": "tuning-geofeeds/scripts/verify_public_sample.py"
+    }
+  ],
+  "format_version": "1",
+  "publicationPerformed": false,
+  "releaseReadiness": {
+    "status": "BLOCKED",
+    "unresolvedBlockerIds": [
+      "source-acquisition-release-gate",
+      "large-feed-performance-budget",
+      "public-repository-migration",
+      "terms-url-deployment-verification",
+      "mcp-origin-deployment-verification",
+      "platform-country-selection-verification",
+      "reviewer-access-submission-verification",
+      "mcp-domain-verification-token",
+      "mcp-scan-snapshot",
+      "mapbox-platform-configuration-verification",
+      "mcp-logging-deployment-verification"
+    ]
+  },
+  "skill": "tuning-geofeeds",
+  "source_commit": "12a7f6f533850b4dbec6d4fb585d4b8cb4234fa1",
+  "stagingFiles": [
+    {
+      "bytes": 495,
+      "path": ".github/plugin/plugin.json",
+      "sha256": "711f0acab84d83c69d42575cde9ecf80b0aef3af2c8fd9fd116ae2bdde55612d",
+      "source": "tuning-geofeeds/packaging/release.json+tuning-geofeeds/packaging/openai-submission.json"
+    },
+    {
+      "bytes": 122,
+      "path": ".vscode/mcp.json",
+      "sha256": "79475b14a1e58de86c70adf10d6803ce223e1304c96e2c40dcf6f651c0cb6f98",
+      "source": "tuning-geofeeds/packaging/release.json"
+    },
+    {
+      "bytes": 3445,
+      "path": "CONTRIBUTING.md",
+      "sha256": "cf27530773fe1a301712b7177a724de4f5d0387aa6717b86122a765311c19892",
+      "source": "tuning-geofeeds/packaging/public-root/CONTRIBUTING.md+tuning-geofeeds/packaging/release.json+pyproject.toml+schema/analysis.schema.json"
+    },
+    {
+      "bytes": 11358,
+      "path": "LICENSE",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "source": "tuning-geofeeds/packaging/public/LICENSE"
+    },
+    {
+      "bytes": 975,
+      "path": "MIGRATION.md",
+      "sha256": "4fffa6b2566ac6a9a4bfb8d9944d46c595e64a60615632f23ea07ae933b56741",
+      "source": "tuning-geofeeds/packaging/public-root/MIGRATION.md+tuning-geofeeds/packaging/release.json+pyproject.toml+schema/analysis.schema.json"
+    },
+    {
+      "bytes": 12857,
+      "path": "README.md",
+      "sha256": "9613ecf1efc1a56c704f5df382cf63cd8cf601e80feae2a4aee68f4c369aea8a",
+      "source": "tuning-geofeeds/packaging/public-root/README.md+tuning-geofeeds/packaging/release.json+pyproject.toml+schema/analysis.schema.json"
+    },
+    {
+      "bytes": 3582,
+      "path": "marketplace-metadata.json",
+      "sha256": "066d52c71b679d9858921b00b3caeffb216e15c7ee15650e9dd71f0db0aff68f",
+      "source": "tuning-geofeeds/packaging/release.json"
+    },
+    {
+      "bytes": 125,
+      "path": "mcp-plugin.json",
+      "sha256": "b35b727b4bdbe7f5a44dba473a1443ce90be77327436178bdad6074b49def41b",
+      "source": "tuning-geofeeds/packaging/release.json"
+    }
+  ],
+  "targetRepository": "fastah/ip-geofeed-skills"
+}

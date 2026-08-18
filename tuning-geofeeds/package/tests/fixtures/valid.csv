@@ -1,0 +1,5 @@
+# Representative public IPv4 and IPv6 rows
+8.8.8.0/24,us,us-ca,Mountain View,
+2606:4700::/48,gb,gb-eng,London,
+
+1.1.1.1,zz,,,

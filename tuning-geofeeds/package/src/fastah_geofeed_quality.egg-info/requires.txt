@@ -1,0 +1,9 @@
+httpx<1,>=0.28
+jsonschema<5,>=4.23
+pycountry>=26.2.16
+pydantic<3,>=2.11
+
+[dev]
+mypy<2,>=1.15
+pytest<9,>=8.3
+ruff<1,>=0.11
