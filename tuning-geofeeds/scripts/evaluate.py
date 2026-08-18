@@ -373,8 +373,8 @@ def _python_guard(runner: Runner) -> list[Result]:
     skill = (runner.skill / "SKILL.md").read_text(encoding="utf-8")
     launcher = runner.launcher.read_text(encoding="utf-8")
     return [
-        ("Requires Python 3.13+" in skill, "frontmatter compatibility requires Python 3.13+"),
-        ("sys.version_info < (3, 13)" in launcher, "launcher has an executable version guard"),
+        ("Requires Python 3.14+" in skill, "frontmatter compatibility requires Python 3.14+"),
+        ("sys.version_info < (3, 14)" in launcher, "launcher has an executable version guard"),
         (None, "requires a clean agent execution trace"),
     ]
 

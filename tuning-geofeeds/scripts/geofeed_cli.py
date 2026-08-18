@@ -24,8 +24,8 @@ def package_root() -> Path:
 
 
 def main() -> int:
-    if sys.version_info < (3, 13):  # noqa: UP036 - portable runtime guard is intentional
-        raise SystemExit("error: tuning-geofeeds requires Python 3.13 or newer")
+    if sys.version_info < (3, 14):  # noqa: UP036 - portable runtime guard is intentional
+        raise SystemExit("error: tuning-geofeeds requires Python 3.14 or newer")
     root = package_root()
     if sys.argv[1:] == ["--print-package-root"]:
         print(root)

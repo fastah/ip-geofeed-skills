@@ -24,7 +24,7 @@ tuning-geofeeds-workspace/
 Run deterministic grading from any working directory:
 
 ```bash
-python3.13 /absolute/skill/root/scripts/evaluate.py \
+python3.14 /absolute/skill/root/scripts/evaluate.py \
   --workspace /absolute/path/to/tuning-geofeeds-workspace \
   --iteration 1
 ```
@@ -65,7 +65,7 @@ snapshots are not committed. If the exact snapshots are available locally,
 verify complete reconstruction with:
 
 ```bash
-python3.13 scripts/verify_public_sample.py verify \
+python3.14 scripts/verify_public_sample.py verify \
   --fixture evals/files/public-cloudflare-starlink-sample.csv \
   --manifest evals/files/public-cloudflare-starlink-sample.manifest.json \
   --snapshot-dir /path/to/source-snapshots

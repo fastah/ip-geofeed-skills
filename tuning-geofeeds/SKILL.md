@@ -2,7 +2,7 @@
 name: tuning-geofeeds
 description: "Analyzes and tunes public IP RFC 8805 geofeed CSVs for network operators, preserving evidence while producing JSON, Markdown, HTML, GeoJSON, and explicitly approved corrected feeds. Use for public prefix geolocation quality, duplicate or carved-prefix review, optional RDAP consistency evidence, or Fastah place-search enrichment; do not use for private/internal IPAM or generic CSV work."
 license: Apache-2.0
-compatibility: "Requires Python 3.13+. Runs locally by default; network access is optional and limited to managed public-HTTPS acquisition, direct authoritative RIR RDAP, and host-mediated Fastah MCP."
+compatibility: "Requires Python 3.14+. Runs locally by default; network access is optional and limited to managed public-HTTPS acquisition, direct authoritative RIR RDAP, and host-mediated Fastah MCP."
 metadata:
   author: fastah
   version: "0.2.0"
@@ -48,7 +48,7 @@ so a host-provided absolute launcher path remains safe from any working director
 ```bash
 SKILL_ROOT="/absolute/path/to/tuning-geofeeds"
 cd "$SKILL_ROOT"
-PYTHON="/absolute/path/to/python3.13"
+PYTHON="/absolute/path/to/python3.14"
 RUN="scripts/geofeed_cli.py"
 WORK="/absolute/path/to/user-selected-work-directory"
 mkdir -p "$WORK"

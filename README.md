@@ -15,7 +15,7 @@ The `tuning-geofeeds` skill works with [RFC 8805](https://www.rfc-editor.org/rfc
 
 | Item | Current support |
 |---|---|
-| Python | 3.13 or newer |
+| Python | 3.14 or newer |
 | Input | A local, strict UTF-8 RFC 8805 CSV file |
 | Amp | Install from this public repository after publication |
 | Claude and OpenAI marketplaces | Not published yet. Do not treat generated review packages as listings. |

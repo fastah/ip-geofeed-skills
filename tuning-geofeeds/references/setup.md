@@ -1,13 +1,13 @@
 # Python setup
 
-The portable analyzer requires Python 3.13 or newer. Resolve the skill root
+The portable analyzer requires Python 3.14 or newer. Resolve the skill root
 from the installed skill location, change to that directory, then ask the
 bundled launcher where its package lives:
 
 ```bash
 SKILL_ROOT="/absolute/path/to/tuning-geofeeds"
 cd "$SKILL_ROOT"
-BOOTSTRAP_PYTHON="/absolute/path/to/python3.13"
+BOOTSTRAP_PYTHON="/absolute/path/to/python3.14"
 PACKAGE_ROOT="$("$BOOTSTRAP_PYTHON" scripts/geofeed_cli.py --print-package-root)"
 "$BOOTSTRAP_PYTHON" -m venv "$WORK/.venv"
 PYTHON="$WORK/.venv/bin/python"

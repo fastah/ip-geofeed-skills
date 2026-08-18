@@ -7,7 +7,7 @@ name = "fastah-geofeed-quality"
 version = "0.4.0"
 description = "Local RFC 8805 geofeed analysis for Fastah NetOps Tools"
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.14"
 dependencies = [
   "httpx>=0.28,<1",
   "jsonschema>=4.23,<5",
@@ -35,13 +35,13 @@ markers = ["live: opt-in tests that make external network requests"]
 
 [tool.ruff]
 line-length = 100
-target-version = "py313"
+target-version = "py314"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
 
 [tool.mypy]
-python_version = "3.13"
+python_version = "3.14"
 strict = true
 files = ["src", "tests"]
 ignore_missing_imports = true

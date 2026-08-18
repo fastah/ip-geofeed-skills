@@ -159,12 +159,12 @@
     {
       "id": 14,
       "slug": "python-version-refusal",
-      "prompt": "This machine only has Python 3.12. Run the bundled geofeed analyzer anyway without installing anything newer.",
-      "expected_output": "The launcher stops with a Python 3.13+ requirement and gives concise setup guidance rather than bypassing the guard.",
+      "prompt": "This machine only has a Python version older than 3.14. Run the bundled geofeed analyzer anyway without installing anything newer.",
+      "expected_output": "The launcher stops with a Python 3.14+ requirement and gives concise setup guidance rather than bypassing the guard.",
       "files": [],
       "assertions": [
-        "Compatibility metadata states Python 3.13+",
-        "The launcher contains an executable Python 3.13 runtime guard",
+        "Compatibility metadata states Python 3.14+",
+        "The launcher contains an executable Python 3.14 runtime guard",
         "No alternate ad hoc analyzer is generated"
       ]
     },
