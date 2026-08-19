@@ -174,6 +174,6 @@ These versions move independently. Include them with the source digest when you 
 - Website: [https://getfastah.com/](https://getfastah.com/)
 - Support: [support@getfastah.com](mailto:support@getfastah.com)
 - [Privacy policy](https://www.iubenda.com/privacy-policy/40053234)
-- [Terms of use](https://mcp.global.fastah.ai/terms-of-use.txt)
+- [Terms of use](https://mcp.fastah.ai/terms-of-use.txt)
 - [Maintainer and release instructions](CONTRIBUTING.md)
 - [Migration from `geofeed-tuner`](MIGRATION.md)

@@ -2,7 +2,7 @@
   "servers": {
     "fastah-netops": {
       "type": "http",
-      "url": "https://mcp.global.fastah.ai/mcp"
+      "url": "https://mcp.fastah.ai/mcp"
     }
   }
 }

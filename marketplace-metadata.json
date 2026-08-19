@@ -98,7 +98,7 @@
     "llmsTxtLinked": true,
     "source": "gen2/cmd/worker-mcp/terms-of-use.txt"
   },
-  "termsOfServiceUrl": "https://mcp.global.fastah.ai/terms-of-use.txt",
-  "termsUrlStatus": "live-inconsistent-load-balanced-body-head-200-recheck-inconclusive",
+  "termsOfServiceUrl": "https://mcp.fastah.ai/terms-of-use.txt",
+  "termsUrlStatus": "canonical-origin-verification-required-historical-global-evidence-retained",
   "website": "https://getfastah.com/"
 }

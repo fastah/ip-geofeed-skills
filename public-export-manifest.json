@@ -278,9 +278,9 @@
       "source": "tests/test_mcp_exchange.py"
     },
     {
-      "bytes": 5360,
+      "bytes": 5370,
       "path": "tuning-geofeeds/package/tests/test_public_packaging.py",
-      "sha256": "8ad7476d63452a42d2e2b10bcc43a62fdfea730c8666af50a98e17e60c88dbcd",
+      "sha256": "ba8563749c7c0b275ee7bbb69672f9af513ec67efcc892189774392015a64f14",
       "source": "tests/test_public_packaging.py"
     },
     {
@@ -369,7 +369,7 @@
     ]
   },
   "skill": "tuning-geofeeds",
-  "source_commit": "0474fabc1720a850753997fe78d137f534519487",
+  "source_commit": "846cd45574be3f87f897c4ce1e7bc59edf883e03",
   "stagingFiles": [
     {
       "bytes": 495,
@@ -378,15 +378,15 @@
       "source": "tuning-geofeeds/packaging/release.json+tuning-geofeeds/packaging/openai-submission.json"
     },
     {
-      "bytes": 122,
+      "bytes": 115,
       "path": ".vscode/mcp.json",
-      "sha256": "79475b14a1e58de86c70adf10d6803ce223e1304c96e2c40dcf6f651c0cb6f98",
+      "sha256": "dd18e553fff186abc979c1c83dcb6432fec9596c2e882f5b265397162569e7d5",
       "source": "tuning-geofeeds/packaging/release.json"
     },
     {
-      "bytes": 3445,
+      "bytes": 3452,
       "path": "CONTRIBUTING.md",
-      "sha256": "cf27530773fe1a301712b7177a724de4f5d0387aa6717b86122a765311c19892",
+      "sha256": "3bbb7a46bd35012a52f8417cac4a47a4e5cb1edd53e611bdea21ce75ce0b2eb3",
       "source": "tuning-geofeeds/packaging/public-root/CONTRIBUTING.md+tuning-geofeeds/packaging/release.json+pyproject.toml+schema/analysis.schema.json"
     },
     {
@@ -402,21 +402,21 @@
       "source": "tuning-geofeeds/packaging/public-root/MIGRATION.md+tuning-geofeeds/packaging/release.json+pyproject.toml+schema/analysis.schema.json"
     },
     {
-      "bytes": 12857,
+      "bytes": 12850,
       "path": "README.md",
-      "sha256": "a1c88e9a4f77ee4eb5a57f71dd41f1e08e67f9fc57ab4ef26f2e5027b1f795ff",
+      "sha256": "a6ea248efbb900656e11040eb9aa4dfab5a4f155e5b9727da6f9a029da5a10b8",
       "source": "tuning-geofeeds/packaging/public-root/README.md+tuning-geofeeds/packaging/release.json+pyproject.toml+schema/analysis.schema.json"
     },
     {
-      "bytes": 3582,
+      "bytes": 3583,
       "path": "marketplace-metadata.json",
-      "sha256": "066d52c71b679d9858921b00b3caeffb216e15c7ee15650e9dd71f0db0aff68f",
+      "sha256": "8381797501cc59ad2efaed73c7dc398dbcc13acefc51d67082307d7ae5e778c6",
       "source": "tuning-geofeeds/packaging/release.json"
     },
     {
-      "bytes": 125,
+      "bytes": 118,
       "path": "mcp-plugin.json",
-      "sha256": "b35b727b4bdbe7f5a44dba473a1443ce90be77327436178bdad6074b49def41b",
+      "sha256": "514db5ca43ed864cf5d92bbac9fb1612099d3a06c40e95d6990cab77558f8150",
       "source": "tuning-geofeeds/packaging/release.json"
     }
   ],
