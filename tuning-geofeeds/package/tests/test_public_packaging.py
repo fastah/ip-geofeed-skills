@@ -86,7 +86,7 @@ def test_public_root_is_generated_from_canonical_metadata(tmp_path: Path) -> Non
         "`do_not_geolocate`",
         "around 225 MB",
         "remarks: Geofeed https://...",
-        "https://mcp.global.fastah.ai/terms-of-use.txt",
+        "https://mcp.fastah.ai/terms-of-use.txt",
     ):
         assert text in readme
     assert "{{" not in readme
@@ -113,14 +113,14 @@ def test_public_root_is_generated_from_canonical_metadata(tmp_path: Path) -> Non
         )
     )
     assert "geofeed-tuner" not in discovery
-    assert "https://mcp.fastah.ai/mcp" not in discovery
-    assert "https://mcp.global.fastah.ai/mcp" in discovery
+    assert "https://mcp.global.fastah.ai/mcp" not in discovery
+    assert "https://mcp.fastah.ai/mcp" in discovery
 
 
-def test_public_root_rejects_stale_mcp_discovery(tmp_path: Path) -> None:
+def test_public_root_rejects_outdated_global_mcp_discovery(tmp_path: Path) -> None:
     packager = _packager()
     config = deepcopy(_config())
-    config["mcp"]["url"] = "https://mcp.fastah.ai/mcp"
+    config["mcp"]["url"] = "https://mcp.global.fastah.ai/mcp"
 
     with pytest.raises(ValueError, match="legacy active skill or endpoint"):
         packager._stage_public_root(tmp_path, config)

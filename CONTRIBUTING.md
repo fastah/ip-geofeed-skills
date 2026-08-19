@@ -42,7 +42,7 @@ Prepare one reviewable pull request against `https://github.com/fastah/ip-geofee
 
 1. Replace the public working tree with the generated stage and record its private source commit.
 2. Replace the active `geofeed-tuner` discovery entries with `tuning-geofeeds`.
-3. Remove every legacy file absent from the generated stage, including `skills/geofeed-tuner/`, `experimental/ip-geofeed/`, `README-PLUGIN.md`, the stale `.github/skills` link, old setup files, and metadata that points to `mcp.fastah.ai`.
+3. Remove every legacy file absent from the generated stage, including `skills/geofeed-tuner/`, `experimental/ip-geofeed/`, `README-PLUGIN.md`, the stale `.github/skills` link, old setup files, and metadata that points to `mcp.global.fastah.ai`.
 4. Keep public history through Git rather than shipping two active skills.
 5. Exclude feeds other than allowlisted eval fixtures, runtime captures, benchmark transcripts, private validation, credentials, local paths, and generated work directories.
 6. Verify every staged file against `public-export-manifest.json` before merge.
