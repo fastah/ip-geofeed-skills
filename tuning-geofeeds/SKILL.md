@@ -14,6 +14,13 @@ Use the bundled analyzer to inspect and improve an RFC 8805 feed without
 silently changing authored data. Keep one user-selected working directory for
 all generated files; never write runtime output into this skill directory.
 
+## Get the feed
+
+Claude Cowork, other cloud agents, and corporate networks may allow only listed
+HTTPS hosts. If the host cannot fetch the geofeed URL, ask the user to upload
+the CSV. That is the intended path. Do not bypass the host's network policy or
+reconstruct feed rows.
+
 ## Gotchas and invariants
 
 - **Fastah MCP receives only** `rowId`, `country`, `region`, `city`, and
@@ -71,23 +78,18 @@ Track these gates and do not skip from analysis to export:
 
 ### 1. Obtain a local source
 
-For a local or uploaded file, copy it into `WORK` without changing its bytes.
-For a public HTTPS URL, use only a host-managed download facility that fully
-downloads to `WORK`, uses no ambient credentials, rejects non-HTTPS and
-credential-bearing URLs, blocks private/loopback/link-local destinations on
-every redirect and connection, and enforces redirect, timeout, and size limits.
-If the host cannot guarantee those controls, stop and ask the user to upload
-the file; never substitute `curl`, `wget`, or an ad hoc downloader.
-The bundled runtime currently accepts only strict UTF-8 local files and cannot
-record raw-response and normalized digests. Do not transcode a remote response
-outside a provenance-preserving host acquisition facility. An absent charset
-means strict UTF-8, never a Latin-1 fallback; unsupported declarations and
-undeclared malformed UTF-8 must fail closed.
+Use a local or uploaded file, or the host's normal HTTPS download capability.
+If the host blocks the URL, ask the user to upload the CSV. Do not create a
+downloader or bypass network controls. The analyzer accepts strict UTF-8 local
+files. If conversion is needed, keep the original and make a separate UTF-8
+working copy.
 
 For named third-party operational examples, see the
 [Interpretation guide](references/interpretation.md#third-party-operational-examples).
 
 Set `INPUT` to that absolute local path.
+Analysis records `source.sha256` for audits and for binding later approvals to
+the analyzed file. Most users do not need to calculate a separate digest.
 
 ### 2. Analyze locally and present base findings
 
@@ -167,7 +169,10 @@ trigger a correction automatically. If MCP is unavailable, continue offline.
 The Analysis JSON itself is the JSON artifact. Renderers accept only validated
 IR and do not recompute findings. Explain output distinctions using
 [Interpretation guide](references/interpretation.md). Present the files through
-the host; the offline dashboard needs no server or Mapbox token.
+the host; the offline dashboard needs no server or Mapbox token. Offline or
+RDAP-only analysis has no point or bounds geometry. In that case GeoJSON is a
+valid empty FeatureCollection and the launcher prints an informational message;
+only MCP place evidence can populate its features.
 
 ### 6. Propose, review, and explicitly approve corrections
 

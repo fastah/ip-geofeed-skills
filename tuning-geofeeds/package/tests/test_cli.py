@@ -27,7 +27,9 @@ def test_analyze_then_render_cli(tmp_path: Path) -> None:
     assert report_path.read_text().startswith("# Geofeed quality analysis\n")
 
 
-def test_html_and_geojson_cli_consume_analysis_json(tmp_path: Path) -> None:
+def test_html_and_geojson_cli_consume_analysis_json(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     analysis_path = tmp_path / "analysis.json"
     html_path = tmp_path / "dashboard.html"
     geojson_path = tmp_path / "analysis.geojson"
@@ -40,6 +42,10 @@ def test_html_and_geojson_cli_consume_analysis_json(tmp_path: Path) -> None:
         "features": [],
         "attribution": ["Contains information derived from GeoNames (https://www.geonames.org/)."],
     }
+    assert capsys.readouterr().err == (
+        "info: GeoJSON contains zero features because no MCP place evidence "
+        "with valid coordinates or bounds is present\n"
+    )
 
 
 def test_html_cli_reads_explicit_mapbox_token_file(tmp_path: Path) -> None:
@@ -195,7 +201,9 @@ def test_cli_preserves_output_when_one_rdap_assessment_is_malformed(
     assert "z" * 64 not in analysis_path.read_text()
 
 
-def test_cli_mcp_export_and_import_are_host_mediated(tmp_path: Path) -> None:
+def test_cli_mcp_export_and_import_are_host_mediated(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     analysis_path = tmp_path / "analysis.json"
     batches_path = tmp_path / "batches"
     enriched_path = tmp_path / "enriched.json"
@@ -249,6 +257,10 @@ def test_cli_mcp_export_and_import_are_host_mediated(tmp_path: Path) -> None:
         item["search_mode"] == "prefer_larger_population_center"
         for item in enriched["enrichment"]["mcp_observations"]
     )
+    geojson_path = tmp_path / "enriched.geojson"
+    assert main(["export-geojson", str(enriched_path), "--output", str(geojson_path)]) == 0
+    assert json.loads(geojson_path.read_text())["features"]
+    assert "zero features" not in capsys.readouterr().err
 
 
 def test_user_facing_outputs_refuse_existing_paths(

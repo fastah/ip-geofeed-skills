@@ -140,6 +140,8 @@ def _mcp(runner: Runner) -> list[Result]:
         "mcp-import",
         str(base),
         str(runner.files / "mcp-response-v1.json"),
+        "--mapping",
+        str(requests / "mapping.json"),
         "--batch-limit",
         "1000",
         "--output",
@@ -375,6 +377,10 @@ def _python_guard(runner: Runner) -> list[Result]:
     return [
         ("Requires Python 3.14+" in skill, "frontmatter compatibility requires Python 3.14+"),
         ("sys.version_info < (3, 14)" in launcher, "launcher has an executable version guard"),
+        (
+            'sys.version_info.releaselevel != "final"' in launcher,
+            "launcher rejects prerelease Python before loading the analyzer",
+        ),
         (None, "requires a clean agent execution trace"),
     ]
 

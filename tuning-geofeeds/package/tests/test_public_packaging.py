@@ -87,16 +87,20 @@ def test_public_root_is_generated_from_canonical_metadata(tmp_path: Path) -> Non
         "around 225 MB",
         "remarks: Geofeed https://...",
         "https://mcp.fastah.ai/terms-of-use.txt",
+        "upload the CSV",
+        "source.sha256",
+        "valid empty FeatureCollection",
     ):
         assert text in readme
     assert "{{" not in readme
     assert "make skill-public-stage" not in readme
-    assert "Public and marketplace release remain blocked" in (
-        tmp_path / "CONTRIBUTING.md"
-    ).read_text(encoding="utf-8")
+    contributing = (tmp_path / "CONTRIBUTING.md").read_text(encoding="utf-8")
+    assert "local-file-first GitHub Skill is public" in contributing
+    assert "Marketplace release remains blocked" in contributing
     migration = (tmp_path / "MIGRATION.md").read_text(encoding="utf-8")
     assert "`tuning-geofeeds` supersedes the legacy `geofeed-tuner`" in migration
-    assert "will remove the legacy skill" in migration
+    assert "public migration removed the legacy skill" in migration
+    assert "future public migration" not in migration
 
     plugin = json.loads((tmp_path / ".github" / "plugin" / "plugin.json").read_text())
     assert plugin["name"] == config["pluginName"]

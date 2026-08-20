@@ -206,6 +206,12 @@ def main(argv: Sequence[str] | None = None) -> int:
         if args.command == "export-geojson":
             document = export_geojson_file(args.input)
             _write_atomic_new(args.output, (json.dumps(document, indent=2) + "\n").encode())
+            if not document["features"]:
+                print(
+                    "info: GeoJSON contains zero features because no MCP place evidence "
+                    "with valid coordinates or bounds is present",
+                    file=sys.stderr,
+                )
             return 0
         if args.command == "propose-corrections":
             document = json.loads(args.input.read_text(encoding="utf-8"))

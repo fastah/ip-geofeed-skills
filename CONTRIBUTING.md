@@ -36,21 +36,20 @@ tuning-geofeeds/
 
 Product identity, plugin version, MCP endpoint and contract, publisher, support, privacy, and Terms values come from `tuning-geofeeds/packaging/release.json`. Python and analyzer versions come from `gen2/geofeed-quality/pyproject.toml`. Analysis schema version comes from the committed schema. Public prose comes from `tuning-geofeeds/packaging/public-root/`. The public Apache-2.0 license comes from `tuning-geofeeds/packaging/public/LICENSE`.
 
-## Public migration pull request
+## Public update pull request
 
 Prepare one reviewable pull request against `https://github.com/fastah/ip-geofeed-skills`. It should:
 
 1. Replace the public working tree with the generated stage and record its private source commit.
-2. Replace the active `geofeed-tuner` discovery entries with `tuning-geofeeds`.
-3. Remove every legacy file absent from the generated stage, including `skills/geofeed-tuner/`, `experimental/ip-geofeed/`, `README-PLUGIN.md`, the stale `.github/skills` link, old setup files, and metadata that points to `mcp.global.fastah.ai`.
-4. Keep public history through Git rather than shipping two active skills.
-5. Exclude feeds other than allowlisted eval fixtures, runtime captures, benchmark transcripts, private validation, credentials, local paths, and generated work directories.
-6. Verify every staged file against `public-export-manifest.json` before merge.
+2. Confirm `geofeed-tuner` and its legacy discovery metadata have not returned.
+3. Remove files absent from the generated stage rather than carrying stale copies.
+4. Exclude feeds other than allowlisted eval fixtures, runtime captures, benchmark transcripts, private validation, credentials, local paths, and generated work directories.
+5. Verify every staged file against `public-export-manifest.json` before merge.
 
 The migration is not a compatibility release. Reanalyze original source feeds with `tuning-geofeeds`; do not import legacy reports as current Analysis JSON.
 
 ## Readiness
 
-Public and marketplace release remain blocked under the current private release policy. Open items include product-owned secure acquisition, measured 60,000-row time/memory/browser budgets, production Terms and OAuth consistency, deployed log-retention evidence, clean host verification, and marketplace review. A local-file-first preview would require an explicit product decision changing those gates. Generating this tree does not make that decision.
+The local-file-first GitHub Skill is public, and its isolated Amp install has been smoke-tested. Marketplace release remains blocked by product-owned secure acquisition, measured 60,000-row time/memory/browser budgets, live production Terms and OAuth consistency, deployed log-retention evidence, clean Claude and OpenAI host verification, reviewer access, and marketplace review. An allowlisted host asking the user to upload the CSV is supported behavior; it is not permission to bypass network policy.
 
-Sequence shared-state work separately: merge the private implementation, generate and review the public pull request, publish to public GitHub with approval, smoke-test the public Amp install, validate Claude and OpenAI hosts, close production blockers, then submit marketplaces with separate approval.
+Sequence shared-state work separately: merge the private implementation, generate and review the public pull request, publish to public GitHub with approval, repeat the public Amp install smoke, validate Claude and OpenAI hosts, close production and product blockers, then submit marketplaces last with separate approval.

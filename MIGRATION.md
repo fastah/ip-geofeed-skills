@@ -2,14 +2,14 @@
 
 `tuning-geofeeds` supersedes the legacy `geofeed-tuner` skill.
 
-The future public migration pull request will remove the legacy skill, experimental implementation, and stale discovery metadata. The two skills will not be listed as active alternatives.
+The public migration removed the legacy skill, experimental implementation, and stale discovery metadata. The two skills are not listed as active alternatives.
 
 The current skill uses a versioned Analysis JSON contract, keeps authored rows and physical lines, separates findings from evidence, limits online data, and requires exact proposal approvals before writing a corrected feed. Legacy reports and generated files do not satisfy this contract.
 
 To migrate:
 
 1. Keep the original geofeed CSV.
-2. Install `tuning-geofeeds` from the migrated public repository.
+2. Install `tuning-geofeeds` from the public repository.
 3. Analyze the original CSV again.
 4. Review new findings and proposals on their own evidence.
 5. Approve exact proposal IDs only after review.
