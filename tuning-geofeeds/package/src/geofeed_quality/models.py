@@ -1,3 +1,4 @@
+# Copyright 2026 Fastah Inc.
 """Pydantic source of truth for analysis IR v0.4.0."""
 
 from __future__ import annotations
@@ -122,7 +123,7 @@ class McpResultCode(StrEnum):
     MATCH_FOUND = "MATCH_FOUND"
     DO_NOT_GEOLOCATE = "DO_NOT_GEOLOCATE"
     NO_MATCH = "NO_MATCH"
-    INVALID_ROW_ID = "INVALID_ROW_ID"
+    INVALID_ROW_KEY = "INVALID_ROW_KEY"
     INVALID_COUNTRY_CODE = "INVALID_COUNTRY_CODE"
     INVALID_REGION_CODE = "INVALID_REGION_CODE"
     INVALID_CITY_NAME = "INVALID_CITY_NAME"

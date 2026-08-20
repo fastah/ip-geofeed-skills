@@ -1,3 +1,4 @@
+# Copyright 2026 Fastah Inc.
 from __future__ import annotations
 
 import subprocess
@@ -42,9 +43,7 @@ def test_pycountry_dependency_floor_and_installed_version() -> None:
 
 
 def test_agent_launcher_rejects_prerelease_before_importing_pydantic() -> None:
-    launcher = (
-        Path(__file__).parents[1] / "tuning-geofeeds" / "scripts" / "geofeed_cli.py"
-    )
+    launcher = Path(__file__).parents[1] / "tuning-geofeeds" / "scripts" / "geofeed_cli.py"
     script = textwrap.dedent(
         f"""
         import importlib.util
@@ -79,9 +78,7 @@ def test_agent_launcher_rejects_prerelease_before_importing_pydantic() -> None:
 
 
 def test_agent_launcher_help_exposes_examples_and_exit_meanings() -> None:
-    launcher = (
-        Path(__file__).parents[1] / "tuning-geofeeds" / "scripts" / "geofeed_cli.py"
-    )
+    launcher = Path(__file__).parents[1] / "tuning-geofeeds" / "scripts" / "geofeed_cli.py"
     completed = subprocess.run(
         [sys.executable, str(launcher), "--help"],
         text=True,

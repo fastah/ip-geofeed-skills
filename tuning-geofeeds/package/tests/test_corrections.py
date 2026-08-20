@@ -1,3 +1,4 @@
+# Copyright 2026 Fastah Inc.
 from __future__ import annotations
 
 import copy
@@ -254,7 +255,8 @@ def test_mcp_best_match_is_advisory_and_failures_never_propose(tmp_path: Path) -
 
     request = request_document(export_request_batches(proposed, 1_000)[0])
     assert all(
-        set(row) <= {"rowId", "country", "region", "city", "searchMode"} for row in request["rows"]
+        set(row) <= {"rowKey", "countryCode", "regionCode", "cityName", "searchMode"}
+        for row in request["rows"]
     )
     encoded = json.dumps(request)
     assert "proposal-" not in encoded and "corrections" not in encoded and "rdap" not in encoded

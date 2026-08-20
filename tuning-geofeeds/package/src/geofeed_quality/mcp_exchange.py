@@ -1,3 +1,4 @@
+# Copyright 2026 Fastah Inc.
 """Host-mediated Fastah MCP request export and response import.
 
 This module intentionally has no MCP transport, OAuth, or credential handling.
@@ -44,13 +45,10 @@ MCP_RESPONSE_SCHEMA_ID = (
 MCP_MAPPING_SCHEMA_ID = (
     "https://schemas.fastah.net/netops/geofeed-quality/mcp-request-mapping-1.0.json"
 )
-ROW_ID_PATTERN = r"^[A-Za-z0-9][A-Za-z0-9._:-]{7,127}$"
-COUNTRY_PATTERN = r"^([A-Za-z]{2})?$"
-REGION_PATTERN = r"^[^,\r\n]*$"
-CITY_PATTERN = r"^[^,\r\n]*$"
+ROW_KEY_PATTERN = r"^[A-Za-z0-9][A-Za-z0-9._:/-]{31,127}$"
 
-OpaqueRowId = Annotated[
-    str, StringConstraints(min_length=8, max_length=128, pattern=ROW_ID_PATTERN)
+OpaqueRowKey = Annotated[
+    str, StringConstraints(min_length=32, max_length=128, pattern=ROW_KEY_PATTERN)
 ]
 
 
@@ -59,10 +57,10 @@ class WireModel(Model):
 
 
 class McpRequestRow(WireModel):
-    row_id: OpaqueRowId = Field(alias="rowId")
-    country: str = Field(max_length=2, pattern=COUNTRY_PATTERN)
-    region: str = Field(default="", max_length=16, pattern=REGION_PATTERN)
-    city: str = Field(default="", max_length=200, pattern=CITY_PATTERN)
+    row_key: OpaqueRowKey = Field(alias="rowKey")
+    country_code: str = Field(alias="countryCode", max_length=16)
+    region_code: str = Field(default="", alias="regionCode", max_length=16)
+    city_name: str = Field(default="", alias="cityName", max_length=200)
     search_mode: McpSearchMode = Field(default=McpSearchMode.AUTO, alias="searchMode")
 
 
@@ -70,44 +68,44 @@ class McpRequestBatch(WireModel):
     rows: list[McpRequestRow] = Field(min_length=1)
 
     @model_validator(mode="after")
-    def validate_unique_row_ids(self) -> McpRequestBatch:
-        ids = [row.row_id for row in self.rows]
-        if len(ids) != len(set(ids)):
-            raise ValueError("rowId values must be unique within a request batch")
+    def validate_unique_row_keys(self) -> McpRequestBatch:
+        keys = [row.row_key for row in self.rows]
+        if len(keys) != len(set(keys)):
+            raise ValueError("rowKey values must be unique within a request batch")
         return self
 
 
 class McpMappingTarget(WireModel):
-    representative_row_id: OpaqueRowId = Field(alias="representativeRowId")
+    representative_row_key: OpaqueRowKey = Field(alias="representativeRowKey")
     target_source_row_ids: list[str] = Field(alias="targetSourceRowIds", min_length=1)
-    target_opaque_row_ids: list[OpaqueRowId] = Field(alias="targetOpaqueRowIds", min_length=1)
+    target_opaque_row_keys: list[OpaqueRowKey] = Field(alias="targetOpaqueRowKeys", min_length=1)
 
     @model_validator(mode="after")
     def validate_targets(self) -> McpMappingTarget:
-        if len(self.target_source_row_ids) != len(self.target_opaque_row_ids):
+        if len(self.target_source_row_ids) != len(self.target_opaque_row_keys):
             raise ValueError("source and opaque target lists must have equal lengths")
         if len(self.target_source_row_ids) != len(set(self.target_source_row_ids)):
             raise ValueError("target source row IDs must be unique")
-        if len(self.target_opaque_row_ids) != len(set(self.target_opaque_row_ids)):
-            raise ValueError("target opaque row IDs must be unique")
-        if self.representative_row_id != self.target_opaque_row_ids[0]:
-            raise ValueError("representativeRowId must be the first target opaque row ID")
+        if len(self.target_opaque_row_keys) != len(set(self.target_opaque_row_keys)):
+            raise ValueError("target opaque row keys must be unique")
+        if self.representative_row_key != self.target_opaque_row_keys[0]:
+            raise ValueError("representativeRowKey must be the first target opaque row key")
         return self
 
 
 class McpMappingBatch(WireModel):
     batch_number: int = Field(alias="batchNumber", ge=1)
     request_sha256: str = Field(alias="requestSha256", pattern="^[0-9a-f]{64}$")
-    representative_row_ids: list[OpaqueRowId] = Field(alias="representativeRowIds", min_length=1)
+    representative_row_keys: list[OpaqueRowKey] = Field(alias="representativeRowKeys", min_length=1)
     targets: list[McpMappingTarget] = Field(min_length=1)
 
     @model_validator(mode="after")
     def validate_representatives(self) -> McpMappingBatch:
-        target_representatives = [target.representative_row_id for target in self.targets]
-        if self.representative_row_ids != target_representatives:
-            raise ValueError("representativeRowIds must match targets in request order")
-        if len(self.representative_row_ids) != len(set(self.representative_row_ids)):
-            raise ValueError("representative row IDs must be unique")
+        target_representatives = [target.representative_row_key for target in self.targets]
+        if self.representative_row_keys != target_representatives:
+            raise ValueError("representativeRowKeys must match targets in request order")
+        if len(self.representative_row_keys) != len(set(self.representative_row_keys)):
+            raise ValueError("representative row keys must be unique")
         return self
 
 
@@ -125,26 +123,26 @@ class McpRequestMapping(WireModel):
         if [batch.batch_number for batch in self.batches] != list(range(1, len(self.batches) + 1)):
             raise ValueError("mapping batch numbers must be contiguous from one")
         representatives = [
-            row_id for batch in self.batches for row_id in batch.representative_row_ids
+            row_key for batch in self.batches for row_key in batch.representative_row_keys
         ]
         if len(representatives) != len(set(representatives)):
-            raise ValueError("representative row IDs must be globally unique")
+            raise ValueError("representative row keys must be globally unique")
         target_source_ids = [
             row_id
             for batch in self.batches
             for target in batch.targets
             for row_id in target.target_source_row_ids
         ]
-        target_opaque_ids = [
-            row_id
+        target_opaque_keys = [
+            row_key
             for batch in self.batches
             for target in batch.targets
-            for row_id in target.target_opaque_row_ids
+            for row_key in target.target_opaque_row_keys
         ]
         if len(target_source_ids) != len(set(target_source_ids)):
             raise ValueError("target source row coverage must be unique")
-        if len(target_opaque_ids) != len(set(target_opaque_ids)):
-            raise ValueError("target opaque row coverage must be unique")
+        if len(target_opaque_keys) != len(set(target_opaque_keys)):
+            raise ValueError("target opaque row-key coverage must be unique")
         if self.integrity_sha256 != _mapping_integrity_digest(self):
             raise ValueError("mapping integrity digest does not match its contents")
         return self
@@ -184,7 +182,7 @@ _STATUS_CODES: dict[McpRowStatus, set[McpResultCode]] = {
     McpRowStatus.DO_NOT_GEOLOCATE: {McpResultCode.DO_NOT_GEOLOCATE},
     McpRowStatus.NO_MATCH: {McpResultCode.NO_MATCH},
     McpRowStatus.INVALID_INPUT: {
-        McpResultCode.INVALID_ROW_ID,
+        McpResultCode.INVALID_ROW_KEY,
         McpResultCode.INVALID_COUNTRY_CODE,
         McpResultCode.INVALID_REGION_CODE,
         McpResultCode.INVALID_CITY_NAME,
@@ -195,7 +193,7 @@ _STATUS_CODES: dict[McpRowStatus, set[McpResultCode]] = {
 
 
 class McpResponseRow(WireModel):
-    row_id: OpaqueRowId = Field(alias="rowId")
+    row_key: OpaqueRowKey = Field(alias="rowKey")
     status: McpRowStatus
     code: McpResultCode
     message: str = Field(min_length=1)
@@ -233,9 +231,9 @@ class McpResponseBatch(WireModel):
     def validate_batch_invariants(self) -> McpResponseBatch:
         if len(self.results) > self.batch_limit:
             raise ValueError("results exceed batchLimit")
-        ids = [result.row_id for result in self.results]
-        if len(ids) != len(set(ids)):
-            raise ValueError("result rowId values must be unique")
+        keys = [result.row_key for result in self.results]
+        if len(keys) != len(set(keys)):
+            raise ValueError("result rowKey values must be unique")
         statuses = Counter(result.status for result in self.results)
         expected = {
             "total": len(self.results),
@@ -251,8 +249,8 @@ class McpResponseBatch(WireModel):
         return self
 
 
-def opaque_row_id(analysis: Analysis, row: RowRecord) -> str:
-    """Derive a stable non-reversible MCP identifier without location-only hashing."""
+def opaque_row_key(analysis: Analysis, row: RowRecord) -> str:
+    """Derive a deterministic privacy-safe MCP rowKey for a source row."""
     material = f"fastah-geofeed-mcp-row-v1\0{analysis.analysis_id}\0{row.id}".encode()
     return f"fq-{hashlib.sha256(material).hexdigest()[:32]}"
 
@@ -308,21 +306,21 @@ def export_request_exchange(
     requests: list[McpRequestRow] = []
     targets: list[McpMappingTarget] = []
     for (country, region, city, _), rows in groups.items():
-        representative_id = opaque_row_id(analysis, rows[0])
+        representative_key = opaque_row_key(analysis, rows[0])
         requests.append(
             McpRequestRow(
-                rowId=representative_id,
-                country=country,
-                region=region,
-                city=city,
+                rowKey=representative_key,
+                countryCode=country,
+                regionCode=region,
+                cityName=city,
                 searchMode=search_mode,
             )
         )
         targets.append(
             McpMappingTarget(
-                representativeRowId=representative_id,
+                representativeRowKey=representative_key,
                 targetSourceRowIds=[row.id for row in rows],
-                targetOpaqueRowIds=[opaque_row_id(analysis, row) for row in rows],
+                targetOpaqueRowKeys=[opaque_row_key(analysis, row) for row in rows],
             )
         )
 
@@ -336,7 +334,7 @@ def export_request_exchange(
             McpMappingBatch(
                 batchNumber=len(batches),
                 requestSha256=_request_digest(batch),
-                representativeRowIds=[target.representative_row_id for target in batch_targets],
+                representativeRowKeys=[target.representative_row_key for target in batch_targets],
                 targets=batch_targets,
             )
         )
@@ -434,7 +432,7 @@ def import_response_batches(
 
     eligible = _eligible_rows(analysis)
     row_by_source = {row.id: row for row in eligible}
-    expected_opaque_ids = [opaque_row_id(analysis, row) for row in eligible]
+    expected_opaque_keys = [opaque_row_key(analysis, row) for row in eligible]
     _, expected_mapping = export_request_exchange(
         analysis, server_advertised_batch_limit, search_mode
     )
@@ -443,51 +441,51 @@ def import_response_batches(
             "mapping does not match this analysis, search mode, limit, or exported requests"
         )
     flattened = list(_response_rows(responses))
-    actual_ids = [result.row_id for _, result in flattened]
-    if len(actual_ids) != len(set(actual_ids)):
-        raise McpExchangeError("captured responses contain duplicate rowId values")
+    actual_keys = [result.row_key for _, result in flattened]
+    if len(actual_keys) != len(set(actual_keys)):
+        raise McpExchangeError("captured responses contain duplicate rowKey values")
     expected_representatives = [
-        row_id for batch in mapping.batches for row_id in batch.representative_row_ids
+        row_key for batch in mapping.batches for row_key in batch.representative_row_keys
     ]
-    unknown = sorted(set(actual_ids) - set(expected_representatives))
+    unknown = sorted(set(actual_keys) - set(expected_representatives))
     if unknown:
         raise McpExchangeError(
-            f"captured response contains unknown representative rowId {unknown[0]}"
+            f"captured response contains unknown representative rowKey {unknown[0]}"
         )
     if len(responses) != len(mapping.batches):
         raise McpExchangeError("captured responses must correspond to every exported request batch")
     for response, batch_mapping in zip(responses, mapping.batches, strict=True):
-        if [result.row_id for result in response.results] != batch_mapping.representative_row_ids:
+        if [result.row_key for result in response.results] != batch_mapping.representative_row_keys:
             raise McpExchangeError(
                 "captured response row order must match its exported request batch"
             )
-    if actual_ids != expected_representatives:
+    if actual_keys != expected_representatives:
         raise McpExchangeError("captured results must cover representative rows once in order")
 
     expanded: list[tuple[McpResponseBatch, McpResponseRow, RowRecord, str, str, str]] = []
     for response, batch_mapping in zip(responses, mapping.batches, strict=True):
         for result, target_mapping in zip(response.results, batch_mapping.targets, strict=True):
-            for source_id, opaque_id in zip(
+            for source_id, opaque_key in zip(
                 target_mapping.target_source_row_ids,
-                target_mapping.target_opaque_row_ids,
+                target_mapping.target_opaque_row_keys,
                 strict=True,
             ):
                 target = row_by_source.get(source_id)
-                if target is None or opaque_row_id(analysis, target) != opaque_id:
+                if target is None or opaque_row_key(analysis, target) != opaque_key:
                     raise McpExchangeError("mapping target is unknown or stale")
                 expanded.append(
                     (
                         response,
                         result,
                         target,
-                        opaque_id,
-                        target_mapping.representative_row_id,
+                        opaque_key,
+                        target_mapping.representative_row_key,
                         batch_mapping.request_sha256,
                     )
                 )
     source_order = {row.id: index for index, row in enumerate(eligible)}
     expanded.sort(key=lambda item: source_order[item[2].id])
-    if [item[3] for item in expanded] != expected_opaque_ids:
+    if [item[3] for item in expanded] != expected_opaque_keys:
         raise McpExchangeError(
             "mapping must cover every eligible target exactly once in source order"
         )
@@ -500,15 +498,15 @@ def import_response_batches(
         for observation in analysis.enrichment.mcp_observations
     }
     if existing:
-        if set(existing) != set(expected_opaque_ids):
+        if set(existing) != set(expected_opaque_keys):
             raise McpExchangeError("analysis already contains a different MCP import")
-        for response, result, _, opaque_id, representative_id, request_digest in expanded:
-            observation = existing[opaque_id]
+        for response, result, _, opaque_key, representative_key, request_digest in expanded:
+            observation = existing[opaque_key]
             if (
                 observation.search_mode != search_mode
                 or observation.contract_version != response.contract_version
                 or observation.server_batch_limit != response.batch_limit
-                or observation.representative_opaque_row_id != representative_id
+                or observation.representative_opaque_row_id != representative_key
                 or observation.request_sha256 != request_digest
                 or observation.status != result.status
                 or observation.code != result.code
@@ -526,7 +524,7 @@ def import_response_batches(
     enriched.configuration.mcp = McpConfigurationSummary(
         server_advertised_batch_limit=server_advertised_batch_limit
     )
-    for response, result, target, opaque_id, representative_id, request_digest in expanded:
+    for response, result, target, opaque_key, representative_key, request_digest in expanded:
         response_digest = response_digests[id(response)]
         evidence = Evidence(
             id=f"evidence-{len(enriched.evidence) + 1:06d}",
@@ -535,8 +533,8 @@ def import_response_batches(
             observed_at=enriched.created_at,
             target_ids=[target.id],
             values={
-                "opaque_row_id": opaque_id,
-                "representative_opaque_row_id": representative_id,
+                "opaque_row_id": opaque_key,
+                "representative_opaque_row_id": representative_key,
                 "request_sha256": request_digest,
                 "search_mode": search_mode.value,
                 "contract_version": response.contract_version,
@@ -553,8 +551,8 @@ def import_response_batches(
         observation = McpObservation(
             id=f"mcp-{len(enriched.enrichment.mcp_observations) + 1:06d}",
             target_row_id=target.id,
-            opaque_row_id=opaque_id,
-            representative_opaque_row_id=representative_id,
+            opaque_row_id=opaque_key,
+            representative_opaque_row_id=representative_key,
             request_sha256=request_digest,
             search_mode=search_mode,
             contract_version=response.contract_version,

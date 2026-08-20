@@ -1,3 +1,4 @@
+# Copyright 2026 Fastah Inc.
 from __future__ import annotations
 
 import ipaddress

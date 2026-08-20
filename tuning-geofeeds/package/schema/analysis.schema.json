@@ -942,7 +942,7 @@
         "MATCH_FOUND",
         "DO_NOT_GEOLOCATE",
         "NO_MATCH",
-        "INVALID_ROW_ID",
+        "INVALID_ROW_KEY",
         "INVALID_COUNTRY_CODE",
         "INVALID_REGION_CODE",
         "INVALID_CITY_NAME",

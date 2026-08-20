@@ -1,3 +1,4 @@
+# Copyright 2026 Fastah Inc.
 from __future__ import annotations
 
 import importlib.util
@@ -10,9 +11,7 @@ from typing import Any, cast
 
 import pytest
 
-APACHE_2_LICENSE_SHA256 = (
-    "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
-)
+APACHE_2_LICENSE_SHA256 = "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
 
 
 def _packager() -> ModuleType:
@@ -34,12 +33,7 @@ def _packager() -> ModuleType:
 
 
 def _config() -> dict[str, Any]:
-    path = (
-        Path(__file__).parents[1]
-        / "tuning-geofeeds"
-        / "packaging"
-        / "release.json"
-    )
+    path = Path(__file__).parents[1] / "tuning-geofeeds" / "packaging" / "release.json"
     value = json.loads(path.read_text(encoding="utf-8"))
     assert isinstance(value, dict)
     return cast(dict[str, Any], value)
@@ -70,9 +64,13 @@ def test_public_root_is_generated_from_canonical_metadata(tmp_path: Path) -> Non
         "sha256": APACHE_2_LICENSE_SHA256,
         "source": "tuning-geofeeds/packaging/public/LICENSE",
     }
-    assert (tmp_path / "LICENSE").read_text(encoding="utf-8").startswith(
-        "\n                                 Apache License\n"
-        "                           Version 2.0, January 2004\n"
+    assert (
+        (tmp_path / "LICENSE")
+        .read_text(encoding="utf-8")
+        .startswith(
+            "\n                                 Apache License\n"
+            "                           Version 2.0, January 2004\n"
+        )
     )
     packager.release_check._validate_files(tmp_path)
 
@@ -133,11 +131,7 @@ def test_public_root_rejects_outdated_global_mcp_discovery(tmp_path: Path) -> No
 def test_canonical_public_license_exists_with_exact_apache_2_content() -> None:
     packager = _packager()
     license_path = (
-        Path(__file__).parents[1]
-        / "tuning-geofeeds"
-        / "packaging"
-        / "public"
-        / "LICENSE"
+        Path(__file__).parents[1] / "tuning-geofeeds" / "packaging" / "public" / "LICENSE"
     )
 
     assert license_path.is_file()
@@ -159,3 +153,18 @@ def test_release_copy_excludes_generated_egg_info(tmp_path: Path) -> None:
 
     assert (target / "package" / "module.py").is_file()
     assert not (target / "package" / "example.egg-info").exists()
+
+
+def test_release_validation_requires_exact_source_notice(tmp_path: Path) -> None:
+    packager = _packager()
+    plain = tmp_path / "plain.py"
+    executable = tmp_path / "executable.py"
+    notice = "# Copyright 2026 Fastah Inc."
+    plain.write_text(f"{notice}\nvalue = 1\n", encoding="utf-8")
+    executable.write_text(f"#!/usr/bin/env python3\n{notice}\nvalue = 1\n", encoding="utf-8")
+
+    packager.release_check._validate_files(tmp_path)
+
+    plain.write_text("value = 1\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="missing exact copyright notice"):
+        packager.release_check._validate_files(tmp_path)

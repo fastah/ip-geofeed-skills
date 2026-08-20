@@ -1,3 +1,4 @@
+# Copyright 2026 Fastah Inc.
 """Generate and validate the committed analysis schema."""
 
 from __future__ import annotations

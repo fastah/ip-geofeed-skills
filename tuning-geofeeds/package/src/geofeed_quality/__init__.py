@@ -1,3 +1,4 @@
+# Copyright 2026 Fastah Inc.
 """Typed local geofeed analysis."""
 # ruff: noqa: E402 - runtime guard must run before Pydantic-backed imports
 

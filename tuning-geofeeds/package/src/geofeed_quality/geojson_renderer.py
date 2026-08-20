@@ -1,3 +1,4 @@
+# Copyright 2026 Fastah Inc.
 """Privacy-bounded GeoJSON projection of validated Analysis IR."""
 
 from __future__ import annotations
@@ -30,6 +31,7 @@ class GeoJsonGeometry(Model):
 
 
 class GeoJsonProperties(Model):
+    # Local Analysis row identifier; this is not the Fastah MCP wire rowKey.
     rowId: str = Field(pattern="^row-[0-9]+$")
     prefix: str
     mcpStatus: str

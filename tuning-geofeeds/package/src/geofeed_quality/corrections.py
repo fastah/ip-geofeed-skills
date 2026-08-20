@@ -1,3 +1,4 @@
+# Copyright 2026 Fastah Inc.
 """Explicit proposal, approval, and corrected-CSV boundaries."""
 
 from __future__ import annotations

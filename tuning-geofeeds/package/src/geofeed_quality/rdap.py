@@ -1,3 +1,4 @@
+# Copyright 2026 Fastah Inc.
 """Privacy-minimizing authoritative RDAP lookup and publisher assessment."""
 
 from __future__ import annotations
@@ -232,7 +233,7 @@ class BootstrapRegistry:
                 for prefix in prefixes:
                     try:
                         network = ipaddress.ip_network(prefix, strict=True)
-                    except (TypeError, ValueError):
+                    except TypeError, ValueError:
                         continue
                     if network.version == version:
                         services.append(
@@ -294,7 +295,7 @@ def _retry_after(value: str | None, now: datetime) -> int | None:
     except ValueError:
         try:
             parsed = parsedate_to_datetime(value)
-        except (TypeError, ValueError, OverflowError):
+        except TypeError, ValueError, OverflowError:
             return None
         if parsed.tzinfo is None:
             parsed = parsed.replace(tzinfo=UTC)
@@ -623,7 +624,7 @@ class AuthoritativeRdapClient:
                 retryable=error.retryable,
                 failure_code=error.code,
             )
-        except (TypeError, ValueError):
+        except TypeError, ValueError:
             result = RdapLookupResult(
                 requested_prefix=prefix,
                 queried_at=queried_at,
@@ -810,7 +811,7 @@ def enrich_analysis(
                 assessment, explanation, matched, conflicting = _assessment(
                     normalized_profile, result.entities
                 )
-            except (TypeError, ValueError):
+            except TypeError, ValueError:
                 result = replace(
                     result,
                     retryable=False,

@@ -12,7 +12,7 @@
   },
   "results": [
     {
-      "rowId": "fq-e060519da065a34770c5e16dd0a1bdeb",
+      "rowKey": "fq-e060519da065a34770c5e16dd0a1bdeb",
       "status": "matched",
       "code": "MATCH_FOUND",
       "message": "Place matches found, ordered best-first.",
@@ -38,7 +38,7 @@
       ]
     },
     {
-      "rowId": "fq-2e905fb3c8238fce769626af308b4715",
+      "rowKey": "fq-2e905fb3c8238fce769626af308b4715",
       "status": "backend_unavailable",
       "code": "BACKEND_UNAVAILABLE",
       "message": "The place-search backend is temporarily unavailable. Retry this row later.",
@@ -46,7 +46,7 @@
       "matches": []
     },
     {
-      "rowId": "fq-f3c1092fa608a325c2f9aec1b49e5f1d",
+      "rowKey": "fq-f3c1092fa608a325c2f9aec1b49e5f1d",
       "status": "do_not_geolocate",
       "code": "DO_NOT_GEOLOCATE",
       "message": "The country is empty or ZZ, so this row must not be geolocated. No place lookup was sent.",

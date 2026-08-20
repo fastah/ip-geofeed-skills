@@ -1,3 +1,4 @@
+# Copyright 2026 Fastah Inc.
 """Portable analyzer runtime compatibility guard."""
 
 from __future__ import annotations

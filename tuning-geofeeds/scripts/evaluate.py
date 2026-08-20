@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright 2026 Fastah Inc.
 """Run deterministic skill eval fixtures and emit evidence-bearing grades."""
 
 from __future__ import annotations
@@ -150,7 +151,7 @@ def _mcp(runner: Runner) -> list[Result]:
     runner.render_all(enriched, "enriched")
     document = _load(enriched)
     statuses = [item["status"] for item in document["enrichment"]["mcp_observations"]]
-    allowed = {"rowId", "country", "region", "city", "searchMode"}
+    allowed = {"rowKey", "countryCode", "regionCode", "cityName", "searchMode"}
     return [
         (
             set(request) == {"rows"} and all(set(row) <= allowed for row in request["rows"]),

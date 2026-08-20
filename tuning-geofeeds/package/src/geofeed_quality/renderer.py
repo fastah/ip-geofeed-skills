@@ -1,3 +1,4 @@
+# Copyright 2026 Fastah Inc.
 """Markdown projection of an already serialized and validated analysis IR."""
 
 from __future__ import annotations

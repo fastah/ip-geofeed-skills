@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright 2026 Fastah Inc.
 """Build or verify the deterministic public geofeed evaluation sample."""
 
 from __future__ import annotations
