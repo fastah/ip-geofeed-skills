@@ -1,3 +1,4 @@
+# Copyright 2026 Fastah Inc.
 """Typed feed-level failures."""
 
 from pathlib import Path

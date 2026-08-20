@@ -1,3 +1,4 @@
+# Copyright 2026 Fastah Inc.
 """Command-line interface for local analysis, rendering, and schema drift checks."""
 
 from __future__ import annotations

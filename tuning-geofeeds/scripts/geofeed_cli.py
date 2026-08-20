@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright 2026 Fastah Inc.
 """Run the bundled analyzer without relying on the current working directory."""
 
 from __future__ import annotations

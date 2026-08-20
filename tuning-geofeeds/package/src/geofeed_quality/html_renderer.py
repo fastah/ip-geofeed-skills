@@ -1,3 +1,4 @@
+# Copyright 2026 Fastah Inc.
 """Secure, offline-first HTML dashboard rendered only from validated Analysis IR."""
 
 # Embedded assets are intentionally compact to bound portable dashboard size.

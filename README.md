@@ -111,7 +111,7 @@ All local artifacts stay in the work directory you choose until you delete or sh
 | Correction plan and approval | Exact proposals and your decisions | Local. They bind decisions to the source and analysis. |
 | Corrected CSV | Full approved feed for your publication process | Local until you publish it. Publication is always manual. |
 | Registry request | Optional authority-consistency check | The canonical prefix goes directly to the authoritative registry selected through current bootstrap data. |
-| Place-search request batches | Optional online place check | Only `rowId`, `country`, `region`, `city`, and `searchMode` go to Fastah. |
+| Place-search request batches | Optional online place check | Only `rowKey`, `countryCode`, `regionCode`, `cityName`, and `searchMode` go to Fastah. |
 | Place-search mapping and captures | Join each result back to local rows and retain an audit trail | Local. The mapping is never sent to Fastah and contains no prefixes. |
 
 ## Optional registry check
@@ -134,7 +134,7 @@ When this stage runs, every valid source row eligible for MCP receives one norma
 | `invalid_input` | The place-search input was not valid for the service. |
 | `backend_unavailable` | The service could not complete that row. It may be retryable. |
 
-Only `rowId`, `country`, `region`, `city`, and `searchMode` cross the Fastah MCP boundary. Prefixes, the feed, comments, Analysis JSON, RDAP data, publisher details, proposals, and approvals do not. Exact repeated place queries are sent once and safely fanned back to their source rows. If MCP is unavailable, keep working with the offline report.
+Only `rowKey`, `countryCode`, `regionCode`, `cityName`, and `searchMode` cross the Fastah MCP boundary. `rowKey` is an opaque, batch-unique correlation key and is echoed unchanged. Prefixes, the feed, comments, Analysis JSON, RDAP data, publisher details, proposals, and approvals do not. Exact repeated place queries are sent once and safely fanned back to their source rows. If MCP is unavailable, keep working with the offline report.
 
 Fastah MCP service logs are separate from your local artifacts. The release policy allows only sanitized request metadata and aggregate outcomes, not tokens, row location contents, feeds, Analysis JSON, RDAP data, publisher data, approvals, or raw backend errors. It requires deletion after 30 days. Production log fields and deletion controls still need live verification before release.
 

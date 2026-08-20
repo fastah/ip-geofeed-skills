@@ -8,15 +8,15 @@
           "title": "Batchnumber",
           "type": "integer"
         },
-        "representativeRowIds": {
+        "representativeRowKeys": {
           "items": {
             "maxLength": 128,
-            "minLength": 8,
-            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{7,127}$",
+            "minLength": 32,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{31,127}$",
             "type": "string"
           },
           "minItems": 1,
-          "title": "Representativerowids",
+          "title": "Representativerowkeys",
           "type": "array"
         },
         "requestSha256": {
@@ -36,7 +36,7 @@
       "required": [
         "batchNumber",
         "requestSha256",
-        "representativeRowIds",
+        "representativeRowKeys",
         "targets"
       ],
       "title": "McpMappingBatch",
@@ -45,22 +45,22 @@
     "McpMappingTarget": {
       "additionalProperties": false,
       "properties": {
-        "representativeRowId": {
+        "representativeRowKey": {
           "maxLength": 128,
-          "minLength": 8,
-          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{7,127}$",
-          "title": "Representativerowid",
+          "minLength": 32,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{31,127}$",
+          "title": "Representativerowkey",
           "type": "string"
         },
-        "targetOpaqueRowIds": {
+        "targetOpaqueRowKeys": {
           "items": {
             "maxLength": 128,
-            "minLength": 8,
-            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{7,127}$",
+            "minLength": 32,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{31,127}$",
             "type": "string"
           },
           "minItems": 1,
-          "title": "Targetopaquerowids",
+          "title": "Targetopaquerowkeys",
           "type": "array"
         },
         "targetSourceRowIds": {
@@ -73,9 +73,9 @@
         }
       },
       "required": [
-        "representativeRowId",
+        "representativeRowKey",
         "targetSourceRowIds",
-        "targetOpaqueRowIds"
+        "targetOpaqueRowKeys"
       ],
       "title": "McpMappingTarget",
       "type": "object"

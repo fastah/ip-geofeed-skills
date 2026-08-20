@@ -1,3 +1,4 @@
+# Copyright 2026 Fastah Inc.
 """Local CSV ingestion, deterministic validation, and analysis assembly."""
 
 from __future__ import annotations

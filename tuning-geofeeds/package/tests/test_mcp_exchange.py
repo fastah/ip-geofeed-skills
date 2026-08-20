@@ -1,3 +1,4 @@
+# Copyright 2026 Fastah Inc.
 from __future__ import annotations
 
 import copy
@@ -16,7 +17,7 @@ from geofeed_quality.mcp_exchange import (
     McpResponseBatch,
     export_request_batches,
     export_request_exchange,
-    opaque_row_id,
+    opaque_row_key,
     request_document,
 )
 from geofeed_quality.mcp_exchange import (
@@ -38,6 +39,10 @@ from geofeed_quality.schema import (
 )
 
 FIXTURES = Path(__file__).parent / "fixtures"
+
+
+def _wire_row_key(index: int) -> str:
+    return f"test-row-key-{index:020d}"
 
 
 def _fixture_response() -> dict[str, Any]:
@@ -96,16 +101,16 @@ def test_export_deduplicates_exact_tuples_in_first_seen_order_and_maps_targets(
     )
     analysis = analyze_file(feed)
     batches, mapping = export_request_exchange(analysis, 2)
-    assert [[row.city for row in batch.rows] for batch in batches] == [
+    assert [[row.city_name for row in batch.rows] for batch in batches] == [
         ["Mountain View", "New York"],
         ["Austin"],
     ]
     first = mapping.batches[0].targets[0]
     assert first.target_source_row_ids == ["row-000001", "row-000003", "row-000005"]
-    assert first.target_opaque_row_ids == [
-        opaque_row_id(analysis, analysis.rows[index]) for index in (0, 2, 4)
+    assert first.target_opaque_row_keys == [
+        opaque_row_key(analysis, analysis.rows[index]) for index in (0, 2, 4)
     ]
-    assert mapping.batches[0].representative_row_ids[0] == first.target_opaque_row_ids[0]
+    assert mapping.batches[0].representative_row_keys[0] == first.target_opaque_row_keys[0]
     encoded_requests = json.dumps([request_document(batch) for batch in batches])
     encoded_mapping = mapping.model_dump_json(by_alias=True)
     for prefix in ("8.8.8.0/24", "1.1.1.0/24", "9.9.9.0/24"):
@@ -144,7 +149,7 @@ def test_every_status_fans_out_to_unique_exactly_once_observations(
     batches, mapping = export_request_exchange(analysis, 1_000)
     result = copy.deepcopy(_fixture_response()["results"][0])
     result.update(
-        rowId=batches[0].rows[0].row_id,
+        rowKey=batches[0].rows[0].row_key,
         status=status,
         code=code,
         retryable=retryable,
@@ -189,17 +194,17 @@ def test_import_rejects_tampered_and_stale_mapping(tmp_path: Path) -> None:
         _import_response_batches(other, [_fixture_response()], mapping, 1_000)
 
 
-def test_opaque_ids_are_deterministic_unique_and_not_location_only() -> None:
+def test_opaque_row_keys_are_deterministic_unique_and_not_location_only() -> None:
     first = analyze_file(FIXTURES / "valid.csv")
     second = first.model_copy(deep=True)
     eligible = [row for row in first.rows if row.kind == RowKind.DATA]
-    ids = [opaque_row_id(first, row) for row in eligible]
-    assert ids == [opaque_row_id(second, row) for row in eligible]
+    ids = [opaque_row_key(first, row) for row in eligible]
+    assert ids == [opaque_row_key(second, row) for row in eligible]
     assert len(ids) == len(set(ids))
     assert all(value.startswith("fq-") and len(value) == 35 for value in ids)
 
     duplicated_location = eligible[0].model_copy(deep=True, update={"id": "row-999999"})
-    assert opaque_row_id(first, eligible[0]) != opaque_row_id(first, duplicated_location)
+    assert opaque_row_key(first, eligible[0]) != opaque_row_key(first, duplicated_location)
 
 
 def test_export_is_a_mechanical_privacy_allowlist() -> None:
@@ -209,7 +214,7 @@ def test_export_is_a_mechanical_privacy_allowlist() -> None:
     )
     document = request_document(export_request_batches(analysis, 1_000)[0])
     assert set(document) == {"rows"}
-    allowed = {"rowId", "country", "region", "city", "searchMode"}
+    allowed = {"rowKey", "countryCode", "regionCode", "cityName", "searchMode"}
     assert all(set(row) <= allowed for row in document["rows"])
     encoded = json.dumps(document)
     for prohibited in (
@@ -231,14 +236,14 @@ def test_empty_and_zz_rows_receive_normalized_dng_outcomes_without_mutation(
     feed.write_text("8.8.8.0/24,,,,\n1.1.1.0/24,zz,,,\n", encoding="utf-8")
     analysis = analyze_file(feed)
     batch = export_request_batches(analysis, 1_000)[0]
-    assert [row.country for row in batch.rows] == ["", "ZZ"]
+    assert [row.country_code for row in batch.rows] == ["", "ZZ"]
     assert all(row.state == RowState.VALID_DO_NOT_GEOLOCATE for row in analysis.rows)
 
     do_not_geolocate = cast(dict[str, Any], _fixture_response()["results"][2])
     results: list[dict[str, Any]] = []
     for request in batch.rows:
         result = copy.deepcopy(do_not_geolocate)
-        result["rowId"] = request.row_id
+        result["rowKey"] = request.row_key
         results.append(result)
     response: dict[str, Any] = {
         "contractVersion": "1.0",
@@ -274,10 +279,10 @@ def test_wire_schemas_are_closed_draft_2020_12_and_drift_checked() -> None:
     assert request_schema["additionalProperties"] is False
     assert response_schema["additionalProperties"] is False
     assert set(request_schema["$defs"]["McpRequestRow"]["properties"]) == {
-        "rowId",
-        "country",
-        "region",
-        "city",
+        "rowKey",
+        "countryCode",
+        "regionCode",
+        "cityName",
         "searchMode",
     }
 
@@ -359,16 +364,16 @@ def test_import_rejects_contract_invariant_failures(
         import_response_batches(analysis, [response], 1_000)
 
 
-def test_import_rejects_unknown_duplicate_missing_and_reordered_ids() -> None:
+def test_import_rejects_unknown_duplicate_missing_and_reordered_keys() -> None:
     analysis = analyze_file(FIXTURES / "valid.csv")
 
     unknown = _fixture_response()
-    unknown["results"][0]["rowId"] = "unknown-row-id"
-    with pytest.raises(McpExchangeError, match="unknown representative rowId"):
+    unknown["results"][0]["rowKey"] = _wire_row_key(999)
+    with pytest.raises(McpExchangeError, match="unknown representative rowKey"):
         import_response_batches(analysis, [unknown], 1_000)
 
     duplicate = _fixture_response()
-    duplicate["results"][1]["rowId"] = duplicate["results"][0]["rowId"]
+    duplicate["results"][1]["rowKey"] = duplicate["results"][0]["rowKey"]
     with pytest.raises(McpExchangeError, match=r"unique|duplicate"):
         import_response_batches(analysis, [duplicate], 1_000)
 
@@ -390,7 +395,7 @@ def test_import_rejects_unknown_duplicate_missing_and_reordered_ids() -> None:
 def test_all_statuses_validate_with_ordered_mixed_partial_results() -> None:
     rows = [
         {
-            "rowId": f"row-000{index}",
+            "rowKey": _wire_row_key(index),
             "status": status,
             "code": code,
             "message": "safe",
@@ -408,7 +413,7 @@ def test_all_statuses_validate_with_ordered_mixed_partial_results() -> None:
         )
     ]
     matched = copy.deepcopy(_fixture_response()["results"][0])
-    matched["rowId"] = "row-0005"
+    matched["rowKey"] = _wire_row_key(5)
     rows.append(matched)
     response = McpResponseBatch.model_validate(
         {
@@ -435,14 +440,14 @@ def test_all_statuses_validate_with_ordered_mixed_partial_results() -> None:
     ]
 
 
-def test_request_model_rejects_unknown_fields_and_duplicate_ids() -> None:
+def test_request_model_rejects_unknown_fields_and_duplicate_row_keys() -> None:
     with pytest.raises(ValueError):
         McpRequestBatch.model_validate(
             {
                 "rows": [
                     {
-                        "rowId": "row-0001",
-                        "country": "US",
+                        "rowKey": _wire_row_key(1),
+                        "countryCode": "US",
                         "searchMode": "auto",
                         "prefix": "8.8.8.0/24",
                     }
@@ -453,8 +458,16 @@ def test_request_model_rejects_unknown_fields_and_duplicate_ids() -> None:
         McpRequestBatch.model_validate(
             {
                 "rows": [
-                    {"rowId": "row-0001", "country": "US", "searchMode": "auto"},
-                    {"rowId": "row-0001", "country": "GB", "searchMode": "auto"},
+                    {
+                        "rowKey": _wire_row_key(1),
+                        "countryCode": "US",
+                        "searchMode": "auto",
+                    },
+                    {
+                        "rowKey": _wire_row_key(1),
+                        "countryCode": "GB",
+                        "searchMode": "auto",
+                    },
                 ]
             }
         )

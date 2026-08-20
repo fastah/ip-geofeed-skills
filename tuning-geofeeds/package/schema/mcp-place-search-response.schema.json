@@ -31,11 +31,11 @@
           "title": "Retryable",
           "type": "boolean"
         },
-        "rowId": {
+        "rowKey": {
           "maxLength": 128,
-          "minLength": 8,
-          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{7,127}$",
-          "title": "Rowid",
+          "minLength": 32,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{31,127}$",
+          "title": "Rowkey",
           "type": "string"
         },
         "status": {
@@ -43,7 +43,7 @@
         }
       },
       "required": [
-        "rowId",
+        "rowKey",
         "status",
         "code",
         "message",
@@ -109,7 +109,7 @@
         "MATCH_FOUND",
         "DO_NOT_GEOLOCATE",
         "NO_MATCH",
-        "INVALID_ROW_ID",
+        "INVALID_ROW_KEY",
         "INVALID_COUNTRY_CODE",
         "INVALID_REGION_CODE",
         "INVALID_CITY_NAME",

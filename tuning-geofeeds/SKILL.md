@@ -23,9 +23,9 @@ reconstruct feed rows.
 
 ## Gotchas and invariants
 
-- **Fastah MCP receives only** `rowId`, `country`, `region`, `city`, and
-  `searchMode`. Never send a prefix, source URL, comment, publisher profile,
-  RDAP evidence, approval data, or the full Analysis IR.
+- **Fastah MCP receives only** `rowKey`, `countryCode`, `regionCode`,
+  `cityName`, and `searchMode`. Never send a prefix, source URL, comment,
+  publisher profile, RDAP evidence, approval data, or the full Analysis IR.
 - Analyze the complete feed locally. More than 60,000 data rows is a hard
   error; comments and blank physical lines do not count. Never truncate or
   split an oversized feed to produce partial Analysis IR.
@@ -136,13 +136,14 @@ Have the host invoke only `rfc8805-row-place-search` once per batch and save
 each structured response in order under `WORK`. Inspect every outbound JSON
 object first: it must contain only `rows`, and every row must contain only the
 five allowlisted fields above. Export deterministically groups only exact,
-byte-identical `(country, region, city, searchMode)` tuples in first-seen order.
+byte-identical `(countryCode, regionCode, cityName, searchMode)` tuples in
+first-seen order.
 `mcp-requests/mapping.json` records the local-only, integrity-bound fanout from
 each representative request row to all source rows; keep it beside the raw
 request/response captures and never send it to MCP. Export includes valid do-not-geolocate rows,
-including empty and `ZZ` country values. Every exported row has a unique opaque
-representative `rowId`; import fans its normalized result into one unique MCP
-observation for every eligible source row;
+including empty and `ZZ` country values. Every exported row has a deterministic,
+privacy-safe, batch-unique `rowKey` of 32–128 characters; import fans its echoed
+result into one unique MCP observation for every eligible source row;
 `do_not_geolocate` is a first-class typed status in that common envelope and
 does not invoke backend geocoding. MCP processing must never clear that state
 or populate/apply location fields. Then import all captured responses:

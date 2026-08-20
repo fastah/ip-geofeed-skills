@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright 2026 Fastah Inc.
 """Build and verify a deterministic private portable release layout."""
 
 from __future__ import annotations
@@ -33,6 +34,7 @@ SECRET_PATTERNS = {
     "Slack token": re.compile(rb"xox[baprs]-[A-Za-z0-9-]{20,}"),
 }
 MARKDOWN_LINK = re.compile(r"\[[^]]*\]\(([^)]+)\)")
+COPYRIGHT_NOTICE = "# Copyright 2026 Fastah Inc."
 
 
 def _skill_root() -> Path:
@@ -193,6 +195,13 @@ def _validate_files(root: Path) -> None:
             content.decode("utf-8")
         except UnicodeDecodeError as error:
             raise ValueError(f"required text file is not UTF-8: {relative}") from error
+        if path.suffix == ".py":
+            lines = content.decode("utf-8").splitlines()
+            notice_index = 1 if lines and lines[0].startswith("#!") else 0
+            if len(lines) <= notice_index or lines[notice_index] != COPYRIGHT_NOTICE:
+                raise ValueError(
+                    f"published Python source missing exact copyright notice: {relative}"
+                )
     prohibited = (".env", "__pycache__", ".pyc", "credentials", "node_modules", ".venv")
     for path in root.rglob("*"):
         if any(part in prohibited for part in path.relative_to(root).parts):
@@ -336,7 +345,9 @@ def main() -> int:
             with tempfile.TemporaryDirectory(prefix="tuning-geofeeds-release-") as temporary:
                 target = Path(temporary)
                 first = _verify(_build(target))
-                with tempfile.TemporaryDirectory(prefix="tuning-geofeeds-release-2-") as second_temp:
+                with tempfile.TemporaryDirectory(
+                    prefix="tuning-geofeeds-release-2-"
+                ) as second_temp:
                     second = _verify(_build(Path(second_temp)))
                 if first != second:
                     raise ValueError("release layout is not deterministic")
