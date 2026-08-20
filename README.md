@@ -4,6 +4,10 @@ Fastah NetOps Tools helps you check a public IP geofeed, decide what to fix, rec
 
 The `tuning-geofeeds` skill works with [RFC 8805](https://www.rfc-editor.org/rfc/rfc8805.html) CSV feeds. It keeps your source file unchanged. It explains what needs attention and creates proposals when you ask. You choose every change. It never silently overwrites or publishes a feed.
 
+## Get the feed
+
+Claude Cowork, other cloud agents, and corporate networks may block some HTTPS downloads. If the host cannot fetch your feed URL, upload the CSV. This is the intended path. Do not ask the agent to bypass the host's network policy or reconstruct rows.
+
 ## What it does not do
 
 - It does not manage private IP address plans.
@@ -17,7 +21,7 @@ The `tuning-geofeeds` skill works with [RFC 8805](https://www.rfc-editor.org/rfc
 |---|---|
 | Python | 3.14 or newer |
 | Input | A local, strict UTF-8 RFC 8805 CSV file |
-| Amp | Install from this public repository after publication |
+| Amp | Published from this public repository; the complete repository install has passed an isolated Amp smoke test |
 | Claude and OpenAI marketplaces | Not published yet. Do not treat generated review packages as listings. |
 | Internet access | Not needed for the standard offline report |
 | Optional online checks | Direct registry checks and Fastah place search, only after you agree |
@@ -28,7 +32,7 @@ Install the complete skill in Amp:
 amp skill add --overwrite https://github.com/fastah/ip-geofeed-skills.git
 ```
 
-Then ask Amp to use `tuning-geofeeds`, or start with the first prompt below. The packaged repository layout is checked with a real isolated Amp installation before release.
+Then ask Amp to use `tuning-geofeeds`, or start with the first prompt below. The packaged repository layout is checked with a real isolated Amp installation.
 
 ## Check a local feed in five minutes
 
@@ -40,7 +44,7 @@ Attach or name the local file, then ask:
 
 > Analyze `/path/to/geofeed.csv` as a public RFC 8805 geofeed. Keep the source unchanged. Work offline. Create Analysis JSON, a Markdown summary, an offline HTML dashboard, and GeoJSON.
 
-Start with Markdown for a quick review. Open the HTML dashboard when you need row filters and linked evidence. Keep the Analysis JSON: it is the complete, machine-readable record used to create every report.
+Start with Markdown for a quick review. Open the HTML dashboard when you need row filters and linked evidence. Keep the Analysis JSON: it is the complete, machine-readable record used to create every report. Its `source.sha256` value supports audits and binds later approvals to the analyzed file. You do not normally need to calculate another digest.
 
 ### 2. Understand what needs attention
 
@@ -103,7 +107,7 @@ All local artifacts stay in the work directory you choose until you delete or sh
 | Analysis JSON | Complete typed record of rows, findings, relationships, and optional evidence | Local. It can contain prefixes, source values, and retained physical lines. |
 | Markdown | Fast review and change discussion | Local unless you share it. It can name prefixes and findings. |
 | Offline HTML | Searchable dashboard with the Analysis data embedded | Local unless you share it. It contains the full report and can be large. |
-| GeoJSON | Map data from existing place evidence | Local unless you share it. It contains canonical prefixes and advisory locations. |
+| GeoJSON | Map data from MCP place evidence | Local unless you share it. Offline or registry-only analysis produces a valid empty FeatureCollection and an informational CLI message; no geometry is invented. |
 | Correction plan and approval | Exact proposals and your decisions | Local. They bind decisions to the source and analysis. |
 | Corrected CSV | Full approved feed for your publication process | Local until you publish it. Publication is always manual. |
 | Registry request | Optional authority-consistency check | The canonical prefix goes directly to the authoritative registry selected through current bootstrap data. |
@@ -140,8 +144,9 @@ Fastah MCP service logs are separate from your local artifacts. The release poli
 |---|---|---|
 | Up to 60,000 data rows | The complete feed can be analyzed. Comments and blank lines do not count. | Keep the complete source and review the output sizes. |
 | More than 60,000 data rows | Analysis stops before creating partial Analysis JSON. Nothing is truncated. | Do not split the feed to hide the limit. Reduce scope only through your normal source-management process. |
-| Invalid UTF-8 | Local analysis stops with an encoding error. | Keep the original bytes. Save a separate verified UTF-8 working copy with provenance. |
-| Remote feed URL | Download is owned by the host, not this package. | Save the feed locally with a controlled HTTPS downloader. Keep the original response bytes and retrieval details. |
+| Invalid UTF-8 | Local analysis stops with an encoding error. | Keep the original file. Save a separate verified UTF-8 working copy. |
+| Remote feed URL | Download is owned by the host, not this package. Allowlisted networks may block it. | Use the host's normal download capability. If unavailable, upload the CSV. Do not bypass network policy or reconstruct it. |
+| Empty GeoJSON | The valid FeatureCollection has no features when no MCP place evidence supplies usable coordinates or bounds. | Use Markdown and Analysis JSON for offline findings. Run optional MCP only after agreeing to its privacy boundary. RDAP does not populate GeoJSON. |
 | Declared non-UTF-8 source | The analyzer does not silently convert it. | For a response such as `Content-Type: text/csv; charset=ISO-8859-1`, keep the raw file and create a separate strict UTF-8 copy with both digests. LACNIC has been observed using this pattern; do not special-case a hostname. |
 | Prefix has host bits | The authored CIDR is retained but marked invalid. | Confirm the intended network address. Do not accept automatic masking without checking the allocation. |
 | Country or region code is invalid | The row is retained with a finding. | Check the intended ISO country and subdivision code. Empty or `ZZ` country has a separate do-not-geolocate meaning. |

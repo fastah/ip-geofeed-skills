@@ -2,9 +2,9 @@
   "bundle": "fastah-netops-tools-agent-skills",
   "files": [
     {
-      "bytes": 9829,
+      "bytes": 9920,
       "path": "tuning-geofeeds/SKILL.md",
-      "sha256": "ee45265480277765f70f607e8a2341bfc00e1ae78c758d19201920817de94522",
+      "sha256": "65f4e159c57ce0a8f86d69a432c2a01c33eee427605241057656d5e65c810f14",
       "source": "tuning-geofeeds/SKILL.md"
     },
     {
@@ -14,9 +14,9 @@
       "source": "tuning-geofeeds/evals/README.md"
     },
     {
-      "bytes": 10279,
+      "bytes": 10357,
       "path": "tuning-geofeeds/evals/evals.json",
-      "sha256": "3e4cb90ef094c0bac9eda6d6a309606d6e66a12f29d217557b45ecaf1e1bb659",
+      "sha256": "320fee13fc8da7b6a977c8b79e9ab2a1e114b537c7c025bb4cdc8aa6da501ccc",
       "source": "tuning-geofeeds/evals/evals.json"
     },
     {
@@ -92,15 +92,15 @@
       "source": "tuning-geofeeds/evals/trigger-queries.json"
     },
     {
-      "bytes": 5072,
+      "bytes": 5194,
       "path": "tuning-geofeeds/package/Makefile",
-      "sha256": "2807a1cefa52a7cc639901a5c51063058460349f979fe1cc3e420e8ec27b4724",
+      "sha256": "d2bd60abb8021ecd1f4e29df990505f65600514aa8de25e130c812e27a5fdc4e",
       "source": "Makefile"
     },
     {
-      "bytes": 1143,
+      "bytes": 1823,
       "path": "tuning-geofeeds/package/README.md",
-      "sha256": "be468db8c25bb9422d7ca2ec22a233e55f6d917161f2703ef323509e2dd9cccb",
+      "sha256": "fa6752d4f166d5e8e49c60117536ec31889649e4f104e05df8f8cdf7bccb1b29",
       "source": "tuning-geofeeds/assets/package-README.md"
     },
     {
@@ -158,9 +158,9 @@
       "source": "schema/mcp-request-mapping.schema.json"
     },
     {
-      "bytes": 723,
+      "bytes": 799,
       "path": "tuning-geofeeds/package/src/geofeed_quality/__init__.py",
-      "sha256": "ad0e99ea861997c1f86ba6ee428b54252ded94ae8cbac967dd0418b5616135f3",
+      "sha256": "75ace06b3239549efa928d2bb95a386ccf22a173aca959c2131b7b96c23a6547",
       "source": "src/geofeed_quality/__init__.py"
     },
     {
@@ -170,9 +170,9 @@
       "source": "src/geofeed_quality/analyzer.py"
     },
     {
-      "bytes": 14708,
+      "bytes": 14984,
       "path": "tuning-geofeeds/package/src/geofeed_quality/cli.py",
-      "sha256": "0c30b832c946d2624e0c5a89429801a66e22bf27f281e4b3d795719cae686a6b",
+      "sha256": "b03062d13870669a24791f96606abcb34e71be1a5dcaa75412f13d6a96e61c23",
       "source": "src/geofeed_quality/cli.py"
     },
     {
@@ -224,9 +224,9 @@
       "source": "src/geofeed_quality/renderer.py"
     },
     {
-      "bytes": 472,
+      "bytes": 876,
       "path": "tuning-geofeeds/package/src/geofeed_quality/runtime.py",
-      "sha256": "bf02967c5220eb6a5ca766d00b4a65f2a9e040d42a687b5c91110b636405273a",
+      "sha256": "4db3042d12a8057e7ff0095d9f9e143dd26d5952e86a1a5d4f093048e7164439",
       "source": "src/geofeed_quality/runtime.py"
     },
     {
@@ -260,9 +260,9 @@
       "source": "tests/test_analyzer.py"
     },
     {
-      "bytes": 10189,
+      "bytes": 10712,
       "path": "tuning-geofeeds/package/tests/test_cli.py",
-      "sha256": "d38fd99d84da265a296779a11781b3f637bbbc549fb60e77e4073c94655fe3c8",
+      "sha256": "ba060341b52c393290456640f045a6d37db2d0162a1271c4cb7afe630bb629e9",
       "source": "tests/test_cli.py"
     },
     {
@@ -278,9 +278,9 @@
       "source": "tests/test_mcp_exchange.py"
     },
     {
-      "bytes": 5370,
+      "bytes": 5606,
       "path": "tuning-geofeeds/package/tests/test_public_packaging.py",
-      "sha256": "ba8563749c7c0b275ee7bbb69672f9af513ec67efcc892189774392015a64f14",
+      "sha256": "1ca5fc7df012a9b8cc761558625a8756d95e16cbb95680531a853cc7d7bf2ed1",
       "source": "tests/test_public_packaging.py"
     },
     {
@@ -296,9 +296,9 @@
       "source": "tests/test_rdap.py"
     },
     {
-      "bytes": 1893,
+      "bytes": 3592,
       "path": "tuning-geofeeds/package/tests/test_runtime.py",
-      "sha256": "21aed029973330d2506db4fee4b3ac6c65cd1ef1a3d039aedd1dcd9eea55eeec",
+      "sha256": "7d63eb901bccabd2afb1834b2bb5ba141680cadc65fc94cdbb5d26893d1bb520",
       "source": "tests/test_runtime.py"
     },
     {
@@ -320,21 +320,21 @@
       "source": "tuning-geofeeds/references/interpretation.md"
     },
     {
-      "bytes": 2503,
+      "bytes": 4073,
       "path": "tuning-geofeeds/references/setup.md",
-      "sha256": "a3b3363ba8cb5b6c9833dff40baaebc7a80e17ea957104e87dbc34c56675b8a5",
+      "sha256": "08d7885812af2a6f33c2903cb7dc0ac276f61976445816e4a0a7a107f66c13f1",
       "source": "tuning-geofeeds/references/setup.md"
     },
     {
-      "bytes": 19283,
+      "bytes": 19511,
       "path": "tuning-geofeeds/scripts/evaluate.py",
-      "sha256": "673dba48c2eb10799d2425f5e552e41243a4ed9fc2ad0e83ed8b348ac222501c",
+      "sha256": "44d3bafdc508a4646699c42d5bfd1bc4953acd73fa76c4feb14b51873f09ed74",
       "source": "tuning-geofeeds/scripts/evaluate.py"
     },
     {
-      "bytes": 1566,
+      "bytes": 1793,
       "path": "tuning-geofeeds/scripts/geofeed_cli.py",
-      "sha256": "a13d831ab5ff2603ee6af2154555fb39a9d8875f2a76ad4a933aa94a3cfd56fc",
+      "sha256": "14df943a34b34c98d49935ece8a94a8d771644de4f70c9a393ee89f64d77a3ec",
       "source": "tuning-geofeeds/scripts/geofeed_cli.py"
     },
     {
@@ -369,7 +369,7 @@
     ]
   },
   "skill": "tuning-geofeeds",
-  "source_commit": "846cd45574be3f87f897c4ce1e7bc59edf883e03",
+  "source_commit": "464706647ccd2f6a7806bd6e74e4e060bc6b889d",
   "stagingFiles": [
     {
       "bytes": 495,
@@ -384,9 +384,9 @@
       "source": "tuning-geofeeds/packaging/release.json"
     },
     {
-      "bytes": 3452,
+      "bytes": 3281,
       "path": "CONTRIBUTING.md",
-      "sha256": "3bbb7a46bd35012a52f8417cac4a47a4e5cb1edd53e611bdea21ce75ce0b2eb3",
+      "sha256": "26e7e2a84fb7478c289954f3cc123e2f9e730634f0e92a7e34581527102afa95",
       "source": "tuning-geofeeds/packaging/public-root/CONTRIBUTING.md+tuning-geofeeds/packaging/release.json+pyproject.toml+schema/analysis.schema.json"
     },
     {
@@ -396,15 +396,15 @@
       "source": "tuning-geofeeds/packaging/public/LICENSE"
     },
     {
-      "bytes": 975,
+      "bytes": 938,
       "path": "MIGRATION.md",
-      "sha256": "4fffa6b2566ac6a9a4bfb8d9944d46c595e64a60615632f23ea07ae933b56741",
+      "sha256": "9edc6faee96513aa13412d3b0d5db8fc5bf95ec8781853dcaa61cfd502e00ebe",
       "source": "tuning-geofeeds/packaging/public-root/MIGRATION.md+tuning-geofeeds/packaging/release.json+pyproject.toml+schema/analysis.schema.json"
     },
     {
-      "bytes": 12850,
+      "bytes": 13683,
       "path": "README.md",
-      "sha256": "a6ea248efbb900656e11040eb9aa4dfab5a4f155e5b9727da6f9a029da5a10b8",
+      "sha256": "8405c9e782a0079eb7cf766348949b6ad91e0d087b6bdfb1ff17e45fc22afc1e",
       "source": "tuning-geofeeds/packaging/public-root/README.md+tuning-geofeeds/packaging/release.json+pyproject.toml+schema/analysis.schema.json"
     },
     {

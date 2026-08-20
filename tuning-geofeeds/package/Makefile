@@ -4,13 +4,13 @@ PYTHON_BOOTSTRAP ?= python3.14
 .PHONY: setup check-python format lint type test test-live-rdap schema-generate schema-check skill-validate skill-eval skill-release-check skill-package-check skill-package-build skill-public-stage check analyze render render-html export-geojson mcp-export mcp-import propose-corrections record-approval export-csv
 
 setup:
-	$(PYTHON_BOOTSTRAP) -c 'import sys; assert sys.version_info >= (3, 14), "Python 3.14 or newer is required"'
+	$(PYTHON_BOOTSTRAP) -c 'import sys; assert sys.version_info >= (3, 14) and sys.version_info.releaselevel == "final", "A final Python 3.14 or newer release is required"'
 	$(PYTHON_BOOTSTRAP) -m venv --clear .venv
 	$(PYTHON) -m pip install --upgrade pip
 	$(PYTHON) -m pip install -e '.[dev]'
 
 check-python:
-	$(PYTHON) -c 'import sys; assert sys.version_info >= (3, 14), "Python 3.14 or newer is required"'
+	$(PYTHON) -c 'import sys; assert sys.version_info >= (3, 14) and sys.version_info.releaselevel == "final", "A final Python 3.14 or newer release is required"'
 
 format:
 	$(PYTHON) -m ruff format src tests tuning-geofeeds/scripts

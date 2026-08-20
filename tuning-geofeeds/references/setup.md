@@ -1,13 +1,16 @@
 # Python setup
 
-The portable analyzer requires Python 3.14 or newer. Resolve the skill root
-from the installed skill location, change to that directory, then ask the
-bundled launcher where its package lives:
+The portable analyzer requires a final—not alpha, beta, or release
+candidate—Python 3.14 or newer. Resolve the skill root from the installed skill
+location and choose a user working directory:
 
 ```bash
 SKILL_ROOT="/absolute/path/to/tuning-geofeeds"
 cd "$SKILL_ROOT"
+WORK="/absolute/path/to/user-selected-work-directory"
+mkdir -p "$WORK"
 BOOTSTRAP_PYTHON="/absolute/path/to/python3.14"
+"$BOOTSTRAP_PYTHON" -c 'import sys; assert sys.version_info >= (3, 14) and sys.version_info.releaselevel == "final", sys.version'
 PACKAGE_ROOT="$("$BOOTSTRAP_PYTHON" scripts/geofeed_cli.py --print-package-root)"
 "$BOOTSTRAP_PYTHON" -m venv "$WORK/.venv"
 PYTHON="$WORK/.venv/bin/python"
@@ -15,6 +18,27 @@ RUNTIME_SOURCE="$WORK/tuning-geofeeds-runtime"
 cp -R "$PACKAGE_ROOT" "$RUNTIME_SOURCE"
 "$PYTHON" -m pip install "$RUNTIME_SOURCE"
 ```
+
+If Python 3.14 is unavailable and `uv` is already installed, it is an optional
+fallback. Keep `uv` current through the same trusted installation channel that
+provided it; `uv self update` applies to the standalone installer, while a
+package-managed installation should be updated by that package manager. Then:
+
+```bash
+uv python install 3.14
+BOOTSTRAP_PYTHON="$(uv python find 3.14)"
+"$BOOTSTRAP_PYTHON" -c 'import sys; assert sys.version_info >= (3, 14) and sys.version_info.releaselevel == "final", sys.version'
+PACKAGE_ROOT="$("$BOOTSTRAP_PYTHON" scripts/geofeed_cli.py --print-package-root)"
+uv venv --python 3.14 "$WORK/.venv"
+PYTHON="$WORK/.venv/bin/python"
+RUNTIME_SOURCE="$WORK/tuning-geofeeds-runtime"
+cp -R "$PACKAGE_ROOT" "$RUNTIME_SOURCE"
+uv pip install --python "$PYTHON" "$RUNTIME_SOURCE"
+```
+
+Do not assume `uv` exists, and do not weaken or pin runtime dependencies to
+support an obsolete Python prerelease. The launcher rejects prerelease Python
+before importing the analyzer or Pydantic.
 
 On Windows, use the virtual environment interpreter at
 `$WORK\.venv\Scripts\python.exe`. Windows users should install Python through
@@ -32,6 +56,12 @@ Run the launcher with the prepared interpreter:
 If the host cannot retain the skill root as its working directory, invoke the
 same launcher by its resolved absolute path. It does not resolve the bundled
 package relative to the caller's current directory.
+
+Cloud-agent and corporate networks often cannot fetch arbitrary HTTPS hosts.
+When that happens, ask the user to upload the CSV. This is the intended path.
+Do not bypass the host's network policy or reconstruct the feed. Analysis
+records `source.sha256` for optional audits and for binding approvals; users do
+not normally need to calculate another digest.
 
 The analyzer accepts at most 60,000 data rows. Comments and blank physical
 lines do not count. An oversized input fails before any Analysis IR is

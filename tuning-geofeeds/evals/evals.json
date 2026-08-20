@@ -165,6 +165,7 @@
       "assertions": [
         "Compatibility metadata states Python 3.14+",
         "The launcher contains an executable Python 3.14 runtime guard",
+        "The launcher rejects prerelease Python before loading the analyzer",
         "No alternate ad hoc analyzer is generated"
       ]
     },
