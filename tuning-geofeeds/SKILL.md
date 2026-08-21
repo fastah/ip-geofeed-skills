@@ -84,9 +84,6 @@ downloader or bypass network controls. The analyzer accepts strict UTF-8 local
 files. If conversion is needed, keep the original and make a separate UTF-8
 working copy.
 
-For named third-party operational examples, see the
-[Interpretation guide](references/interpretation.md#third-party-operational-examples).
-
 Set `INPUT` to that absolute local path.
 Analysis records `source.sha256` for audits and for binding later approvals to
 the analyzed file. Most users do not need to calculate a separate digest.

@@ -370,7 +370,7 @@ def export_request_batches(
 
 
 def request_document(batch: McpRequestBatch) -> dict[str, Any]:
-    """Serialize only the allowlisted wire fields accepted by worker-mcp."""
+    """Serialize only the allowlisted wire fields accepted by Fastah MCP."""
     return batch.model_dump(mode="json", by_alias=True)
 
 

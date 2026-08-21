@@ -76,8 +76,6 @@ Downloaded feeds, analysis IR, approval artifacts, reports, and exports remain
 in that user-selected local work directory until the user deletes them. Fastah
 does not retain those artifacts server-side. Optional RDAP uses only a per-run
 in-memory cache by default; persistent caching is not enabled. Fastah MCP
-operational/authentication logs are separate and may retain only sanitized
-request metadata and aggregate outcomes. They must exclude tokens, row location
-contents, feed/IR/publisher/RDAP/approval data, and raw backend errors, and must
-be deleted after 30 days. Do not claim deployed compliance until worker fields
-and retention infrastructure have been verified.
+receives only `rowKey`, `countryCode`, `regionCode`, `cityName`, and
+`searchMode`; it does not receive the feed, prefixes, comments, Analysis IR,
+RDAP evidence, publisher details, proposals, or approvals.
