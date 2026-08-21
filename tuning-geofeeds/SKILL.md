@@ -26,7 +26,7 @@ reconstruct feed rows.
 - **Fastah MCP receives only** `rowKey`, `countryCode`, `regionCode`,
   `cityName`, and `searchMode`. Never send a prefix, source URL, comment,
   publisher profile, RDAP evidence, approval data, or the full Analysis IR.
-- Analyze the complete feed locally. More than 60,000 data rows is a hard
+- Analyze the complete feed locally. More than 400,000 data rows is a hard
   error; comments and blank physical lines do not count. Never truncate or
   split an oversized feed to produce partial Analysis IR.
 - Never auto-apply a proposal. A corrected CSV requires the user to identify

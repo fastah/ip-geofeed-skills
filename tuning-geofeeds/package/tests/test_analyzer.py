@@ -297,9 +297,9 @@ def test_output_is_deterministic_for_unchanged_source(tmp_path: Path) -> None:
     assert first == second
 
 
-def test_60_000_rows_are_accepted_with_linear_graph_bound(tmp_path: Path) -> None:
+def test_400_000_rows_are_accepted_with_linear_graph_bound(tmp_path: Path) -> None:
     lines = [f"2606:4700:{index:x}::/48,US,US-CA,City," for index in range(MAX_DATA_ROWS)]
-    path = _feed(tmp_path, "\n".join(lines) + "\n", name="sixty-thousand.csv")
+    path = _feed(tmp_path, "\n".join(lines) + "\n", name="four-hundred-thousand.csv")
     analysis = analyze_file(path)
 
     assert analysis.statistics.data_rows == MAX_DATA_ROWS
@@ -308,7 +308,7 @@ def test_60_000_rows_are_accepted_with_linear_graph_bound(tmp_path: Path) -> Non
     assert len({row.prefix.canonical for row in analysis.rows if row.prefix}) == MAX_DATA_ROWS
 
 
-def test_60_001_rows_are_rejected_before_ir(tmp_path: Path) -> None:
+def test_400_001_rows_are_rejected_before_ir(tmp_path: Path) -> None:
     line = "8.8.8.8,US,US-CA,City,"
     path = _feed(tmp_path, "\n".join([line] * (MAX_DATA_ROWS + 1)), name="too-large.csv")
     with pytest.raises(DataRowLimitError) as raised:

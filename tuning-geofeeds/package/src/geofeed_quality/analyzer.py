@@ -47,7 +47,7 @@ from .models import (
     SourceMetadata,
 )
 
-MAX_DATA_ROWS = 60_000
+MAX_DATA_ROWS = 400_000
 RELATIONSHIP_LIMIT = MAX_DATA_ROWS * 4
 UTF8_BOM = b"\xef\xbb\xbf"
 # Nonredundant equivalent of data-processing/pkg/ipshared/ipshared.go's

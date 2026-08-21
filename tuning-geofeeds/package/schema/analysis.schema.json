@@ -1,5 +1,261 @@
 {
   "$defs": {
+    "ASNAssociationProvenance": {
+      "additionalProperties": false,
+      "properties": {
+        "snapshot_id": {
+          "title": "Snapshot Id",
+          "type": "string"
+        },
+        "snapshot_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Snapshot Sha256",
+          "type": "string"
+        },
+        "snapshot_sources": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Snapshot Sources",
+          "type": "array"
+        },
+        "source_name": {
+          "title": "Source Name",
+          "type": "string"
+        },
+        "source_url": {
+          "title": "Source Url",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_name",
+        "source_url",
+        "snapshot_sources",
+        "snapshot_id",
+        "snapshot_sha256"
+      ],
+      "title": "ASNAssociationProvenance",
+      "type": "object"
+    },
+    "ASNOrganizationAssociation": {
+      "additionalProperties": false,
+      "properties": {
+        "as_name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "As Name"
+        },
+        "asn": {
+          "maximum": 4294967295,
+          "minimum": 0,
+          "title": "Asn",
+          "type": "integer"
+        },
+        "asn_source_registry": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Asn Source Registry"
+        },
+        "evidence_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Evidence Ids",
+          "type": "array"
+        },
+        "id": {
+          "pattern": "^asn-association-[0-9]{6}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "kind": {
+          "const": "asn_organization_snapshot",
+          "default": "asn_organization_snapshot",
+          "title": "Kind",
+          "type": "string"
+        },
+        "organization_country": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Organization Country"
+        },
+        "organization_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Organization Id"
+        },
+        "organization_name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Organization Name"
+        },
+        "organization_source_registry": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Organization Source Registry"
+        },
+        "provenance": {
+          "$ref": "#/$defs/ASNAssociationProvenance"
+        },
+        "routing_association_id": {
+          "pattern": "^asn-association-[0-9]{6}$",
+          "title": "Routing Association Id",
+          "type": "string"
+        },
+        "target_row_id": {
+          "pattern": "^row-[0-9]+$",
+          "title": "Target Row Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "target_row_id",
+        "routing_association_id",
+        "asn",
+        "provenance",
+        "evidence_ids"
+      ],
+      "title": "ASNOrganizationAssociation",
+      "type": "object"
+    },
+    "ASNOriginGroup": {
+      "additionalProperties": false,
+      "properties": {
+        "as_set": {
+          "default": false,
+          "title": "As Set",
+          "type": "boolean"
+        },
+        "asns": {
+          "items": {
+            "type": "integer"
+          },
+          "minItems": 1,
+          "title": "Asns",
+          "type": "array"
+        }
+      },
+      "required": [
+        "asns"
+      ],
+      "title": "ASNOriginGroup",
+      "type": "object"
+    },
+    "ASNRegistrationAssociation": {
+      "additionalProperties": false,
+      "properties": {
+        "asn": {
+          "maximum": 4294967295,
+          "minimum": 0,
+          "title": "Asn",
+          "type": "integer"
+        },
+        "evidence_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Evidence Ids",
+          "type": "array"
+        },
+        "id": {
+          "pattern": "^asn-association-[0-9]{6}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "kind": {
+          "const": "asn_registration",
+          "default": "asn_registration",
+          "title": "Kind",
+          "type": "string"
+        },
+        "organization_name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Organization Name"
+        },
+        "provenance": {
+          "$ref": "#/$defs/ASNAssociationProvenance"
+        },
+        "registration_handle": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Registration Handle"
+        },
+        "target_row_id": {
+          "pattern": "^row-[0-9]+$",
+          "title": "Target Row Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "target_row_id",
+        "asn",
+        "provenance",
+        "evidence_ids"
+      ],
+      "title": "ASNRegistrationAssociation",
+      "type": "object"
+    },
     "AddressFamily": {
       "enum": [
         "ipv4",
@@ -17,7 +273,7 @@
           "type": "boolean"
         },
         "enum_version": {
-          "pattern": "^4$",
+          "pattern": "^5$",
           "title": "Enum Version",
           "type": "string"
         },
@@ -129,7 +385,7 @@
           "type": "string"
         },
         "analysis_schema_version": {
-          "const": "0.4.0",
+          "const": "0.5.0",
           "title": "Analysis Schema Version",
           "type": "string"
         },
@@ -349,6 +605,31 @@
     "Enrichment": {
       "additionalProperties": false,
       "properties": {
+        "asn_associations": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "asn_organization_snapshot": "#/$defs/ASNOrganizationAssociation",
+                "asn_registration": "#/$defs/ASNRegistrationAssociation",
+                "routing_origin_snapshot": "#/$defs/RoutingOriginAssociation"
+              },
+              "propertyName": "kind"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/RoutingOriginAssociation"
+              },
+              {
+                "$ref": "#/$defs/ASNOrganizationAssociation"
+              },
+              {
+                "$ref": "#/$defs/ASNRegistrationAssociation"
+              }
+            ]
+          },
+          "title": "Asn Associations",
+          "type": "array"
+        },
         "mcp_observations": {
           "items": {
             "$ref": "#/$defs/McpObservation"
@@ -429,7 +710,10 @@
         "validation",
         "relationship",
         "rdap",
-        "mcp"
+        "mcp",
+        "routing_origin",
+        "asn_organization",
+        "asn_registration"
       ],
       "title": "EvidenceType",
       "type": "string"
@@ -441,6 +725,12 @@
           "default": 0,
           "minimum": 0,
           "title": "Approved Corrections",
+          "type": "integer"
+        },
+        "asn_associations": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Asn Associations",
           "type": "integer"
         },
         "blank_lines": {
@@ -1592,6 +1882,59 @@
       "title": "RelationshipType",
       "type": "string"
     },
+    "RoutingOriginAssociation": {
+      "additionalProperties": false,
+      "properties": {
+        "evidence_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Evidence Ids",
+          "type": "array"
+        },
+        "id": {
+          "pattern": "^asn-association-[0-9]{6}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "kind": {
+          "const": "routing_origin_snapshot",
+          "default": "routing_origin_snapshot",
+          "title": "Kind",
+          "type": "string"
+        },
+        "matched_prefix": {
+          "title": "Matched Prefix",
+          "type": "string"
+        },
+        "origin_groups": {
+          "items": {
+            "$ref": "#/$defs/ASNOriginGroup"
+          },
+          "minItems": 1,
+          "title": "Origin Groups",
+          "type": "array"
+        },
+        "provenance": {
+          "$ref": "#/$defs/ASNAssociationProvenance"
+        },
+        "target_row_id": {
+          "pattern": "^row-[0-9]+$",
+          "title": "Target Row Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "target_row_id",
+        "matched_prefix",
+        "origin_groups",
+        "provenance",
+        "evidence_ids"
+      ],
+      "title": "RoutingOriginAssociation",
+      "type": "object"
+    },
     "RowKind": {
       "enum": [
         "data",
@@ -1604,6 +1947,13 @@
     "RowRecord": {
       "additionalProperties": false,
       "properties": {
+        "asn_association_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Asn Association Ids",
+          "type": "array"
+        },
         "effective_line": {
           "title": "Effective Line",
           "type": "string"
@@ -1827,7 +2177,7 @@
       "type": "object"
     }
   },
-  "$id": "https://schemas.fastah.net/netops/geofeed-quality/analysis-0.4.0.json",
+  "$id": "https://schemas.fastah.net/netops/geofeed-quality/analysis-0.5.0.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "properties": {
@@ -1837,7 +2187,7 @@
       "type": "string"
     },
     "analyzer_version": {
-      "const": "0.4.0",
+      "const": "0.5.0",
       "title": "Analyzer Version",
       "type": "string"
     },
@@ -1896,7 +2246,7 @@
       "type": "string"
     },
     "schema_version": {
-      "const": "0.4.0",
+      "const": "0.5.0",
       "title": "Schema Version",
       "type": "string"
     },

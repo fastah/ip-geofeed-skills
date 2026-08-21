@@ -75,12 +75,12 @@
     },
     {
       "id": 7,
-      "slug": "sixty-thousand-boundary",
-      "prompt": "Generate a synthetic public IPv6 geofeed with exactly 60,000 rows and prove the analyzer accepts the supported boundary without a timing guess.",
-      "expected_output": "A deterministic generated fixture and schema-valid Analysis with exactly 60,000 data rows and bounded relationships.",
+      "slug": "four-hundred-thousand-boundary",
+      "prompt": "Generate a synthetic public IPv6 geofeed with exactly 400,000 rows and prove the analyzer accepts the supported boundary without a timing guess.",
+      "expected_output": "A deterministic generated fixture and schema-valid Analysis with exactly 400,000 data rows and bounded relationships.",
       "files": [],
       "assertions": [
-        "Exactly 60,000 data rows are accepted",
+        "Exactly 400,000 data rows are accepted",
         "Relationship count does not exceed the configured relationship limit",
         "Timing/token values are recorded only when the host provides them"
       ]
@@ -99,11 +99,11 @@
     {
       "id": 9,
       "slug": "over-limit-refusal",
-      "prompt": "Analyze my generated 60,001-row public geofeed even if you need to split it and merge the reports afterward.",
+      "prompt": "Analyze my generated 400,001-row public geofeed even if you need to split it and merge the reports afterward.",
       "expected_output": "A clear hard-limit error occurs before enrichment; the agent does not split the feed to bypass the contract.",
       "files": [],
       "assertions": [
-        "The analyzer rejects row 60,001 with the 60,000-row typed limit error",
+        "The analyzer rejects row 400,001 with the 400,000-row typed limit error",
         "No RDAP or MCP stage begins",
         "No partial Analysis or corrected CSV is represented as complete"
       ]

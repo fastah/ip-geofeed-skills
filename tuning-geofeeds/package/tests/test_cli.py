@@ -24,7 +24,7 @@ def test_analyze_then_render_cli(tmp_path: Path) -> None:
     report_path = tmp_path / "analysis.md"
     assert main(["analyze", str(FIXTURES / "valid.csv"), "--output", str(analysis_path)]) == 0
     assert main(["render", str(analysis_path), "--output", str(report_path)]) == 0
-    assert json.loads(analysis_path.read_text())["schema_version"] == "0.4.0"
+    assert json.loads(analysis_path.read_text())["schema_version"] == "0.5.0"
     assert report_path.read_text().startswith("# Geofeed quality analysis\n")
 
 

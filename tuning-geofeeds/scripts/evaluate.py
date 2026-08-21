@@ -238,13 +238,16 @@ def _large_feed(path: Path, count: int) -> None:
 
 
 def _boundary(runner: Runner) -> list[Result]:
-    source = runner.outputs / "sixty-thousand.csv"
-    _large_feed(source, 60_000)
+    source = runner.outputs / "four-hundred-thousand.csv"
+    _large_feed(source, 400_000)
     analysis_path = runner.outputs / "analysis.json"
     runner.run("analyze", str(source), "--output", str(analysis_path))
     analysis = _load(analysis_path)
     return [
-        (analysis["statistics"]["data_rows"] == 60_000, "exactly 60,000 data rows accepted"),
+        (
+            analysis["statistics"]["data_rows"] == 400_000,
+            "exactly 400,000 data rows accepted",
+        ),
         (
             len(analysis["relationships"]) <= analysis["configuration"]["relationship_limit"],
             "relationship count is within the configured bound",
@@ -259,12 +262,12 @@ def _not_run(runner: Runner) -> list[Result]:
 
 
 def _over_limit(runner: Runner) -> list[Result]:
-    source = runner.outputs / "sixty-thousand-one.csv"
-    _large_feed(source, 60_001)
+    source = runner.outputs / "four-hundred-thousand-one.csv"
+    _large_feed(source, 400_001)
     output = runner.outputs / "analysis.json"
     completed = runner.run("analyze", str(source), "--output", str(output), expected=2)
     return [
-        ("more than 60,000 data rows" in completed.stderr, completed.stderr.strip()),
+        ("more than 400,000 data rows" in completed.stderr, completed.stderr.strip()),
         (not (runner.outputs / "mcp-requests").exists(), "no MCP or RDAP output exists"),
         (not output.exists(), "no partial Analysis or corrected CSV exists"),
     ]
@@ -414,7 +417,7 @@ SCENARIOS: dict[str, Callable[[Runner], list[Result]]] = {
     "optional-rdap-profile": _rdap_policy,
     "mcp-partial-render": _mcp,
     "explicit-correction-export": _corrections,
-    "sixty-thousand-boundary": _boundary,
+    "four-hundred-thousand-boundary": _boundary,
     "private-ipam-near-miss": _not_run,
     "over-limit-refusal": _over_limit,
     "unsafe-remote-url": _unsafe_remote,

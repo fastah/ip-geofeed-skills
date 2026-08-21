@@ -28,7 +28,7 @@ def test_committed_schema_has_no_drift_and_is_draft_2020_12() -> None:
     assert check_schema()
     schema = json.loads(schema_text())
     assert schema["$schema"] == "https://json-schema.org/draft/2020-12/schema"
-    assert schema["$id"].endswith("analysis-0.4.0.json")
+    assert schema["$id"].endswith("analysis-0.5.0.json")
     assert schema["$defs"]["FindingCategory"]["enum"] == [
         member.value for member in FindingCategory
     ]

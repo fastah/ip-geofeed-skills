@@ -1,21 +1,22 @@
 # Copyright 2026 Fastah Inc.
-"""Pydantic source of truth for analysis IR v0.4.0."""
+"""Pydantic source of truth for analysis IR v0.5.0."""
 
 from __future__ import annotations
 
 import hashlib
+import ipaddress
 import json
 import unicodedata
 from collections import Counter
 from datetime import datetime
 from enum import StrEnum
-from typing import Literal, cast
+from typing import Annotated, Literal, cast
 
 from pydantic import BaseModel, ConfigDict, Field, JsonValue, field_validator, model_validator
 
-SCHEMA_VERSION: Literal["0.4.0"] = "0.4.0"
-ENUM_VERSION: Literal["4"] = "4"
-SCHEMA_ID = "https://schemas.fastah.net/netops/geofeed-quality/analysis-0.4.0.json"
+SCHEMA_VERSION: Literal["0.5.0"] = "0.5.0"
+ENUM_VERSION: Literal["5"] = "5"
+SCHEMA_ID = "https://schemas.fastah.net/netops/geofeed-quality/analysis-0.5.0.json"
 CORRECTION_PLAN_SCHEMA_ID = (
     "https://schemas.fastah.net/netops/geofeed-quality/correction-plan-1.0.json"
 )
@@ -84,6 +85,9 @@ class EvidenceType(StrEnum):
     RELATIONSHIP = "relationship"
     RDAP = "rdap"
     MCP = "mcp"
+    ROUTING_ORIGIN = "routing_origin"
+    ASN_ORGANIZATION = "asn_organization"
+    ASN_REGISTRATION = "asn_registration"
 
 
 class RdapAssessment(StrEnum):
@@ -201,6 +205,7 @@ class RowRecord(Model):
     location: LocationValue | None = None
     finding_ids: list[str] = Field(default_factory=list)
     evidence_ids: list[str] = Field(default_factory=list)
+    asn_association_ids: list[str] = Field(default_factory=list)
 
 
 class Evidence(Model):
@@ -268,6 +273,7 @@ class FeedStatistics(Model):
     unresolved_rows: int = Field(ge=0)
     resolved_rows: int = Field(default=0, ge=0, le=0)
     enrichment_observations: int = Field(default=0, ge=0)
+    asn_associations: int = Field(default=0, ge=0)
     proposed_corrections: int = Field(default=0, ge=0)
     approved_corrections: int = Field(default=0, ge=0)
     rejected_corrections: int = Field(default=0, ge=0)
@@ -277,7 +283,7 @@ class FeedStatistics(Model):
 
 
 class AnalysisConfiguration(Model):
-    enum_version: str = Field(pattern="^4$")
+    enum_version: str = Field(pattern="^5$")
     max_data_rows: int = Field(ge=1)
     relationship_limit: int = Field(ge=1)
     enrichment_enabled: bool = False
@@ -440,10 +446,76 @@ class McpObservation(Model):
     evidence_ids: list[str]
 
 
+class ASNAssociationProvenance(Model):
+    source_name: str
+    source_url: str
+    snapshot_sources: list[str] = Field(min_length=1)
+    snapshot_id: str
+    snapshot_sha256: str = Field(pattern="^[0-9a-f]{64}$")
+
+
+class ASNOriginGroup(Model):
+    asns: list[int] = Field(min_length=1)
+    as_set: bool = False
+
+    @field_validator("asns")
+    @classmethod
+    def validate_asns(cls, value: list[int]) -> list[int]:
+        if any(asn < 0 or asn > 4_294_967_295 for asn in value):
+            raise ValueError("ASNs must be 32-bit unsigned integers")
+        if len(value) != len(set(value)):
+            raise ValueError("origin-group ASNs must be unique")
+        return value
+
+
+class RoutingOriginAssociation(Model):
+    id: str = Field(pattern="^asn-association-[0-9]{6}$")
+    kind: Literal["routing_origin_snapshot"] = "routing_origin_snapshot"
+    target_row_id: str = Field(pattern="^row-[0-9]+$")
+    matched_prefix: str
+    origin_groups: list[ASNOriginGroup] = Field(min_length=1)
+    provenance: ASNAssociationProvenance
+    evidence_ids: list[str]
+
+
+class ASNOrganizationAssociation(Model):
+    id: str = Field(pattern="^asn-association-[0-9]{6}$")
+    kind: Literal["asn_organization_snapshot"] = "asn_organization_snapshot"
+    target_row_id: str = Field(pattern="^row-[0-9]+$")
+    routing_association_id: str = Field(pattern="^asn-association-[0-9]{6}$")
+    asn: int = Field(ge=0, le=4_294_967_295)
+    as_name: str | None = None
+    organization_id: str | None = None
+    organization_name: str | None = None
+    organization_country: str | None = None
+    asn_source_registry: str | None = None
+    organization_source_registry: str | None = None
+    provenance: ASNAssociationProvenance
+    evidence_ids: list[str]
+
+
+class ASNRegistrationAssociation(Model):
+    id: str = Field(pattern="^asn-association-[0-9]{6}$")
+    kind: Literal["asn_registration"] = "asn_registration"
+    target_row_id: str = Field(pattern="^row-[0-9]+$")
+    asn: int = Field(ge=0, le=4_294_967_295)
+    organization_name: str | None = None
+    registration_handle: str | None = None
+    provenance: ASNAssociationProvenance
+    evidence_ids: list[str]
+
+
+ASNAssociation = Annotated[
+    RoutingOriginAssociation | ASNOrganizationAssociation | ASNRegistrationAssociation,
+    Field(discriminator="kind"),
+]
+
+
 class Enrichment(Model):
     publisher_profile: PublisherProfile | None = None
     observations: list[RdapObservation] = Field(default_factory=list)
     mcp_observations: list[McpObservation] = Field(default_factory=list)
+    asn_associations: list[ASNAssociation] = Field(default_factory=list)
 
 
 class CorrectionProposal(Model):
@@ -499,7 +571,7 @@ class CorrectionPlan(Model):
     version: Literal["1.0"] = "1.0"
     source_sha256: str = Field(pattern="^[0-9a-f]{64}$")
     analysis_id: str = Field(pattern="^analysis-[0-9a-f]{16}$")
-    analysis_schema_version: Literal["0.4.0"]
+    analysis_schema_version: Literal["0.5.0"]
     proposal_set_sha256: str = Field(pattern="^[0-9a-f]{64}$")
     proposals: list[CorrectionProposal]
 
@@ -523,7 +595,7 @@ class CorrectionApproval(Model):
     id: str = Field(pattern="^approval-[0-9a-f]{16}$")
     source_sha256: str = Field(pattern="^[0-9a-f]{64}$")
     analysis_id: str = Field(pattern="^analysis-[0-9a-f]{16}$")
-    analysis_schema_version: Literal["0.4.0"]
+    analysis_schema_version: Literal["0.5.0"]
     proposal_set_sha256: str = Field(pattern="^[0-9a-f]{64}$")
     approver_label: str = Field(min_length=1, max_length=200)
     decided_at: datetime
@@ -586,10 +658,10 @@ class Artifact(Model):
 
 class Analysis(Model):
     schema_uri: str = Field(pattern="^https://schemas\\.fastah\\.net/")
-    schema_version: Literal["0.4.0"]
+    schema_version: Literal["0.5.0"]
     analysis_id: str = Field(pattern="^analysis-[0-9a-f]{16}$")
     created_at: datetime
-    analyzer_version: Literal["0.4.0"]
+    analyzer_version: Literal["0.5.0"]
     source: SourceMetadata
     configuration: AnalysisConfiguration
     statistics: FeedStatistics
@@ -609,6 +681,8 @@ class Analysis(Model):
         relationship_ids = [relationship.id for relationship in self.relationships]
         rdap_ids = [observation.id for observation in self.enrichment.observations]
         mcp_ids = [observation.id for observation in self.enrichment.mcp_observations]
+        asn_association_ids = [item.id for item in self.enrichment.asn_associations]
+        asn_association_id_set = set(asn_association_ids)
         proposal_ids = [proposal.id for proposal in self.corrections.proposals]
         approval_ids = [approval.id for approval in self.corrections.approvals]
         opaque_mcp_ids = [
@@ -621,6 +695,7 @@ class Analysis(Model):
             ("relationship", relationship_ids),
             ("RDAP observation", rdap_ids),
             ("MCP observation", mcp_ids),
+            ("ASN association", asn_association_ids),
             ("opaque MCP row", opaque_mcp_ids),
             ("correction proposal", proposal_ids),
             ("correction approval", approval_ids),
@@ -632,6 +707,7 @@ class Analysis(Model):
         findings = set(finding_ids)
         findings_by_id = {finding.id: finding for finding in self.findings}
         evidence = set(evidence_ids)
+        evidence_by_id = {item.id: item for item in self.evidence}
         if [row.line_number for row in self.rows] != list(range(1, len(self.rows) + 1)):
             raise ValueError("row line numbers must be contiguous and ordered")
         if self.source.physical_line_count != len(self.rows):
@@ -662,7 +738,10 @@ class Analysis(Model):
                 row.state == RowState.VALID_DO_NOT_GEOLOCATE for row in data_rows
             ),
             "unresolved_rows": sum(row.state == RowState.VALID_UNRESOLVED for row in data_rows),
-            "enrichment_observations": len(self.enrichment.observations) + len(mcp_ids),
+            "enrichment_observations": len(self.enrichment.observations)
+            + len(mcp_ids)
+            + len(asn_association_ids),
+            "asn_associations": len(asn_association_ids),
             "proposed_corrections": len(self.corrections.proposals),
             "approved_corrections": sum(
                 decision.action == CorrectionAction.APPROVE
@@ -704,6 +783,10 @@ class Analysis(Model):
                 raise ValueError(f"row {row.id} has a dangling finding reference")
             if not set(row.evidence_ids) <= evidence:
                 raise ValueError(f"row {row.id} has a dangling evidence reference")
+            if len(row.asn_association_ids) != len(set(row.asn_association_ids)):
+                raise ValueError(f"row {row.id} has duplicate ASN association references")
+            if not set(row.asn_association_ids) <= asn_association_id_set:
+                raise ValueError(f"row {row.id} has a dangling ASN association reference")
         for finding in self.findings:
             if not set(finding.target_ids) <= rows.keys():
                 raise ValueError(f"finding {finding.id} has an invalid target")
@@ -758,6 +841,63 @@ class Analysis(Model):
                 raise ValueError(
                     f"MCP observation {mcp_observation.id} disagrees with MCP configuration"
                 )
+        asn_associations = {item.id: item for item in self.enrichment.asn_associations}
+        for association in self.enrichment.asn_associations:
+            if association.target_row_id not in rows:
+                raise ValueError(f"ASN association {association.id} has an invalid row target")
+            if association.id not in rows[association.target_row_id].asn_association_ids:
+                raise ValueError(f"ASN association {association.id} row link is not reciprocal")
+            if len(association.evidence_ids) != len(set(association.evidence_ids)):
+                raise ValueError(f"ASN association {association.id} has duplicate evidence")
+            if not set(association.evidence_ids) <= evidence:
+                raise ValueError(f"ASN association {association.id} has dangling evidence")
+            if any(
+                association.target_row_id not in evidence_by_id[evidence_id].target_ids
+                for evidence_id in association.evidence_ids
+            ):
+                raise ValueError(
+                    f"ASN association {association.id} evidence does not target its row"
+                )
+            if isinstance(association, RoutingOriginAssociation):
+                row_prefix = rows[association.target_row_id].prefix
+                canonical_prefix = row_prefix.canonical if row_prefix else None
+                try:
+                    if canonical_prefix is None:
+                        raise ValueError("row has no canonical prefix")
+                    requested_network = ipaddress.ip_network(canonical_prefix, strict=True)
+                    matched_network = ipaddress.ip_network(association.matched_prefix, strict=True)
+                except ValueError as error:
+                    raise ValueError(
+                        f"ASN association {association.id} has an invalid matched prefix"
+                    ) from error
+                if (
+                    requested_network.version != matched_network.version
+                    or requested_network.network_address not in matched_network
+                ):
+                    raise ValueError(
+                        f"ASN association {association.id} matched prefix does not cover its row"
+                    )
+            if isinstance(association, ASNOrganizationAssociation):
+                routing = asn_associations.get(association.routing_association_id)
+                if not isinstance(routing, RoutingOriginAssociation):
+                    raise ValueError(
+                        f"ASN association {association.id} has an invalid routing association"
+                    )
+                if routing.target_row_id != association.target_row_id:
+                    raise ValueError(
+                        f"ASN association {association.id} routing target does not match its row"
+                    )
+                routed_asns = {asn for group in routing.origin_groups for asn in group.asns}
+                if association.asn not in routed_asns:
+                    raise ValueError(
+                        f"ASN association {association.id} ASN is absent from routing evidence"
+                    )
+        for row in self.rows:
+            if any(
+                asn_associations[association_id].target_row_id != row.id
+                for association_id in row.asn_association_ids
+            ):
+                raise ValueError(f"row {row.id} has an ASN association for another row")
         field_indexes = {"country": 1, "region": 2, "city": 3, "postal_code": 4}
         proposals = {proposal.id: proposal for proposal in self.corrections.proposals}
         for proposal in self.corrections.proposals:
