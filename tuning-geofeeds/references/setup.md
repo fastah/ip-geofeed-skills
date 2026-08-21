@@ -63,7 +63,7 @@ Do not bypass the host's network policy or reconstruct the feed. Analysis
 records `source.sha256` for optional audits and for binding approvals; users do
 not normally need to calculate another digest.
 
-The analyzer accepts at most 60,000 data rows. Comments and blank physical
+The analyzer accepts at most 400,000 data rows. Comments and blank physical
 lines do not count. An oversized input fails before any Analysis IR is
 generated; never truncate or split it to create partial IR.
 

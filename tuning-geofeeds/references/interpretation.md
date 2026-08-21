@@ -23,7 +23,7 @@ authorities. GeoJSON is a user-chosen artifact that may disclose canonical
 prefixes; it omits source comments, publisher/RDAP identifiers, raw MCP
 messages, and unapproved correction data.
 
-Inputs with at most 60,000 data rows can produce Analysis IR. An oversized
+Inputs with at most 400,000 data rows can produce Analysis IR. An oversized
 input fails closed before IR generation; it is not truncated, split, or
 represented by a partial result.
 

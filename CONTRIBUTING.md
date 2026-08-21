@@ -50,6 +50,6 @@ The migration is not a compatibility release. Reanalyze original source feeds wi
 
 ## Readiness
 
-The local-file-first GitHub Skill is public, and its isolated Amp install has been smoke-tested. Marketplace release remains blocked by product-owned secure acquisition, measured 60,000-row time/memory/browser budgets, live production Terms and OAuth consistency, deployed log-retention evidence, clean Claude and OpenAI host verification, reviewer access, and marketplace review. An allowlisted host asking the user to upload the CSV is supported behavior; it is not permission to bypass network policy.
+The local-file-first GitHub Skill is public, and its isolated Amp install has been smoke-tested. Marketplace release remains blocked by product-owned secure acquisition, measured 400,000-row time/memory/browser budgets, live production Terms and OAuth consistency, deployed log-retention evidence, clean Claude and OpenAI host verification, reviewer access, and marketplace review. An allowlisted host asking the user to upload the CSV is supported behavior; it is not permission to bypass network policy.
 
 Sequence shared-state work separately: merge the private implementation, generate and review the public pull request, publish to public GitHub with approval, repeat the public Amp install smoke, validate Claude and OpenAI hosts, close production and product blockers, then submit marketplaces last with separate approval.

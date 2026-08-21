@@ -142,8 +142,8 @@ Fastah MCP service logs are separate from your local artifacts. The release poli
 
 | Situation | What happens | First response |
 |---|---|---|
-| Up to 60,000 data rows | The complete feed can be analyzed. Comments and blank lines do not count. | Keep the complete source and review the output sizes. |
-| More than 60,000 data rows | Analysis stops before creating partial Analysis JSON. Nothing is truncated. | Do not split the feed to hide the limit. Reduce scope only through your normal source-management process. |
+| Up to 400,000 data rows | The complete feed can be analyzed. Comments and blank lines do not count. | Keep the complete source and review the output sizes. |
+| More than 400,000 data rows | Analysis stops before creating partial Analysis JSON. Nothing is truncated. | Do not split the feed to hide the limit. Reduce scope only through your normal source-management process. |
 | Invalid UTF-8 | Local analysis stops with an encoding error. | Keep the original file. Save a separate verified UTF-8 working copy. |
 | Remote feed URL | Download is owned by the host, not this package. Allowlisted networks may block it. | Use the host's normal download capability. If unavailable, upload the CSV. Do not bypass network policy or reconstruct it. |
 | Empty GeoJSON | The valid FeatureCollection has no features when no MCP place evidence supplies usable coordinates or bounds. | Use Markdown and Analysis JSON for offline findings. Run optional MCP only after agreeing to its privacy boundary. RDAP does not populate GeoJSON. |
@@ -152,7 +152,7 @@ Fastah MCP service logs are separate from your local artifacts. The release poli
 | Country or region code is invalid | The row is retained with a finding. | Check the intended ISO country and subdivision code. Empty or `ZZ` country has a separate do-not-geolocate meaning. |
 | Output file already exists | The command refuses to overwrite it. | Choose a new output name. Keep the earlier artifact for comparison. |
 | RDAP or MCP partly fails | Typed unavailable results remain beside successful results. | Continue offline. Retry only the optional stage when appropriate. |
-| Large HTML report | It can take time and memory to generate and open. | Use Markdown and Analysis JSON first. In review, feeds near 51,000 and 53,000 rows produced HTML around 225 MB, took over three minutes to generate, and took about 14 seconds to build the browser document. The 60,000-row input limit is not an acceptable browser-performance budget. |
+| Large HTML report | It can take time and memory to generate and open. | Use Markdown and Analysis JSON first. In review, feeds near 51,000 and 53,000 rows produced HTML around 225 MB, took over three minutes to generate, and took about 14 seconds to build the browser document. The 400,000-row input limit is not an acceptable browser-performance budget. |
 
 ## Publish the checked feed
 
@@ -171,7 +171,7 @@ RFC 8805 consumers treat a feed as a hint and may refresh it on their own schedu
 ## Versions and help
 
 - Skill and plugin: `0.2.0`
-- Analyzer and Analysis schema: `0.4.0` / `0.4.0`
+- Analyzer and Analysis schema: `0.5.0` / `0.5.0`
 - MCP response contract: `1.0`
 
 These versions move independently. Include them with the source digest when you report a problem.

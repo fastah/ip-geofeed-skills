@@ -874,8 +874,10 @@ def enrich_analysis(
             row.evidence_ids.append(evidence.id)
             row.finding_ids.append(finding.id)
 
-    enriched.statistics.enrichment_observations = len(enriched.enrichment.observations) + len(
-        enriched.enrichment.mcp_observations
+    enriched.statistics.enrichment_observations = (
+        len(enriched.enrichment.observations)
+        + len(enriched.enrichment.mcp_observations)
+        + len(enriched.enrichment.asn_associations)
     )
     enriched.statistics.finding_counts.rdap_mcp_enrichment_observation = sum(
         finding.category == FindingCategory.ENRICHMENT_OBSERVATION for finding in enriched.findings

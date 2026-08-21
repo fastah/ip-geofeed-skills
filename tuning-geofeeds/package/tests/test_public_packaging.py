@@ -79,7 +79,7 @@ def test_public_root_is_generated_from_canonical_metadata(tmp_path: Path) -> Non
         "Fastah NetOps Tools helps you check a public IP geofeed",
         "Python | 3.14 or newer",
         "Skill and plugin: `0.2.0`",
-        "Analyzer and Analysis schema: `0.4.0` / `0.4.0`",
+        "Analyzer and Analysis schema: `0.5.0` / `0.5.0`",
         "MCP response contract: `1.0`",
         "`do_not_geolocate`",
         "around 225 MB",
