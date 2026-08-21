@@ -33,22 +33,4 @@ IANA special-purpose deny policy. Both are intentional: Python's IPv4
 `is_reserved` currently covers only `240.0.0.0/4` and is not the IANA
 Reserved-by-Protocol column, while the stdlib classifications remain owned by
 the selected Python runtime. The explicit policy also preserves whole-prefix
-checks and parity with production's special-purpose exclusions.
-
-## Third-party operational examples
-
-These named public geofeeds are URL references for operational review:
-
-- [GTT](https://geolocation.gtt.net/gtt_geolocation.csv)
-- [Cisco Cloud Security](https://geofeed.network.strln.net)
-- [LACNIC](https://milacnic.lacnic.net/lacnic/geofeeds)
-- [SpaceX Starlink](https://geoip.starlinkisp.net/feed.csv)
-- [Verizon USA](https://raw.githubusercontent.com/Verizon/verizon-geofeed/refs/heads/main/feed.csv)
-
-They are third-party operational examples, may change or be unavailable, and
-are not endorsements or bundled test fixtures. Do not treat availability,
-encoding, row count, or acceptance under the current analyzer limit as stable.
-As non-normative review evidence, a live HEAD check supplied on 2026-08-17
-reported LACNIC as HTTP 200 with
-`Content-Type: text/csv;charset=ISO-8859-1`. This does not create a live-test
-dependency or permit hostname-specific decoding.
+checks for special-purpose address space.

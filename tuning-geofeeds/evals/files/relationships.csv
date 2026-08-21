@@ -1,5 +1,0 @@
-8.8.0.0/16,US,US-CA,Parent,
-8.8.8.0/24,US,US-CA,Child,
-8.8.8.0/24,US,US-CA,Child,
-8.8.8.0/24,US,US-NY,Conflict,
-8.8.8.0/25,US,US-CA,Carved,

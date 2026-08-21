@@ -6,7 +6,9 @@ The `tuning-geofeeds` skill works with [RFC 8805](https://www.rfc-editor.org/rfc
 
 ## Get the feed
 
-Claude Cowork, other cloud agents, and corporate networks may block some HTTPS downloads. If the host cannot fetch your feed URL, upload the CSV. This is the intended path. Do not ask the agent to bypass the host's network policy or reconstruct rows.
+Some AI hosts and corporate networks block downloads from unlisted websites. If
+the host cannot fetch your feed URL, upload the CSV. Do not ask the agent to
+bypass the host's network policy or reconstruct rows.
 
 ## What it does not do
 
@@ -21,8 +23,7 @@ Claude Cowork, other cloud agents, and corporate networks may block some HTTPS d
 |---|---|
 | Python | 3.14 or newer |
 | Input | A local, strict UTF-8 RFC 8805 CSV file |
-| Amp | Published from this public repository; the complete repository install has passed an isolated Amp smoke test |
-| Claude and OpenAI marketplaces | Not published yet. Do not treat generated review packages as listings. |
+| Amp | Install from this public repository |
 | Internet access | Not needed for the standard offline report |
 | Optional online checks | Direct registry checks and Fastah place search, only after you agree |
 
@@ -32,7 +33,7 @@ Install the complete skill in Amp:
 amp skill add --overwrite https://github.com/fastah/ip-geofeed-skills.git
 ```
 
-Then ask Amp to use `tuning-geofeeds`, or start with the first prompt below. The packaged repository layout is checked with a real isolated Amp installation.
+Then ask Amp to use `tuning-geofeeds`, or start with the first prompt below.
 
 ## Check a local feed in five minutes
 
@@ -122,7 +123,9 @@ The result is one of `consistent`, `conflicting`, `unverified`, or `unavailable`
 
 ## Optional Fastah place search
 
-Fastah's Model Context Protocol (MCP) service is optional and online. It uses host-managed OAuth. The skill asks first. The host must have a verified production connection. It discovers the tool and its current batch limit before sending any rows.
+Fastah's Model Context Protocol (MCP) service is optional and online. It uses
+host-managed sign-in. The skill asks first and checks the tool's current batch
+limit before sending any rows.
 
 When this stage runs, every valid source row eligible for MCP receives one normalized typed result:
 
@@ -136,7 +139,9 @@ When this stage runs, every valid source row eligible for MCP receives one norma
 
 Only `rowKey`, `countryCode`, `regionCode`, `cityName`, and `searchMode` cross the Fastah MCP boundary. `rowKey` is an opaque, batch-unique correlation key and is echoed unchanged. Prefixes, the feed, comments, Analysis JSON, RDAP data, publisher details, proposals, and approvals do not. Exact repeated place queries are sent once and safely fanned back to their source rows. If MCP is unavailable, keep working with the offline report.
 
-Fastah MCP service logs are separate from your local artifacts. The release policy allows only sanitized request metadata and aggregate outcomes, not tokens, row location contents, feeds, Analysis JSON, RDAP data, publisher data, approvals, or raw backend errors. It requires deletion after 30 days. Production log fields and deletion controls still need live verification before release.
+Fastah MCP receives only the five place-search fields listed above. Review
+[Fastah's privacy policy](https://www.iubenda.com/privacy-policy/40053234) and [terms of use](https://mcp.fastah.ai/terms-of-use.txt)
+before enabling the optional online step.
 
 ## Limits and troubleshooting
 
@@ -147,12 +152,12 @@ Fastah MCP service logs are separate from your local artifacts. The release poli
 | Invalid UTF-8 | Local analysis stops with an encoding error. | Keep the original file. Save a separate verified UTF-8 working copy. |
 | Remote feed URL | Download is owned by the host, not this package. Allowlisted networks may block it. | Use the host's normal download capability. If unavailable, upload the CSV. Do not bypass network policy or reconstruct it. |
 | Empty GeoJSON | The valid FeatureCollection has no features when no MCP place evidence supplies usable coordinates or bounds. | Use Markdown and Analysis JSON for offline findings. Run optional MCP only after agreeing to its privacy boundary. RDAP does not populate GeoJSON. |
-| Declared non-UTF-8 source | The analyzer does not silently convert it. | For a response such as `Content-Type: text/csv; charset=ISO-8859-1`, keep the raw file and create a separate strict UTF-8 copy with both digests. LACNIC has been observed using this pattern; do not special-case a hostname. |
+| Declared non-UTF-8 source | The analyzer does not silently convert it. | Keep the raw file and create a separate strict UTF-8 copy with both digests. Do not special-case a hostname. |
 | Prefix has host bits | The authored CIDR is retained but marked invalid. | Confirm the intended network address. Do not accept automatic masking without checking the allocation. |
 | Country or region code is invalid | The row is retained with a finding. | Check the intended ISO country and subdivision code. Empty or `ZZ` country has a separate do-not-geolocate meaning. |
 | Output file already exists | The command refuses to overwrite it. | Choose a new output name. Keep the earlier artifact for comparison. |
 | RDAP or MCP partly fails | Typed unavailable results remain beside successful results. | Continue offline. Retry only the optional stage when appropriate. |
-| Large HTML report | It can take time and memory to generate and open. | Use Markdown and Analysis JSON first. In review, feeds near 51,000 and 53,000 rows produced HTML around 225 MB, took over three minutes to generate, and took about 14 seconds to build the browser document. The 400,000-row input limit is not an acceptable browser-performance budget. |
+| Large HTML report | It can take substantial time and memory to generate and open. | Use Markdown and Analysis JSON first. Treat 400,000 rows as a hard input ceiling, not a recommended dashboard size. |
 
 ## Publish the checked feed
 
@@ -180,5 +185,5 @@ These versions move independently. Include them with the source digest when you 
 - Support: [support@getfastah.com](mailto:support@getfastah.com)
 - [Privacy policy](https://www.iubenda.com/privacy-policy/40053234)
 - [Terms of use](https://mcp.fastah.ai/terms-of-use.txt)
-- [Maintainer and release instructions](CONTRIBUTING.md)
+- [Contributing](CONTRIBUTING.md)
 - [Migration from `geofeed-tuner`](MIGRATION.md)
