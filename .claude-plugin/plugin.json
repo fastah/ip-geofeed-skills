@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "author": {
+    "email": "support@getfastah.com",
+    "name": "Fastah Inc.",
+    "url": "https://getfastah.com/"
+  },
+  "defaultEnabled": false,
+  "description": "Audit and tune public RFC 8805 IP geofeeds with explicit approval.",
+  "displayName": "Fastah NetOps Tools",
+  "homepage": "https://github.com/fastah/ip-geofeed-skills",
+  "keywords": [
+    "geofeed",
+    "RFC 8805",
+    "IP geolocation",
+    "network operations"
+  ],
+  "license": "Apache-2.0",
+  "mcpServers": "./.mcp.json",
+  "name": "fastah-netops-tools",
+  "repository": "https://github.com/fastah/ip-geofeed-skills",
+  "skills": "./tuning-geofeeds/",
+  "version": "0.2.0"
+}

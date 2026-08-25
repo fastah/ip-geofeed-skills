@@ -2,9 +2,19 @@
   "bundle": "fastah-netops-tools-agent-skills",
   "files": [
     {
+      "bytes": 725,
+      "path": ".claude-plugin/plugin.json",
+      "sha256": "a6cf63780587e378d4b2be6dc4f9abb6214630bcff13bb65ef28bf77fd68ea32"
+    },
+    {
       "bytes": 495,
       "path": ".github/plugin/plugin.json",
       "sha256": "711f0acab84d83c69d42575cde9ecf80b0aef3af2c8fd9fd116ae2bdde55612d"
+    },
+    {
+      "bytes": 118,
+      "path": ".mcp.json",
+      "sha256": "514db5ca43ed864cf5d92bbac9fb1612099d3a06c40e95d6990cab77558f8150"
     },
     {
       "bytes": 115,
@@ -37,9 +47,9 @@
       "sha256": "514db5ca43ed864cf5d92bbac9fb1612099d3a06c40e95d6990cab77558f8150"
     },
     {
-      "bytes": 9839,
+      "bytes": 9958,
       "path": "tuning-geofeeds/SKILL.md",
-      "sha256": "bae4352fdb22ff2250733e64e5287a0d124776859f759996af83316ca5c60b98"
+      "sha256": "fc67c0d793d798a54a7c755508437cd17e88733e6777497a49e4143a4b0e18e0"
     },
     {
       "bytes": 1823,
