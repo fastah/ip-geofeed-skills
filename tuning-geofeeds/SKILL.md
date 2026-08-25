@@ -119,9 +119,10 @@ analysis usable; report `unavailable` rather than guessing.
 ### 4. Optionally add host-mediated Fastah MCP evidence
 
 Ask the host to discover the Fastah MCP tool `rfc8805-row-place-search`, its
-current closed schema, and its advertised positive batch limit. Do not embed
-credentials or implement OAuth/MCP transport. Export batches using that exact
-discovered limit:
+current closed schema, and its advertised positive batch limit. If the host
+asks the user to sign in, use the host's normal OAuth flow. Never ask the user
+to paste a password, token, or other credential. Do not implement OAuth/MCP
+transport. Export batches using that exact discovered limit:
 
 ```bash
 "$PYTHON" "$RUN" mcp-export "$CURRENT_IR" \

@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "fastah-netops": {
+      "type": "http",
+      "url": "https://mcp.fastah.ai/mcp"
+    }
+  }
+}
