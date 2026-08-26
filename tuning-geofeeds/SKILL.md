@@ -1,6 +1,6 @@
 ---
 name: tuning-geofeeds
-description: "Analyzes and tunes public IP RFC 8805 geofeed CSVs for network operators, preserving evidence while producing JSON, Markdown, HTML, GeoJSON, and explicitly approved corrected feeds. Use for public prefix geolocation quality, duplicate or carved-prefix review, optional RDAP consistency evidence, or Fastah place-search enrichment; do not use for private/internal IPAM or generic CSV work."
+description: 'Analyzes and tunes public IP RFC 8805 geofeed CSVs for network operators, preserving evidence while producing JSON, Markdown, HTML, GeoJSON, and explicitly approved corrected feeds. Use for public prefix geolocation quality, duplicate or carved-prefix review, optional RDAP consistency evidence, or Fastah place-search enrichment; do not use for private/internal IPAM or generic CSV work.'
 license: Apache-2.0
 compatibility: "Requires Python 3.14+. Runs locally by default; network access is optional and limited to managed public-HTTPS acquisition, direct authoritative RIR RDAP, and host-mediated Fastah MCP."
 metadata:
@@ -34,6 +34,10 @@ reconstruct feed rows.
 - RDAP evidence can be `consistent`, `conflicting`, `unverified`, or
   `unavailable`; it never proves legal ownership. MCP matches are advisory.
   Rank, population weight, and radius are not confidence.
+- `package/schema/mcp-place-search-request.schema.json` and
+  `package/schema/mcp-place-search-response.schema.json` are frozen local
+  adapter/exchange contract v1.0 schemas. They validate the local export/import
+  envelope and audit captures; they are not the live Fastah MCP tool schemas.
 - Do not write parser, validator, schema, renderer, or correction scripts.
   Invoke `scripts/geofeed_cli.py`; the typed models and committed schemas are
   the source of truth.
@@ -118,11 +122,22 @@ analysis usable; report `unavailable` rather than guessing.
 
 ### 4. Optionally add host-mediated Fastah MCP evidence
 
-Ask the host to discover the Fastah MCP tool `rfc8805-row-place-search`, its
-current closed schema, and its advertised positive batch limit. If the host
-asks the user to sign in, use the host's normal OAuth flow. Never ask the user
-to paste a password, token, or other credential. Do not implement OAuth/MCP
-transport. Export batches using that exact discovered limit:
+If the user opts in, have the host complete its normal OAuth flow, then use
+`tools/list` (including all pages) to rediscover the current Fastah MCP tool
+definitions before use. This workflow uses `rfc8805-row-place-search`; Fastah
+may offer other tools, so do not treat it as the only valid Fastah MCP tool.
+Read that tool's current `inputSchema`, `outputSchema`, and advertised positive
+batch limit. Rediscover after a `notifications/tools/list_changed` notification
+or before a later enrichment run; do not substitute the committed local adapter
+schemas for discovery. Never ask the user to paste a password, token, or other
+credential. Do not implement OAuth/MCP transport.
+
+Use MCP only when the discovered `rfc8805-row-place-search` definition has an
+`outputSchema` and supports the five allowlisted request fields plus the
+row-correlation semantics needed by the local adapter. If it lacks an
+`outputSchema`, cannot satisfy those checks, or MCP is unavailable, explain
+that enrichment was skipped and continue with the local analysis. Export
+batches using the discovered limit:
 
 ```bash
 "$PYTHON" "$RUN" mcp-export "$CURRENT_IR" \
@@ -130,8 +145,8 @@ transport. Export batches using that exact discovered limit:
   --output-dir "$WORK/mcp-requests"
 ```
 
-Have the host invoke only `rfc8805-row-place-search` once per batch and save
-each structured response in order under `WORK`. Inspect every outbound JSON
+Have the host invoke `rfc8805-row-place-search` once per batch and save each
+validated structured response in order under `WORK`. Inspect every outbound JSON
 object first: it must contain only `rows`, and every row must contain only the
 five allowlisted fields above. Export deterministically groups only exact,
 byte-identical `(countryCode, regionCode, cityName, searchMode)` tuples in
