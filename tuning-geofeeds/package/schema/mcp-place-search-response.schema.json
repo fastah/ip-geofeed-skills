@@ -240,6 +240,7 @@
   "$id": "https://schemas.fastah.net/netops/geofeed-quality/mcp-place-search-response-1.0.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
+  "description": "Frozen local adapter/exchange contract v1.0 response envelope. It is not the live Fastah MCP tool outputSchema; discover that via tools/list.",
   "properties": {
     "batchLimit": {
       "minimum": 1,

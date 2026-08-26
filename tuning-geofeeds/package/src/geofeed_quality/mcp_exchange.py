@@ -1,5 +1,5 @@
 # Copyright 2026 Fastah Inc.
-"""Host-mediated Fastah MCP request export and response import.
+"""Host-mediated Fastah MCP local adapter/exchange request export and response import.
 
 This module intentionally has no MCP transport, OAuth, or credential handling.
 """
@@ -65,6 +65,18 @@ class McpRequestRow(WireModel):
 
 
 class McpRequestBatch(WireModel):
+    """Frozen local adapter/exchange v1.0 request envelope, not a live MCP tool schema."""
+
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+        json_schema_extra={
+            "description": (
+                "Frozen local adapter/exchange contract v1.0 request envelope. "
+                "It is not the live Fastah MCP tool inputSchema; discover that via tools/list."
+            )
+        },
+    )
     rows: list[McpRequestRow] = Field(min_length=1)
 
     @model_validator(mode="after")
@@ -222,6 +234,18 @@ class McpResponseSummary(WireModel):
 
 
 class McpResponseBatch(WireModel):
+    """Frozen local adapter/exchange v1.0 response envelope, not a live MCP tool schema."""
+
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+        json_schema_extra={
+            "description": (
+                "Frozen local adapter/exchange contract v1.0 response envelope. "
+                "It is not the live Fastah MCP tool outputSchema; discover that via tools/list."
+            )
+        },
+    )
     contract_version: Literal["1.0"] = Field(alias="contractVersion")
     batch_limit: int = Field(alias="batchLimit", ge=1)
     summary: McpResponseSummary
