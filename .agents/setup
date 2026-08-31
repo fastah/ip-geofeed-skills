@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$repo_root"
+
+log_step() {
+  printf '\n==> %s (%s)\n' "$1" "$(date -Is)"
+}
+
+uv_bin="$HOME/.local/bin/uv"
+if [[ ! -x "$uv_bin" ]]; then
+  log_step "Installing uv"
+  installer="$(mktemp)"
+  trap 'rm -f "$installer"' EXIT
+  curl --fail --location --silent --show-error https://astral.sh/uv/install.sh -o "$installer"
+  UV_NO_MODIFY_PATH=1 sh "$installer"
+  rm -f "$installer"
+  trap - EXIT
+fi
+
+log_step "Installing Python 3.14"
+"$uv_bin" python install 3.14
+
+runtime_root="$repo_root/.amp/runtime"
+venv="$runtime_root/.venv"
+runtime_package="$runtime_root/tuning-geofeeds-package"
+package_root="$repo_root/tuning-geofeeds/package"
+fingerprint_file="$runtime_root/package.sha256"
+
+mkdir -p "$runtime_root"
+package_fingerprint="$({
+  find "$package_root" -type f -print0 | sort -z | xargs -0 sha256sum
+} | sha256sum | awk '{print $1}')"
+
+if [[ ! -x "$venv/bin/python" ]] || [[ ! -f "$fingerprint_file" ]] || \
+  [[ "$(<"$fingerprint_file")" != "$package_fingerprint" ]]; then
+  log_step "Preparing analyzer environment"
+  rm -rf "$runtime_package"
+  mkdir -p "$runtime_package"
+  cp -a "$package_root/." "$runtime_package/"
+  "$uv_bin" venv --python 3.14 "$venv"
+  "$uv_bin" pip install --python "$venv/bin/python" "$runtime_package"
+  printf '%s\n' "$package_fingerprint" > "$fingerprint_file"
+else
+  log_step "Analyzer environment is current"
+fi
+
+log_step "Verifying analyzer"
+"$venv/bin/python" -c 'import sys; assert sys.version_info >= (3, 14) and sys.version_info.releaselevel == "final"'
+"$venv/bin/geofeed-quality" --help >/dev/null

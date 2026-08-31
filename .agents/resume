@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+python="$repo_root/.amp/runtime/.venv/bin/python"
+
+[[ -x "$python" ]]
+"$python" -c 'import sys; assert sys.version_info >= (3, 14) and sys.version_info.releaselevel == "final"'
