@@ -21,6 +21,9 @@ fi
 
 log_step "Installing Python 3.14"
 "$uv_bin" python install 3.14
+python_314="$("$uv_bin" python find 3.14)"
+ln -sfn "$python_314" "$HOME/.local/bin/python"
+ln -sfn "$python_314" "$HOME/.local/bin/python3"
 
 runtime_root="$repo_root/.amp/runtime"
 venv="$runtime_root/.venv"
