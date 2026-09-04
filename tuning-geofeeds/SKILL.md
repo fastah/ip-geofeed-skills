@@ -5,7 +5,7 @@ license: Apache-2.0
 compatibility: "Requires Python 3.14+. Runs locally by default; network access is optional and limited to managed public-HTTPS acquisition, direct authoritative RIR RDAP, and host-mediated Fastah MCP."
 metadata:
   author: fastah
-  version: "0.2.0"
+  version: "0.2.1"
 ---
 
 # Tune public geofeeds
