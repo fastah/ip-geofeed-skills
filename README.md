@@ -175,7 +175,7 @@ RFC 8805 consumers treat a feed as a hint and may refresh it on their own schedu
 
 ## Versions and help
 
-- Skill and plugin: `0.3.0`
+- Skill and plugin: `0.3.1`
 - Analyzer and Analysis schema: `0.5.0` / `0.5.0`
 - MCP response contract: `1.0`
 

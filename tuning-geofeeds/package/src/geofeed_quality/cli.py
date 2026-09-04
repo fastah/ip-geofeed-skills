@@ -167,6 +167,11 @@ Requested output files are created atomically and are never overwritten.""",
     mcp_import.add_argument("--mapping", type=Path, required=True)
     mcp_import.add_argument("--output", type=Path, required=True)
     mcp_import.add_argument(
+        "--partial",
+        action="store_true",
+        help="accept a subset of the exported batches; repeat to add more coverage",
+    )
+    mcp_import.add_argument(
         "--batch-limit",
         type=int,
         default=DEFAULT_MCP_FALLBACK_BATCH_LIMIT,
@@ -197,9 +202,17 @@ def main(argv: Sequence[str] | None = None) -> int:
                     raise ValueError("--rdap-progress-every must be zero or a positive integer")
                 profile = None
                 if args.publisher_profile:
-                    profile = PublisherProfile.model_validate_json(
-                        args.publisher_profile.read_text(encoding="utf-8")
-                    )
+                    raw = str(args.publisher_profile)
+                    if raw.lstrip().startswith("{"):
+                        profile_text: str = raw
+                    elif args.publisher_profile.is_file():
+                        profile_text = args.publisher_profile.read_text(encoding="utf-8")
+                    else:
+                        raise ValueError(
+                            "--publisher-profile expects a path to a profile JSON file "
+                            f"(or inline JSON), but {raw} is neither"
+                        )
+                    profile = PublisherProfile.model_validate_json(profile_text)
                 config = RdapRuntimeConfig(
                     connect_timeout_seconds=args.rdap_connect_timeout,
                     read_timeout_seconds=args.rdap_read_timeout,
@@ -353,9 +366,17 @@ def main(argv: Sequence[str] | None = None) -> int:
                 json.loads(response.read_text(encoding="utf-8")) for response in args.responses
             ]
             mapping = json.loads(args.mapping.read_text(encoding="utf-8"))
+            mapping_batches = len(mapping["batches"])
             enriched = import_response_batches(
-                analysis, responses, mapping, args.batch_limit, args.search_mode
+                analysis, responses, mapping, args.batch_limit, args.search_mode, args.partial
             )
+            if args.partial and len(responses) < mapping_batches:
+                print(
+                    f"warning: partial import: {len(responses)} of {mapping_batches} exported "
+                    "batches captured; rows in uncaptured batches have no MCP observations. "
+                    "Repeat mcp-import with --partial on this output to add more batches.",
+                    file=sys.stderr,
+                )
             output = enriched.model_dump(mode="json")
             validate_document(output)
             _write_atomic_new(args.output, (json.dumps(output, indent=2) + "\n").encode())
