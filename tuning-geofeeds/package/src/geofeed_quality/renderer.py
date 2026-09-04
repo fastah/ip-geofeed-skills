@@ -5,15 +5,61 @@ from __future__ import annotations
 
 import html
 import json
+from collections import Counter
 from pathlib import Path
 from typing import Any
 
-from .models import Analysis
+from .models import Analysis, RowKind
 from .schema import validate_document
 
 
 def _cell(value: object) -> str:
     return html.escape(str(value)).replace("|", "\\|").replace("\n", " ")
+
+
+ROW_STATE_GLOSSARY = (
+    "Row states: `valid_unresolved` — parsed successfully and carries a declared "
+    "location; external geocode checks are recorded separately when run. "
+    "`valid_do_not_geolocate` — the publisher declared that this prefix must not "
+    "be geolocated. `invalid` — the row failed validation and is retained as "
+    "authored. `not_applicable` — comment or blank line."
+)
+
+RELATIONSHIP_PREVIEW_LIMIT = 50
+
+_ENDING_LABELS = {"\r\n": "CRLF", "\n": "LF", "\r": "CR"}
+
+
+def source_format_summary(analysis: Analysis) -> str:
+    """One-line normalization report derived from per-row IR fields."""
+    data_rows = [row for row in analysis.rows if row.kind == RowKind.DATA]
+    endings: Counter[str] = Counter(row.line_ending for row in data_rows if row.line_ending)
+    field_counts: Counter[int] = Counter(
+        row.parsed_field_count for row in data_rows if row.parsed_field_count is not None
+    )
+    ignored_rows = sum(1 for row in data_rows if row.ignored_fields)
+    if not endings:
+        ending_text = "line endings not recorded"
+    elif len(endings) == 1:
+        ending_text = f"{_ENDING_LABELS.get(next(iter(endings)), 'mixed')} line endings"
+    else:
+        ending_text = "mixed line endings"
+    if len(field_counts) == 1:
+        field_text = f"all rows parse {next(iter(field_counts))} fields"
+    else:
+        field_text = ", ".join(
+            f"{count} rows with {fields} fields" for fields, count in sorted(field_counts.items())
+        )
+    ignored_text = (
+        f"{ignored_rows} rows carry extension fields that were ignored"
+        if ignored_rows
+        else "no extension fields were ignored"
+    )
+    return (
+        f"Source format: {len(data_rows)} data rows; {ending_text}; {field_text} "
+        f"(the fifth field is the postal code; an empty postal code is valid, "
+        f"not an error); {ignored_text}."
+    )
 
 
 def render_markdown_document(document: Any) -> str:
@@ -40,6 +86,10 @@ def render_markdown_document(document: Any) -> str:
         f"| Unresolved | {stats.unresolved_rows} |",
         f"| Findings | {len(analysis.findings)} |",
         f"| Relationships | {len(analysis.relationships)} |",
+        "",
+        ROW_STATE_GLOSSARY,
+        "",
+        source_format_summary(analysis),
         "",
         "## Findings",
         "",
@@ -69,11 +119,34 @@ def render_markdown_document(document: Any) -> str:
             "",
             "## Prefix relationships",
             "",
-            "| ID | Type | Source | Target | Conflict |",
-            "|---|---|---|---|---|",
         ]
     )
     if analysis.relationships:
+        by_priority = {
+            "conflicting_geolocation": 0,
+            "duplicate": 1,
+            "equal": 1,
+            "parent": 2,
+            "carved_child": 2,
+            "overlap": 2,
+        }
+        ordered = sorted(
+            analysis.relationships,
+            key=lambda relation: (
+                by_priority.get(relation.type.value, 3),
+                not relation.geolocation_conflict,
+                relation.id,
+            ),
+        )
+        preview = ordered[:RELATIONSHIP_PREVIEW_LIMIT]
+        type_counts = Counter(relation.type.value for relation in analysis.relationships)
+        count_text = ", ".join(
+            f"{relation_type}: {count}" for relation_type, count in sorted(type_counts.items())
+        )
+        lines.append(f"Relationships by type: {count_text}.")
+        lines.append("")
+        lines.append("| ID | Type | Source | Target | Conflict |")
+        lines.append("|---|---|---|---|---|")
         lines.extend(
             "| "
             + " | ".join(
@@ -86,9 +159,18 @@ def render_markdown_document(document: Any) -> str:
                 ]
             )
             + " |"
-            for relation in analysis.relationships
+            for relation in preview
         )
+        if len(ordered) > RELATIONSHIP_PREVIEW_LIMIT:
+            lines.append("")
+            lines.append(
+                f"Showing {RELATIONSHIP_PREVIEW_LIMIT} of {len(analysis.relationships)} "
+                "relationships, prioritized for review (conflicts first). The HTML "
+                "dashboard and Analysis JSON contain the complete set."
+            )
     else:
+        lines.append("| ID | Type | Source | Target | Conflict |")
+        lines.append("|---|---|---|---|---|")
         lines.append("| — | — | — | — | — |")
     lines.extend(
         [

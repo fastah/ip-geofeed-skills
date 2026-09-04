@@ -1,6 +1,24 @@
 # Python setup
 
-The portable analyzer requires a final—not alpha, beta, or release
+Preferred: one-command bootstrap. It creates (or reuses) the virtual
+environment, refreshes the runtime copy, installs the package, and prints the
+interpreter to use. It is non-interactive and uses only the standard library.
+Obtaining Python 3.14 remains a host or user step; the launcher rejects
+prerelease interpreters.
+
+```bash
+SKILL_ROOT="/absolute/path/to/tuning-geofeeds"
+cd "$SKILL_ROOT"
+WORK="/absolute/path/to/user-selected-work-directory"
+mkdir -p "$WORK"
+BOOTSTRAP_PYTHON="/absolute/path/to/python3.14"
+"$BOOTSTRAP_PYTHON" scripts/geofeed_cli.py --bootstrap "$WORK"
+# prints: PYTHON=/absolute/path/to/user-selected-work-directory/.venv/bin/python
+PYTHON="$WORK/.venv/bin/python"
+```
+
+If `--bootstrap` is unavailable, set up manually. The portable analyzer
+requires a final—not alpha, beta, or release
 candidate—Python 3.14 or newer. Resolve the skill root from the installed skill
 location and choose a user working directory:
 
