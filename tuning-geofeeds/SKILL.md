@@ -5,7 +5,7 @@ license: Apache-2.0
 compatibility: "Requires Python 3.14+. Runs locally by default; network access is optional and limited to managed public-HTTPS acquisition, direct authoritative RIR RDAP, and host-mediated Fastah MCP."
 metadata:
   author: fastah
-  version: "0.3.0"
+  version: "0.3.1"
 ---
 
 # Tune public geofeeds
@@ -140,7 +140,8 @@ retains only allowlisted consistency evidence, not contact payloads. A profile
 is optional, but without one the returned registration evidence normally
 remains `unverified`; it is not an RDAP failure. Ask for a minimal profile when
 the operator wants a consistency assessment, for example
-`{"organization_name":"Example Networks","asn":"AS64500"}`. The default
+`{"organization_name":"Example Networks","asn":"AS64500"}`. `--publisher-profile`
+accepts either a path to a small JSON file or that JSON inline. The default
 progress line reports completed canonical public prefixes and an approximate
 ETA. If the user accepts and supplies a profile:
 
@@ -172,7 +173,9 @@ captured response still records and validates the server's returned limit:
 ```
 
 Have the host invoke only `rfc8805-row-place-search` once per batch and save
-each structured response in order under `WORK`. Inspect every outbound JSON
+each structured response in order under `WORK`. If one captured batch is too
+large for the host to relay intact, re-export with a smaller `--batch-limit`
+(for example 100) and capture the smaller batches instead. Inspect every outbound JSON
 object first: it must contain only `rows`, and every row must contain only the
 five allowlisted fields above. Export deterministically groups only exact,
 byte-identical `(countryCode, regionCode, cityName, searchMode)` tuples in
@@ -193,6 +196,11 @@ or populate/apply location fields. Then import all captured responses:
   --batch-limit "${DISCOVERED_BATCH_LIMIT:-100}" \
   --output "$WORK/analysis-enriched.json"
 ```
+
+If the host can capture only some batches now, import those with `--partial`
+and repeat the import on its own output to add more batches; rows in
+uncaptured batches simply carry no MCP observations, and the import prints a
+warning stating how many batches remain.
 
 Set `CURRENT_IR` to the enriched output. Partial, no-match, invalid-input, or
 backend-unavailable statuses remain evidence and never erase base findings or

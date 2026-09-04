@@ -426,8 +426,14 @@ def import_response_batches(
     mapping_document: dict[str, Any] | McpRequestMapping,
     server_advertised_batch_limit: int,
     search_mode: McpSearchMode = McpSearchMode.AUTO,
+    partial: bool = False,
 ) -> Analysis:
-    """Merge captured structured tool output without invoking MCP or changing base rows."""
+    """Merge captured structured tool output without invoking MCP or changing base rows.
+
+    With ``partial`` set, a subset of the exported request batches may be
+    imported; rows in uncaptured batches simply receive no MCP observations.
+    Repeat partial imports to accumulate coverage batch by batch.
+    """
     if server_advertised_batch_limit < 1:
         raise McpExchangeError("server-advertised batch limit must be positive")
     try:
@@ -476,18 +482,36 @@ def import_response_batches(
         raise McpExchangeError(
             f"captured response contains unknown representative rowKey {unknown[0]}"
         )
-    if len(responses) != len(mapping.batches):
-        raise McpExchangeError("captured responses must correspond to every exported request batch")
-    for response, batch_mapping in zip(responses, mapping.batches, strict=True):
-        if [result.row_key for result in response.results] != batch_mapping.representative_row_keys:
+    if partial:
+        batch_by_keys = {tuple(batch.representative_row_keys): batch for batch in mapping.batches}
+        matched_batches: list[tuple[McpResponseBatch, McpMappingBatch]] = []
+        for response in responses:
+            batch_mapping = batch_by_keys.get(tuple(result.row_key for result in response.results))
+            if batch_mapping is None:
+                raise McpExchangeError(
+                    "captured response row order must match one exported request batch"
+                )
+            if any(batch_mapping is matched for _, matched in matched_batches):
+                raise McpExchangeError("captured responses repeat one exported request batch")
+            matched_batches.append((response, batch_mapping))
+        matched_batches.sort(key=lambda item: item[1].batch_number)
+    else:
+        if len(responses) != len(mapping.batches):
             raise McpExchangeError(
-                "captured response row order must match its exported request batch"
+                "captured responses must correspond to every exported request batch"
             )
-    if actual_keys != expected_representatives:
-        raise McpExchangeError("captured results must cover representative rows once in order")
+        for response, batch_mapping in zip(responses, mapping.batches, strict=True):
+            keys = [result.row_key for result in response.results]
+            if keys != batch_mapping.representative_row_keys:
+                raise McpExchangeError(
+                    "captured response row order must match its exported request batch"
+                )
+        if actual_keys != expected_representatives:
+            raise McpExchangeError("captured results must cover representative rows once in order")
+        matched_batches = list(zip(responses, mapping.batches, strict=True))
 
     expanded: list[tuple[McpResponseBatch, McpResponseRow, RowRecord, str, str, str]] = []
-    for response, batch_mapping in zip(responses, mapping.batches, strict=True):
+    for response, batch_mapping in matched_batches:
         for result, target_mapping in zip(response.results, batch_mapping.targets, strict=True):
             for source_id, opaque_key in zip(
                 target_mapping.target_source_row_ids,
@@ -516,7 +540,13 @@ def import_response_batches(
                 )
     source_order = {row.id: index for index, row in enumerate(eligible)}
     expanded.sort(key=lambda item: source_order[item[2].id])
-    if [item[3] for item in expanded] != expected_opaque_keys:
+    expanded_keys = [item[3] for item in expanded]
+    if partial:
+        if len(expanded_keys) != len(set(expanded_keys)):
+            raise McpExchangeError("partial import must cover each eligible target at most once")
+        if not set(expanded_keys) <= set(expected_opaque_keys):
+            raise McpExchangeError("partial import contains targets outside this analysis")
+    elif expanded_keys != expected_opaque_keys:
         raise McpExchangeError(
             "mapping must cover every eligible target exactly once in source order"
         )
@@ -529,10 +559,12 @@ def import_response_batches(
         for observation in analysis.enrichment.mcp_observations
     }
     if existing:
-        if set(existing) != set(expected_opaque_keys):
+        if not partial and set(existing) != set(expected_opaque_keys):
             raise McpExchangeError("analysis already contains a different MCP import")
         for response, result, _, opaque_key, representative_key, request_digest in expanded:
-            observation = existing[opaque_key]
+            observation = existing.get(opaque_key)
+            if observation is None:
+                continue
             if (
                 observation.search_mode != search_mode
                 or observation.contract_version != response.contract_version
@@ -547,7 +579,10 @@ def import_response_batches(
                 or observation.response_sha256 != response_digests[id(response)]
             ):
                 raise McpExchangeError("analysis already contains a conflicting MCP result")
-        return analysis.model_copy(deep=True)
+        fresh = [item for item in expanded if item[3] not in existing]
+        if not fresh or not partial:
+            return analysis.model_copy(deep=True)
+        expanded = fresh
 
     enriched = analysis.model_copy(deep=True)
     rows_by_id = {row.id: row for row in enriched.rows}

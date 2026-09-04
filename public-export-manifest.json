@@ -4,12 +4,12 @@
     {
       "bytes": 725,
       "path": ".claude-plugin/plugin.json",
-      "sha256": "6def67c48d91f27e3e479a43f86289b0bba0d6ff8b4597d6c25c325627ce2fd0"
+      "sha256": "1cbdd87f035d4fe7751ac0eb904e307e30a1217991df8e4440e069d1c042b3b9"
     },
     {
       "bytes": 495,
       "path": ".github/plugin/plugin.json",
-      "sha256": "888f4ec1e542654b48dae9504782ca5a1e8e1dc084b7babaffad92f408dda430"
+      "sha256": "9c4ec28200ea6da02eaeb337d8b03bd8c4ecac566b0c3831ac1725539fdaff1d"
     },
     {
       "bytes": 118,
@@ -39,7 +39,7 @@
     {
       "bytes": 13119,
       "path": "README.md",
-      "sha256": "27dafab60fdab0033ce8acc3cbf18e1323309ee93d8a4faf0c24f92f170e140e"
+      "sha256": "2397472acf80a7e59dc31d004bac39c3758c4d7f13c7e84cbc467f0dd5ca618b"
     },
     {
       "bytes": 118,
@@ -47,9 +47,9 @@
       "sha256": "514db5ca43ed864cf5d92bbac9fb1612099d3a06c40e95d6990cab77558f8150"
     },
     {
-      "bytes": 12619,
+      "bytes": 13135,
       "path": "tuning-geofeeds/SKILL.md",
-      "sha256": "8fd68be87adf969f1f82cd632bbbb9754ced0b160fc809af2a47886684c35c7e"
+      "sha256": "2e6e9f107c309b9d76ded0bb0db8fae60891cd3c3ef86f2dc36c27bbd85dd7b9"
     },
     {
       "bytes": 1823,
@@ -112,9 +112,9 @@
       "sha256": "71f5e9969ec18fd6c930e29cce3fd0e61c36ea78c86165f5190d9588efc548ae"
     },
     {
-      "bytes": 17005,
+      "bytes": 18142,
       "path": "tuning-geofeeds/package/src/geofeed_quality/cli.py",
-      "sha256": "12a6805aa1600b13bf3de0ead01981598b0fa63883685a0148d1ae9480007043"
+      "sha256": "754255ed7f062bc7318fdd5c0f40db0a05848bc6685c166a6edddb11aac8c350"
     },
     {
       "bytes": 19664,
@@ -137,9 +137,9 @@
       "sha256": "e21cbb628082f9d29ab8c8ddb04c7919648a3a0faa4ee531252cb7b423a7b9f7"
     },
     {
-      "bytes": 27786,
+      "bytes": 29582,
       "path": "tuning-geofeeds/package/src/geofeed_quality/mcp_exchange.py",
-      "sha256": "8f9c769a66c79a0e203a71f987ec5a4263572fba14ef197314c55c3da173dcc2"
+      "sha256": "337394992454e91eb0bb87d86aa170c4c34106577bd27a4c8d954a401915b788"
     },
     {
       "bytes": 40674,
@@ -172,9 +172,9 @@
       "sha256": "8ca463b4532c81c60aa25789da6d79dbd33d8aae902f44f5622298a41c2a5c9a"
     },
     {
-      "bytes": 4930,
+      "bytes": 5290,
       "path": "tuning-geofeeds/references/setup.md",
-      "sha256": "c0383aed8588d28618b98662abf128376b82e92683c38a53eda473d1e4bc53c3"
+      "sha256": "c6deef0bf355c60e4ff1bf441020c24c7a500e52f827a00f1c4a1d439ce0f523"
     },
     {
       "bytes": 4146,

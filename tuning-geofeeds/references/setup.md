@@ -95,6 +95,12 @@ build or metadata files beside their input. Keep the runtime source copy,
 virtual environment, and all analysis outputs in the user-selected working
 directory so the installed skill remains read-only.
 
+Install from the bundle root only. Installing the `tuning-geofeeds/`
+subdirectory alone may still print a success message while landing an
+incomplete skill that lacks `scripts/geofeed_cli.py` and `package/`; there is
+no install-time failure to rely on. The launcher's self-check catches this at
+first run and tells the user to reinstall from the bundle root.
+
 Downloaded feeds, analysis IR, approval artifacts, reports, and exports remain
 in that user-selected local work directory until the user deletes them. Fastah
 does not retain those artifacts server-side. Optional RDAP uses only a per-run
