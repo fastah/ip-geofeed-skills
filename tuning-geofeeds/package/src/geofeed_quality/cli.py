@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+import time
 from collections.abc import Sequence
 from datetime import datetime
 from pathlib import Path
@@ -20,7 +21,12 @@ from .corrections import (
 from .errors import AnalysisError
 from .geojson_renderer import export_geojson_file
 from .html_renderer import MapboxOptions, render_html_file
-from .mcp_exchange import export_request_exchange, import_response_batches, request_bytes
+from .mcp_exchange import (
+    DEFAULT_MCP_FALLBACK_BATCH_LIMIT,
+    export_request_exchange,
+    import_response_batches,
+    request_bytes,
+)
 from .models import Analysis, CorrectionApproval, CorrectionPlan, McpSearchMode, PublisherProfile
 from .rdap import AuthoritativeRdapClient, RdapRuntimeConfig, enrich_analysis
 from .renderer import render_markdown_file
@@ -69,6 +75,13 @@ Requested output files are created atomically and are never overwritten.""",
     analyze.add_argument("--rdap-max-redirects", type=int, default=3)
     analyze.add_argument("--rdap-max-concurrency", type=int, default=2)
     analyze.add_argument("--rdap-min-interval", type=float, default=0.5)
+    analyze.add_argument(
+        "--rdap-progress-every",
+        type=int,
+        default=10,
+        metavar="LOOKUPS",
+        help="write RDAP progress and ETA to stderr every N completed lookups; 0 disables it",
+    )
 
     render = subcommands.add_parser("render", help="render a validated analysis JSON document")
     render.add_argument("input", type=Path)
@@ -133,7 +146,12 @@ Requested output files are created atomically and are never overwritten.""",
     )
     mcp_export.add_argument("input", type=Path)
     mcp_export.add_argument("--output-dir", type=Path, required=True)
-    mcp_export.add_argument("--batch-limit", type=int, required=True)
+    mcp_export.add_argument(
+        "--batch-limit",
+        type=int,
+        default=DEFAULT_MCP_FALLBACK_BATCH_LIMIT,
+        help="discovered server limit; defaults to the conservative fallback of 100",
+    )
     mcp_export.add_argument(
         "--search-mode",
         type=McpSearchMode,
@@ -148,7 +166,12 @@ Requested output files are created atomically and are never overwritten.""",
     mcp_import.add_argument("responses", type=Path, nargs="+")
     mcp_import.add_argument("--mapping", type=Path, required=True)
     mcp_import.add_argument("--output", type=Path, required=True)
-    mcp_import.add_argument("--batch-limit", type=int, required=True)
+    mcp_import.add_argument(
+        "--batch-limit",
+        type=int,
+        default=DEFAULT_MCP_FALLBACK_BATCH_LIMIT,
+        help="limit used to export the request; defaults to the conservative fallback of 100",
+    )
     mcp_import.add_argument(
         "--search-mode",
         type=McpSearchMode,
@@ -170,6 +193,8 @@ def main(argv: Sequence[str] | None = None) -> int:
             if args.publisher_profile and not args.rdap:
                 raise ValueError("--publisher-profile requires --rdap")
             if args.rdap:
+                if args.rdap_progress_every < 0:
+                    raise ValueError("--rdap-progress-every must be zero or a positive integer")
                 profile = None
                 if args.publisher_profile:
                     profile = PublisherProfile.model_validate_json(
@@ -183,8 +208,26 @@ def main(argv: Sequence[str] | None = None) -> int:
                     max_concurrency=args.rdap_max_concurrency,
                     min_interval_per_rir_seconds=args.rdap_min_interval,
                 )
+                started = time.monotonic()
+
+                def report_rdap_progress(completed: int, total: int, _result: object) -> None:
+                    if args.rdap_progress_every == 0 or (
+                        completed != total and completed % args.rdap_progress_every != 0
+                    ):
+                        return
+                    elapsed = time.monotonic() - started
+                    remaining = (elapsed / completed) * (total - completed) if completed else 0
+                    print(
+                        f"RDAP: {completed}/{total} canonical public prefixes complete "
+                        f"({elapsed:.0f}s elapsed, ~{remaining:.0f}s remaining)",
+                        file=sys.stderr,
+                    )
+
                 analysis = enrich_analysis(
-                    analysis, AuthoritativeRdapClient.from_iana(config=config), profile
+                    analysis,
+                    AuthoritativeRdapClient.from_iana(config=config),
+                    profile,
+                    report_rdap_progress,
                 )
             document = analysis.model_dump(mode="json")
             validate_document(document)
@@ -209,8 +252,8 @@ def main(argv: Sequence[str] | None = None) -> int:
             _write_atomic_new(args.output, (json.dumps(document, indent=2) + "\n").encode())
             if not document["features"]:
                 print(
-                    "info: GeoJSON contains zero features because no MCP place evidence "
-                    "with valid coordinates or bounds is present",
+                    "info: GeoJSON contains zero features because no rows with "
+                    "canonical prefixes are present",
                     file=sys.stderr,
                 )
             return 0

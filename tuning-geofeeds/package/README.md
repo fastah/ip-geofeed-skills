@@ -33,15 +33,3 @@ reconstruct the feed. Analysis records `source.sha256` for optional audits and
 for binding approvals to the analyzed file.
 
 The skill workflow and safety boundaries are in [`../SKILL.md`](../SKILL.md).
-
-## MCP schema boundary
-
-`schema/mcp-place-search-request.schema.json` and
-`schema/mcp-place-search-response.schema.json` are frozen local
-adapter/exchange contract v1.0 schemas. They validate the analyzer's local
-export/import envelope and retained audit captures; they do not define the live
-Fastah MCP server contract. After normal host OAuth, discover the current tool
-definition with `tools/list` before enrichment. This workflow uses
-`rfc8805-row-place-search` when its discovered `inputSchema` and `outputSchema`
-support the local privacy-preserving adapter. If it has no `outputSchema` or is
-incompatible, skip MCP enrichment and continue with local analysis.

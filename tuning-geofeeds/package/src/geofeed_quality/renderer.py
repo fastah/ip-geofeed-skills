@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import html
 import json
 from pathlib import Path
 from typing import Any
@@ -12,7 +13,7 @@ from .schema import validate_document
 
 
 def _cell(value: object) -> str:
-    return str(value).replace("|", "\\|").replace("\n", " ")
+    return html.escape(str(value)).replace("|", "\\|").replace("\n", " ")
 
 
 def render_markdown_document(document: Any) -> str:

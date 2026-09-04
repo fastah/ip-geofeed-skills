@@ -1,5 +1,5 @@
 # Copyright 2026 Fastah Inc.
-"""Host-mediated Fastah MCP local adapter/exchange request export and response import.
+"""Host-mediated Fastah MCP request export and response import.
 
 This module intentionally has no MCP transport, OAuth, or credential handling.
 """
@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 from collections import Counter
 from collections.abc import Iterable, Sequence
 from typing import Annotated, Any, Literal
@@ -45,6 +46,7 @@ MCP_RESPONSE_SCHEMA_ID = (
 MCP_MAPPING_SCHEMA_ID = (
     "https://schemas.fastah.net/netops/geofeed-quality/mcp-request-mapping-1.0.json"
 )
+DEFAULT_MCP_FALLBACK_BATCH_LIMIT = 100
 ROW_KEY_PATTERN = r"^[A-Za-z0-9][A-Za-z0-9._:/-]{31,127}$"
 
 OpaqueRowKey = Annotated[
@@ -65,18 +67,6 @@ class McpRequestRow(WireModel):
 
 
 class McpRequestBatch(WireModel):
-    """Frozen local adapter/exchange v1.0 request envelope, not a live MCP tool schema."""
-
-    model_config = ConfigDict(
-        extra="forbid",
-        populate_by_name=True,
-        json_schema_extra={
-            "description": (
-                "Frozen local adapter/exchange contract v1.0 request envelope. "
-                "It is not the live Fastah MCP tool inputSchema; discover that via tools/list."
-            )
-        },
-    )
     rows: list[McpRequestRow] = Field(min_length=1)
 
     @model_validator(mode="after")
@@ -183,6 +173,24 @@ class McpWirePlaceMatch(WireModel):
             raise ValueError("centerLongLat must be empty or [longitude, latitude]")
         if len(self.bounding_box) not in {0, 4}:
             raise ValueError("boundingBox must be empty or contain four coordinates")
+        coordinates = [*self.center_long_lat, *self.bounding_box]
+        if not all(math.isfinite(value) for value in coordinates):
+            raise ValueError("MCP coordinates must be finite")
+        if self.center_long_lat:
+            longitude, latitude = self.center_long_lat
+            if not -180 <= longitude <= 180 or not -90 <= latitude <= 90:
+                raise ValueError("centerLongLat is outside longitude/latitude bounds")
+        if self.bounding_box:
+            west, south, east, north = self.bounding_box
+            if not (
+                -180 <= west <= 180
+                and -180 <= east <= 180
+                and -90 <= south <= 90
+                and -90 <= north <= 90
+            ):
+                raise ValueError("boundingBox is outside longitude/latitude bounds")
+            if west > east or south > north:
+                raise ValueError("boundingBox must be ordered west, south, east, north")
         return self
 
     def to_ir(self) -> McpPlaceMatch:
@@ -234,18 +242,6 @@ class McpResponseSummary(WireModel):
 
 
 class McpResponseBatch(WireModel):
-    """Frozen local adapter/exchange v1.0 response envelope, not a live MCP tool schema."""
-
-    model_config = ConfigDict(
-        extra="forbid",
-        populate_by_name=True,
-        json_schema_extra={
-            "description": (
-                "Frozen local adapter/exchange contract v1.0 response envelope. "
-                "It is not the live Fastah MCP tool outputSchema; discover that via tools/list."
-            )
-        },
-    )
     contract_version: Literal["1.0"] = Field(alias="contractVersion")
     batch_limit: int = Field(alias="batchLimit", ge=1)
     summary: McpResponseSummary
@@ -451,8 +447,12 @@ def import_response_batches(
         raise McpExchangeError(f"invalid MCP request mapping: {error}") from error
     if not responses:
         raise McpExchangeError("at least one captured MCP response is required")
-    if any(response.batch_limit != server_advertised_batch_limit for response in responses):
-        raise McpExchangeError("response batchLimit does not match the host-discovered limit")
+    response_batch_limits = {response.batch_limit for response in responses}
+    if len(response_batch_limits) != 1:
+        raise McpExchangeError("captured responses disagree about the server batchLimit")
+    response_batch_limit = response_batch_limits.pop()
+    if response_batch_limit < server_advertised_batch_limit:
+        raise McpExchangeError("response batchLimit is lower than the exported request batch limit")
 
     eligible = _eligible_rows(analysis)
     row_by_source = {row.id: row for row in eligible}
@@ -497,6 +497,13 @@ def import_response_batches(
                 target = row_by_source.get(source_id)
                 if target is None or opaque_row_key(analysis, target) != opaque_key:
                     raise McpExchangeError("mapping target is unknown or stale")
+                if (
+                    target.state == RowState.VALID_DO_NOT_GEOLOCATE
+                    and result.status == McpRowStatus.MATCHED
+                ):
+                    raise McpExchangeError(
+                        "captured MCP result contradicts a do-not-geolocate source row"
+                    )
                 expanded.append(
                     (
                         response,
@@ -546,7 +553,7 @@ def import_response_batches(
     rows_by_id = {row.id: row for row in enriched.rows}
     enriched.configuration.enrichment_enabled = True
     enriched.configuration.mcp = McpConfigurationSummary(
-        server_advertised_batch_limit=server_advertised_batch_limit
+        server_advertised_batch_limit=response_batch_limit
     )
     for response, result, target, opaque_key, representative_key, request_digest in expanded:
         response_digest = response_digests[id(response)]

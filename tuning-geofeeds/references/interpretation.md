@@ -20,8 +20,10 @@ Use these boundaries when explaining a validated Analysis IR or its renderers:
 
 The HTML dashboard and Markdown summary are review surfaces, never approval
 authorities. GeoJSON is a user-chosen artifact that may disclose canonical
-prefixes; it omits source comments, publisher/RDAP identifiers, raw MCP
-messages, and unapproved correction data.
+prefixes; it carries declared geography, declaration depth, finding summaries,
+and typed ASN/organization/routing association evidence (kept distinct; none
+proves ownership), and it omits source comments, publisher/RDAP identifiers
+and handles, raw MCP messages, and unapproved correction data.
 
 Inputs with at most 400,000 data rows can produce Analysis IR. An oversized
 input fails closed before IR generation; it is not truncated, split, or

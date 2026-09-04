@@ -15,6 +15,8 @@ PACKAGE_ROOT="$("$BOOTSTRAP_PYTHON" scripts/geofeed_cli.py --print-package-root)
 "$BOOTSTRAP_PYTHON" -m venv "$WORK/.venv"
 PYTHON="$WORK/.venv/bin/python"
 RUNTIME_SOURCE="$WORK/tuning-geofeeds-runtime"
+test "$RUNTIME_SOURCE" = "$WORK/tuning-geofeeds-runtime" || exit 1
+rm -rf "$RUNTIME_SOURCE"
 cp -R "$PACKAGE_ROOT" "$RUNTIME_SOURCE"
 "$PYTHON" -m pip install "$RUNTIME_SOURCE"
 ```
@@ -32,6 +34,8 @@ PACKAGE_ROOT="$("$BOOTSTRAP_PYTHON" scripts/geofeed_cli.py --print-package-root)
 uv venv --python 3.14 "$WORK/.venv"
 PYTHON="$WORK/.venv/bin/python"
 RUNTIME_SOURCE="$WORK/tuning-geofeeds-runtime"
+test "$RUNTIME_SOURCE" = "$WORK/tuning-geofeeds-runtime" || exit 1
+rm -rf "$RUNTIME_SOURCE"
 cp -R "$PACKAGE_ROOT" "$RUNTIME_SOURCE"
 uv pip install --python "$PYTHON" "$RUNTIME_SOURCE"
 ```
@@ -43,9 +47,10 @@ before importing the analyzer or Pydantic.
 On Windows, use the virtual environment interpreter at
 `$WORK\.venv\Scripts\python.exe`. Windows users should install Python through
 [Python Install Manager in the Microsoft Store](https://apps.microsoft.com/detail/9nq7512cxl7t?hl=en-US)
-so it auto-updates; the Microsoft Store is not mandatory. Use the host's file
-copy operation to create the same `tuning-geofeeds-runtime` working copy before
-installing it.
+so it auto-updates; the Microsoft Store is not mandatory. Before using the
+host's file-copy operation, remove exactly `$WORK\\tuning-geofeeds-runtime`,
+then create a new working copy there before installing it. Do not copy into an
+existing runtime directory.
 
 Run the launcher with the prepared interpreter:
 
