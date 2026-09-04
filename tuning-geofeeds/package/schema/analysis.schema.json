@@ -80,7 +80,7 @@
           "type": "array"
         },
         "id": {
-          "pattern": "^asn-association-[0-9]{6}$",
+          "pattern": "^asn-association-[0-9]{6,}$",
           "title": "Id",
           "type": "string"
         },
@@ -142,7 +142,7 @@
           "$ref": "#/$defs/ASNAssociationProvenance"
         },
         "routing_association_id": {
-          "pattern": "^asn-association-[0-9]{6}$",
+          "pattern": "^asn-association-[0-9]{6,}$",
           "title": "Routing Association Id",
           "type": "string"
         },
@@ -203,7 +203,7 @@
           "type": "array"
         },
         "id": {
-          "pattern": "^asn-association-[0-9]{6}$",
+          "pattern": "^asn-association-[0-9]{6,}$",
           "title": "Id",
           "type": "string"
         },
@@ -663,7 +663,7 @@
       "additionalProperties": false,
       "properties": {
         "id": {
-          "pattern": "^evidence-[0-9]{6}$",
+          "pattern": "^evidence-[0-9]{6,}$",
           "title": "Id",
           "type": "string"
         },
@@ -838,7 +838,7 @@
           "type": "array"
         },
         "id": {
-          "pattern": "^finding-[0-9]{6}$",
+          "pattern": "^finding-[0-9]{6,}$",
           "title": "Id",
           "type": "string"
         },
@@ -1037,7 +1037,7 @@
           "type": "array"
         },
         "id": {
-          "pattern": "^mcp-[0-9]{6}$",
+          "pattern": "^mcp-[0-9]{6,}$",
           "title": "Id",
           "type": "string"
         },
@@ -1288,7 +1288,7 @@
           "type": "boolean"
         },
         "id": {
-          "pattern": "^relationship-[0-9]{6}$",
+          "pattern": "^relationship-[0-9]{6,}$",
           "title": "Id",
           "type": "string"
         },
@@ -1717,7 +1717,7 @@
           "title": "Http Status"
         },
         "id": {
-          "pattern": "^rdap-[0-9]{6}$",
+          "pattern": "^rdap-[0-9]{6,}$",
           "title": "Id",
           "type": "string"
         },
@@ -1893,7 +1893,7 @@
           "type": "array"
         },
         "id": {
-          "pattern": "^asn-association-[0-9]{6}$",
+          "pattern": "^asn-association-[0-9]{6,}$",
           "title": "Id",
           "type": "string"
         },

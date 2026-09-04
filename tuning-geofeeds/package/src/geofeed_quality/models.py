@@ -6,6 +6,7 @@ from __future__ import annotations
 import hashlib
 import ipaddress
 import json
+import math
 import unicodedata
 from collections import Counter
 from datetime import datetime
@@ -209,7 +210,7 @@ class RowRecord(Model):
 
 
 class Evidence(Model):
-    id: str = Field(pattern="^evidence-[0-9]{6}$")
+    id: str = Field(pattern="^evidence-[0-9]{6,}$")
     type: EvidenceType
     source: str
     observed_at: datetime
@@ -218,7 +219,7 @@ class Evidence(Model):
 
 
 class Finding(Model):
-    id: str = Field(pattern="^finding-[0-9]{6}$")
+    id: str = Field(pattern="^finding-[0-9]{6,}$")
     category: FindingCategory
     severity: Severity
     rule_id: str = Field(pattern="^[A-Z0-9]+(?:[._][A-Z0-9]+)+$")
@@ -230,7 +231,7 @@ class Finding(Model):
 
 
 class PrefixRelationship(Model):
-    id: str = Field(pattern="^relationship-[0-9]{6}$")
+    id: str = Field(pattern="^relationship-[0-9]{6,}$")
     type: RelationshipType
     source_row_id: str
     target_row_id: str
@@ -376,7 +377,7 @@ class RdapNetworkSummary(Model):
 
 
 class RdapObservation(Model):
-    id: str = Field(pattern="^rdap-[0-9]{6}$")
+    id: str = Field(pattern="^rdap-[0-9]{6,}$")
     target_row_ids: list[str]
     requested_prefix: str
     rir: str | None = None
@@ -425,11 +426,29 @@ class McpPlaceMatch(Model):
             raise ValueError("center_long_lat must be empty or [longitude, latitude]")
         if len(self.bounding_box) not in {0, 4}:
             raise ValueError("bounding_box must be empty or contain four coordinates")
+        coordinates = [*self.center_long_lat, *self.bounding_box]
+        if not all(math.isfinite(value) for value in coordinates):
+            raise ValueError("MCP coordinates must be finite")
+        if self.center_long_lat:
+            longitude, latitude = self.center_long_lat
+            if not -180 <= longitude <= 180 or not -90 <= latitude <= 90:
+                raise ValueError("center_long_lat is outside longitude/latitude bounds")
+        if self.bounding_box:
+            west, south, east, north = self.bounding_box
+            if not (
+                -180 <= west <= 180
+                and -180 <= east <= 180
+                and -90 <= south <= 90
+                and -90 <= north <= 90
+            ):
+                raise ValueError("bounding_box is outside longitude/latitude bounds")
+            if west > east or south > north:
+                raise ValueError("bounding_box must be ordered west, south, east, north")
         return self
 
 
 class McpObservation(Model):
-    id: str = Field(pattern="^mcp-[0-9]{6}$")
+    id: str = Field(pattern="^mcp-[0-9]{6,}$")
     target_row_id: str = Field(pattern="^row-[0-9]+$")
     opaque_row_id: str = Field(pattern="^[A-Za-z0-9][A-Za-z0-9._:-]{7,127}$")
     representative_opaque_row_id: str = Field(pattern="^[A-Za-z0-9][A-Za-z0-9._:-]{7,127}$")
@@ -469,7 +488,7 @@ class ASNOriginGroup(Model):
 
 
 class RoutingOriginAssociation(Model):
-    id: str = Field(pattern="^asn-association-[0-9]{6}$")
+    id: str = Field(pattern="^asn-association-[0-9]{6,}$")
     kind: Literal["routing_origin_snapshot"] = "routing_origin_snapshot"
     target_row_id: str = Field(pattern="^row-[0-9]+$")
     matched_prefix: str
@@ -479,10 +498,10 @@ class RoutingOriginAssociation(Model):
 
 
 class ASNOrganizationAssociation(Model):
-    id: str = Field(pattern="^asn-association-[0-9]{6}$")
+    id: str = Field(pattern="^asn-association-[0-9]{6,}$")
     kind: Literal["asn_organization_snapshot"] = "asn_organization_snapshot"
     target_row_id: str = Field(pattern="^row-[0-9]+$")
-    routing_association_id: str = Field(pattern="^asn-association-[0-9]{6}$")
+    routing_association_id: str = Field(pattern="^asn-association-[0-9]{6,}$")
     asn: int = Field(ge=0, le=4_294_967_295)
     as_name: str | None = None
     organization_id: str | None = None
@@ -495,7 +514,7 @@ class ASNOrganizationAssociation(Model):
 
 
 class ASNRegistrationAssociation(Model):
-    id: str = Field(pattern="^asn-association-[0-9]{6}$")
+    id: str = Field(pattern="^asn-association-[0-9]{6,}$")
     kind: Literal["asn_registration"] = "asn_registration"
     target_row_id: str = Field(pattern="^row-[0-9]+$")
     asn: int = Field(ge=0, le=4_294_967_295)

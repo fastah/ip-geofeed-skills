@@ -1,6 +1,6 @@
 ---
 name: tuning-geofeeds
-description: 'Analyzes and tunes public IP RFC 8805 geofeed CSVs for network operators, preserving evidence while producing JSON, Markdown, HTML, GeoJSON, and explicitly approved corrected feeds. Use for public prefix geolocation quality, duplicate or carved-prefix review, optional RDAP consistency evidence, or Fastah place-search enrichment; do not use for private/internal IPAM or generic CSV work.'
+description: "Analyzes and tunes public IP RFC 8805 geofeed CSVs for network operators, preserving evidence while producing JSON, Markdown, HTML, GeoJSON, and explicitly approved corrected feeds. Use for public prefix geolocation quality, duplicate or carved-prefix review, optional RDAP consistency evidence, or Fastah place-search enrichment; do not use for private/internal IPAM or generic CSV work."
 license: Apache-2.0
 compatibility: "Requires Python 3.14+. Runs locally by default; network access is optional and limited to managed public-HTTPS acquisition, direct authoritative RIR RDAP, and host-mediated Fastah MCP."
 metadata:
@@ -34,10 +34,6 @@ reconstruct feed rows.
 - RDAP evidence can be `consistent`, `conflicting`, `unverified`, or
   `unavailable`; it never proves legal ownership. MCP matches are advisory.
   Rank, population weight, and radius are not confidence.
-- `package/schema/mcp-place-search-request.schema.json` and
-  `package/schema/mcp-place-search-response.schema.json` are frozen local
-  adapter/exchange contract v1.0 schemas. They validate the local export/import
-  envelope and audit captures; they are not the live Fastah MCP tool schemas.
 - Do not write parser, validator, schema, renderer, or correction scripts.
   Invoke `scripts/geofeed_cli.py`; the typed models and committed schemas are
   the source of truth.
@@ -107,8 +103,13 @@ invalid and unresolved rows. Do not claim enrichment has occurred.
 
 Before enabling RDAP, explain that canonical prefixes go directly to the
 authoritative RIR selected through IANA bootstrap, not to Fastah MCP. The IR
-retains only allowlisted consistency evidence, not contact payloads. If the
-user accepts and supplies an optional profile:
+retains only allowlisted consistency evidence, not contact payloads. A profile
+is optional, but without one the returned registration evidence normally
+remains `unverified`; it is not an RDAP failure. Ask for a minimal profile when
+the operator wants a consistency assessment, for example
+`{"organization_name":"Example Networks","asn":"AS64500"}`. The default
+progress line reports completed canonical public prefixes and an approximate
+ETA. If the user accepts and supplies a profile:
 
 ```bash
 "$PYTHON" "$RUN" analyze "$INPUT" \
@@ -122,31 +123,23 @@ analysis usable; report `unavailable` rather than guessing.
 
 ### 4. Optionally add host-mediated Fastah MCP evidence
 
-If the user opts in, have the host complete its normal OAuth flow, then use
-`tools/list` (including all pages) to rediscover the current Fastah MCP tool
-definitions before use. This workflow uses `rfc8805-row-place-search`; Fastah
-may offer other tools, so do not treat it as the only valid Fastah MCP tool.
-Read that tool's current `inputSchema`, `outputSchema`, and advertised positive
-batch limit. Rediscover after a `notifications/tools/list_changed` notification
-or before a later enrichment run; do not substitute the committed local adapter
-schemas for discovery. Never ask the user to paste a password, token, or other
-credential. Do not implement OAuth/MCP transport.
-
-Use MCP only when the discovered `rfc8805-row-place-search` definition has an
-`outputSchema` and supports the five allowlisted request fields plus the
-row-correlation semantics needed by the local adapter. If it lacks an
-`outputSchema`, cannot satisfy those checks, or MCP is unavailable, explain
-that enrichment was skipped and continue with the local analysis. Export
-batches using the discovered limit:
+Ask the host to discover the Fastah MCP tool `rfc8805-row-place-search`, its
+current closed schema, and its advertised positive batch limit (the current
+service accepts 1–1,000 rows). If the host
+asks the user to sign in, use the host's normal OAuth flow. Never ask the user
+to paste a password, token, or other credential. Do not implement OAuth/MCP
+transport. Export batches using that exact discovered limit. If discovery does
+not expose a positive limit, use the conservative fallback of 100 rows; the
+captured response still records and validates the server's returned limit:
 
 ```bash
 "$PYTHON" "$RUN" mcp-export "$CURRENT_IR" \
-  --batch-limit "$DISCOVERED_BATCH_LIMIT" \
+  --batch-limit "${DISCOVERED_BATCH_LIMIT:-100}" \
   --output-dir "$WORK/mcp-requests"
 ```
 
-Have the host invoke `rfc8805-row-place-search` once per batch and save each
-validated structured response in order under `WORK`. Inspect every outbound JSON
+Have the host invoke only `rfc8805-row-place-search` once per batch and save
+each structured response in order under `WORK`. Inspect every outbound JSON
 object first: it must contain only `rows`, and every row must contain only the
 five allowlisted fields above. Export deterministically groups only exact,
 byte-identical `(countryCode, regionCode, cityName, searchMode)` tuples in
@@ -164,7 +157,7 @@ or populate/apply location fields. Then import all captured responses:
 ```bash
 "$PYTHON" "$RUN" mcp-import "$CURRENT_IR" "$WORK"/mcp-response-*.json \
   --mapping "$WORK/mcp-requests/mapping.json" \
-  --batch-limit "$DISCOVERED_BATCH_LIMIT" \
+  --batch-limit "${DISCOVERED_BATCH_LIMIT:-100}" \
   --output "$WORK/analysis-enriched.json"
 ```
 
@@ -183,10 +176,13 @@ trigger a correction automatically. If MCP is unavailable, continue offline.
 The Analysis JSON itself is the JSON artifact. Renderers accept only validated
 IR and do not recompute findings. Explain output distinctions using
 [Interpretation guide](references/interpretation.md). Present the files through
-the host; the offline dashboard needs no server or Mapbox token. Offline or
-RDAP-only analysis has no point or bounds geometry. In that case GeoJSON is a
-valid empty FeatureCollection and the launcher prints an informational message;
-only MCP place evidence can populate its features.
+the host; the offline dashboard needs no server or Mapbox token. GeoJSON emits
+one feature per row with a canonical prefix, carrying the declared geography,
+declaration depth, finding summaries, ASN/organization/routing association
+evidence, and MCP H3 cells — use it to build tables and maps in any GeoJSON
+client. Geometry (MCP best-match bounding box, else center point) is null
+without usable MCP place evidence; features and their declared data remain
+present either way, and no geometry is ever invented.
 
 ### 6. Propose, review, and explicitly approve corrections
 

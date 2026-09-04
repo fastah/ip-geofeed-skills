@@ -1,5 +1,17 @@
 # Copyright 2026 Fastah Inc.
-"""Privacy-bounded GeoJSON projection of validated Analysis IR."""
+"""Rich per-row GeoJSON projection of validated Analysis IR.
+
+One feature is emitted for every row that has a canonical prefix. Each feature
+carries the row's declared geography, a declaration-depth classification
+(country/region/city/none), finding summaries, typed ASN/organization/routing
+associations, and MCP H3 cell identifiers. Geometry follows the
+regions-over-points principle: the MCP best-match bounding box is preferred and
+the center point is the fallback, so coarse declarations render as areas rather
+than false-precision points; geometry is null when no MCP evidence exists and
+is never invented. The property set remains an allowlist: source URLs and
+comments, publisher and RDAP identifiers, raw MCP messages, correction data,
+rank, radius, and population weight are never projected.
+"""
 
 from __future__ import annotations
 
@@ -10,7 +22,18 @@ from typing import Any, Literal
 
 from pydantic import Field, model_validator
 
-from .models import Analysis, McpObservation, Model, RowRecord
+from .models import (
+    AddressFamily,
+    Analysis,
+    ASNOrganizationAssociation,
+    ASNRegistrationAssociation,
+    McpObservation,
+    McpPlaceMatch,
+    Model,
+    PrefixValue,
+    RoutingOriginAssociation,
+    RowRecord,
+)
 from .schema import validate_document
 
 GEOJSON_ATTRIBUTION = "Contains information derived from GeoNames (https://www.geonames.org/)."
@@ -30,24 +53,69 @@ class GeoJsonGeometry(Model):
         return self
 
 
+class GeoJsonDeclaredLocation(Model):
+    country: str = ""
+    region: str = ""
+    city: str = ""
+    postalCode: str = ""
+
+
+class GeoJsonFindingSummary(Model):
+    ruleId: str
+    category: str
+    severity: Literal["error", "warning", "info"]
+
+
+class GeoJsonOriginGroup(Model):
+    asns: list[int]
+    asSet: bool = False
+
+
+class GeoJsonAsnAssociation(Model):
+    kind: Literal["routing_origin_snapshot", "asn_organization_snapshot", "asn_registration"]
+    matchedPrefix: str | None = None
+    originGroups: list[GeoJsonOriginGroup] = Field(default_factory=list)
+    asn: int | None = Field(default=None, ge=0, le=4_294_967_295)
+    asName: str | None = None
+    organizationName: str | None = None
+    organizationCountry: str | None = None
+    asnSourceRegistry: str | None = None
+
+
+class GeoJsonMcpEvidence(Model):
+    status: str
+    placeType: str
+    placeName: str
+    countryName: str
+    countryCode: str
+    regionName: str
+    regionCode: str
+    timezone: str
+    centerLongLat: list[float] = Field(default_factory=list)
+
+
 class GeoJsonProperties(Model):
     # Local Analysis row identifier; this is not the Fastah MCP wire rowKey.
     rowId: str = Field(pattern="^row-[0-9]+$")
     prefix: str
-    mcpStatus: str
-    placeType: str
-    placeName: str
-    countryCode: str
-    regionCode: str
-    geometryRole: Literal["best_match_point", "best_match_bounding_box"]
+    addressFamily: Literal["ipv4", "ipv6"] | None = None
+    parseStatus: str
+    rowState: str
+    declared: GeoJsonDeclaredLocation = Field(default_factory=GeoJsonDeclaredLocation)
+    declarationDepth: Literal["none", "country", "region", "city"]
+    geometryRole: Literal["best_match_point", "best_match_bounding_box", "none"]
     findingCount: int = Field(ge=0)
     highestSeverity: Literal["error", "warning", "info", "none"]
+    findings: list[GeoJsonFindingSummary] = Field(default_factory=list)
+    asnAssociations: list[GeoJsonAsnAssociation] = Field(default_factory=list)
+    h3Cells: list[str] = Field(default_factory=list)
+    mcp: GeoJsonMcpEvidence | None = None
 
 
 class GeoJsonFeature(Model):
     type: Literal["Feature"] = "Feature"
     id: str
-    geometry: GeoJsonGeometry
+    geometry: GeoJsonGeometry | None = None
     properties: GeoJsonProperties
 
 
@@ -102,56 +170,151 @@ def _highest_severity(
     return "none"
 
 
-def _properties(
-    observation: McpObservation,
-    rows: dict[str, RowRecord],
-    severities: dict[str, str],
-) -> GeoJsonProperties:
-    row = rows[observation.target_row_id]
-    match = observation.matches[0]
-    return GeoJsonProperties(
-        rowId=row.id,
-        prefix=row.prefix.canonical if row.prefix and row.prefix.canonical else "",
-        mcpStatus=observation.status.value,
+def _declared_location(row: RowRecord) -> GeoJsonDeclaredLocation:
+    location = row.location
+    if location is None:
+        return GeoJsonDeclaredLocation()
+    return GeoJsonDeclaredLocation(
+        country=location.country,
+        region=location.region,
+        city=location.city,
+        postalCode=location.postal_code,
+    )
+
+
+def declaration_depth(row: RowRecord) -> Literal["none", "country", "region", "city"]:
+    """Publisher declaration depth for a row, shared by all visual projections."""
+    location = row.location
+    if location is None:
+        return "none"
+    if location.city:
+        return "city"
+    if location.region:
+        return "region"
+    if location.country:
+        return "country"
+    return "none"
+
+
+def _address_family(prefix: PrefixValue) -> Literal["ipv4", "ipv6"] | None:
+    if prefix.address_family == AddressFamily.IPV4:
+        return "ipv4"
+    if prefix.address_family == AddressFamily.IPV6:
+        return "ipv6"
+    return None
+
+
+def _asn_associations(
+    association_ids: list[str], associations_by_id: dict[str, Any]
+) -> list[GeoJsonAsnAssociation]:
+    projected: list[GeoJsonAsnAssociation] = []
+    for association_id in association_ids:
+        association = associations_by_id[association_id]
+        if isinstance(association, RoutingOriginAssociation):
+            projected.append(
+                GeoJsonAsnAssociation(
+                    kind=association.kind,
+                    matchedPrefix=association.matched_prefix,
+                    originGroups=[
+                        GeoJsonOriginGroup(asns=group.asns, asSet=group.as_set)
+                        for group in association.origin_groups
+                    ],
+                )
+            )
+        elif isinstance(association, ASNOrganizationAssociation):
+            projected.append(
+                GeoJsonAsnAssociation(
+                    kind=association.kind,
+                    asn=association.asn,
+                    asName=association.as_name,
+                    organizationName=association.organization_name,
+                    organizationCountry=association.organization_country,
+                    asnSourceRegistry=association.asn_source_registry,
+                )
+            )
+        elif isinstance(association, ASNRegistrationAssociation):
+            projected.append(
+                GeoJsonAsnAssociation(
+                    kind=association.kind,
+                    asn=association.asn,
+                    organizationName=association.organization_name,
+                )
+            )
+    return projected
+
+
+def _mcp_evidence(observation: McpObservation, match: McpPlaceMatch) -> GeoJsonMcpEvidence:
+    return GeoJsonMcpEvidence(
+        status=observation.status.value,
         placeType=match.place_type.value,
         placeName=match.place_name,
+        countryName=match.country_name,
         countryCode=match.country_code,
+        regionName=match.region_name,
         regionCode=match.region_code,
-        geometryRole="best_match_point",
-        findingCount=len(row.finding_ids),
-        highestSeverity=_highest_severity(severities, row.finding_ids),
+        timezone=match.timezone,
+        centerLongLat=list(match.center_long_lat),
     )
 
 
 def export_geojson_analysis(analysis: Analysis) -> GeoJsonFeatureCollection:
     features: list[GeoJsonFeature] = []
-    rows = {row.id: row for row in analysis.rows}
     severities = {finding.id: finding.severity.value for finding in analysis.findings}
-    for observation in analysis.enrichment.mcp_observations:
-        if not observation.matches:
+    findings_by_id = {finding.id: finding for finding in analysis.findings}
+    associations_by_id = {
+        association.id: association for association in analysis.enrichment.asn_associations
+    }
+    mcp_by_row = {
+        observation.target_row_id: observation
+        for observation in analysis.enrichment.mcp_observations
+    }
+    for row in analysis.rows:
+        prefix_value = row.prefix
+        prefix = prefix_value.canonical if prefix_value and prefix_value.canonical else None
+        if prefix is None or prefix_value is None:
             continue
-        match = observation.matches[0]
-        properties = _properties(observation, rows, severities)
-        if _valid_point(match.center_long_lat):
-            features.append(
-                GeoJsonFeature(
-                    id=f"{observation.id}-point",
-                    geometry=GeoJsonGeometry(type="Point", coordinates=list(match.center_long_lat)),
-                    properties=properties,
-                )
+        finding_summaries = [
+            GeoJsonFindingSummary(
+                ruleId=findings_by_id[finding_id].rule_id,
+                category=findings_by_id[finding_id].category.value,
+                severity=findings_by_id[finding_id].severity.value,
             )
-        if _valid_bbox(match.bounding_box):
-            features.append(
-                GeoJsonFeature(
-                    id=f"{observation.id}-bbox",
-                    geometry=GeoJsonGeometry(
-                        type="Polygon", coordinates=_bbox_polygon(match.bounding_box)
-                    ),
-                    properties=properties.model_copy(
-                        update={"geometryRole": "best_match_bounding_box"}
-                    ),
+            for finding_id in row.finding_ids
+            if finding_id in findings_by_id
+        ]
+        observation = mcp_by_row.get(row.id)
+        match = observation.matches[0] if observation and observation.matches else None
+        geometry: GeoJsonGeometry | None = None
+        geometry_role: Literal["best_match_point", "best_match_bounding_box", "none"] = "none"
+        if match is not None:
+            # Regions over points: render the declared/matched extent as an area
+            # first so coarse declarations keep their statistical honesty; the
+            # center point is only a fallback when no usable bbox exists.
+            if _valid_bbox(match.bounding_box):
+                geometry = GeoJsonGeometry(
+                    type="Polygon", coordinates=_bbox_polygon(match.bounding_box)
                 )
-            )
+                geometry_role = "best_match_bounding_box"
+            elif _valid_point(match.center_long_lat):
+                geometry = GeoJsonGeometry(type="Point", coordinates=list(match.center_long_lat))
+                geometry_role = "best_match_point"
+        properties = GeoJsonProperties(
+            rowId=row.id,
+            prefix=prefix,
+            addressFamily=_address_family(prefix_value),
+            parseStatus=row.parse_status.value,
+            rowState=row.state.value,
+            declared=_declared_location(row),
+            declarationDepth=declaration_depth(row),
+            geometryRole=geometry_role,
+            findingCount=len(row.finding_ids),
+            highestSeverity=_highest_severity(severities, row.finding_ids),
+            findings=finding_summaries,
+            asnAssociations=_asn_associations(row.asn_association_ids, associations_by_id),
+            h3Cells=list(match.h3_cells) if match is not None else [],
+            mcp=_mcp_evidence(observation, match) if observation is not None and match else None,
+        )
+        features.append(GeoJsonFeature(id=row.id, geometry=geometry, properties=properties))
     return GeoJsonFeatureCollection(features=features)
 
 

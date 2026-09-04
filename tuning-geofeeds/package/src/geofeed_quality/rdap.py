@@ -9,7 +9,7 @@ import threading
 import time
 import unicodedata
 from collections.abc import Callable, Mapping
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass, replace
 from datetime import UTC, datetime
 from email.utils import parsedate_to_datetime
@@ -20,6 +20,7 @@ import httpx
 from pydantic import JsonValue
 
 from .models import (
+    SCHEMA_VERSION,
     Analysis,
     Evidence,
     EvidenceType,
@@ -38,7 +39,7 @@ from .models import (
 
 IANA_IPV4_BOOTSTRAP = "https://data.iana.org/rdap/ipv4.json"
 IANA_IPV6_BOOTSTRAP = "https://data.iana.org/rdap/ipv6.json"
-DEFAULT_USER_AGENT = "Fastah-NetOps-Tools-geofeed-quality/0.3.0 (+https://fastah.net/)"
+DEFAULT_USER_AGENT = f"Fastah-NetOps-Tools-geofeed-quality/{SCHEMA_VERSION} (+https://fastah.net/)"
 
 
 @dataclass(frozen=True)
@@ -759,8 +760,14 @@ def enrich_analysis(
     analysis: Analysis,
     client: RdapLookupClient,
     profile: PublisherProfile | None = None,
+    progress: Callable[[int, int, RdapLookupResult], None] | None = None,
 ) -> Analysis:
-    """Return a new analysis with optional RDAP evidence; base row validity is untouched."""
+    """Return a new analysis with optional RDAP evidence; base row validity is untouched.
+
+    ``progress`` receives each completed lookup, its one-based completion count,
+    and the total canonical public-prefix count. It is intentionally transient
+    and never becomes Analysis IR evidence.
+    """
     enriched = analysis.model_copy(deep=True)
     enriched.configuration.enrichment_enabled = True
     enriched.configuration.rdap = client.config.summary()
@@ -794,8 +801,15 @@ def enrich_analysis(
         if row.prefix and row.prefix.canonical and row.prefix.is_publicly_routable is True:
             groups.setdefault(row.prefix.canonical, []).append(row.id)
     prefixes = sorted(groups, key=lambda value: (ipaddress.ip_network(value).version, value))
+    results_by_prefix: dict[str, RdapLookupResult] = {}
     with ThreadPoolExecutor(max_workers=client.config.max_concurrency) as executor:
-        results = list(executor.map(client.lookup, prefixes))
+        futures = {executor.submit(client.lookup, prefix): prefix for prefix in prefixes}
+        for completed, future in enumerate(as_completed(futures), start=1):
+            result = future.result()
+            results_by_prefix[futures[future]] = result
+            if progress is not None:
+                progress(completed, len(prefixes), result)
+    results = [results_by_prefix[prefix] for prefix in prefixes]
 
     for index, result in enumerate(results, start=1):
         if result.failure_code:

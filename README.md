@@ -108,7 +108,7 @@ All local artifacts stay in the work directory you choose until you delete or sh
 | Analysis JSON | Complete typed record of rows, findings, relationships, and optional evidence | Local. It can contain prefixes, source values, and retained physical lines. |
 | Markdown | Fast review and change discussion | Local unless you share it. It can name prefixes and findings. |
 | Offline HTML | Searchable dashboard with the Analysis data embedded | Local unless you share it. It contains the full report and can be large. |
-| GeoJSON | Map data from MCP place evidence | Local unless you share it. Offline or registry-only analysis produces a valid empty FeatureCollection and an informational CLI message; no geometry is invented. |
+| GeoJSON | One feature per prefix row: declared geography, declaration depth, finding summaries, ASN/org/routing associations, MCP H3 cells, and place geometry when available | Local unless you share it. Geometry is null without MCP place evidence; no geometry is invented. |
 | Correction plan and approval | Exact proposals and your decisions | Local. They bind decisions to the source and analysis. |
 | Corrected CSV | Full approved feed for your publication process | Local until you publish it. Publication is always manual. |
 | Registry request | Optional authority-consistency check | The canonical prefix goes directly to the authoritative registry selected through current bootstrap data. |
@@ -151,7 +151,7 @@ before enabling the optional online step.
 | More than 400,000 data rows | Analysis stops before creating partial Analysis JSON. Nothing is truncated. | Do not split the feed to hide the limit. Reduce scope only through your normal source-management process. |
 | Invalid UTF-8 | Local analysis stops with an encoding error. | Keep the original file. Save a separate verified UTF-8 working copy. |
 | Remote feed URL | Download is owned by the host, not this package. Allowlisted networks may block it. | Use the host's normal download capability. If unavailable, upload the CSV. Do not bypass network policy or reconstruct it. |
-| Empty GeoJSON | The valid FeatureCollection has no features when no MCP place evidence supplies usable coordinates or bounds. | Use Markdown and Analysis JSON for offline findings. Run optional MCP only after agreeing to its privacy boundary. RDAP does not populate GeoJSON. |
+| GeoJSON without geometry | Features exist for every prefix row with declared data, but geometry is null when no MCP place evidence supplies usable coordinates or bounds. | Use the per-feature properties for tables; run optional MCP only after agreeing to its privacy boundary to add map geometry. RDAP does not populate geometry. |
 | Declared non-UTF-8 source | The analyzer does not silently convert it. | Keep the raw file and create a separate strict UTF-8 copy with both digests. Do not special-case a hostname. |
 | Prefix has host bits | The authored CIDR is retained but marked invalid. | Confirm the intended network address. Do not accept automatic masking without checking the allocation. |
 | Country or region code is invalid | The row is retained with a finding. | Check the intended ISO country and subdivision code. Empty or `ZZ` country has a separate do-not-geolocate meaning. |

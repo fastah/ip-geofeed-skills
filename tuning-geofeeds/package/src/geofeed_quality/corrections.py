@@ -27,6 +27,7 @@ from .models import (
     CorrectionProposal,
     Evidence,
     EvidenceType,
+    McpPlaceType,
     McpRowStatus,
     ParseStatus,
     RowKind,
@@ -206,7 +207,11 @@ def propose_corrections(analysis: Analysis) -> tuple[Analysis, CorrectionPlan]:
         candidates: tuple[tuple[Literal["country", "region", "city"], str, str], ...] = (
             ("country", match.country_code, row.location.country),
             ("region", match.region_code, row.location.region),
-            ("city", match.place_name, row.location.city),
+            (
+                "city",
+                match.place_name if match.place_type == McpPlaceType.CITY else "",
+                row.location.city,
+            ),
         )
         mcp_findings = _related_findings(analysis, row.id, "MCP.MATCHED")
         for field_name, value, normalized_old in candidates:
@@ -267,6 +272,9 @@ def record_approval(
     unknown = sorted(set(all_requested) - known)
     if unknown:
         raise CorrectionError(f"approval references unknown proposal {unknown[0]}")
+    missing = sorted(known - set(all_requested))
+    if missing:
+        raise CorrectionError(f"approval omits a decision for proposal {missing[0]}")
     decisions = [
         *(
             CorrectionDecision(proposal_id=proposal_id, action=CorrectionAction.APPROVE)
@@ -306,6 +314,12 @@ def validate_approval(analysis: Analysis, approval: CorrectionApproval) -> None:
     unknown = sorted({decision.proposal_id for decision in approval.decisions} - known)
     if unknown:
         raise CorrectionError(f"approval references unknown proposal {unknown[0]}")
+    decision_ids = [decision.proposal_id for decision in approval.decisions]
+    if len(decision_ids) != len(set(decision_ids)):
+        raise CorrectionError("approval contains duplicate proposal IDs")
+    missing = sorted(known - set(decision_ids))
+    if missing:
+        raise CorrectionError(f"approval omits a decision for proposal {missing[0]}")
 
 
 def _source_bytes(analysis: Analysis) -> bytes:
