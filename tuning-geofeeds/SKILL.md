@@ -5,7 +5,7 @@ license: Apache-2.0
 compatibility: "Requires Python 3.14+. Runs locally by default; network access is optional and limited to managed public-HTTPS acquisition, direct authoritative RIR RDAP, and host-mediated Fastah MCP."
 metadata:
   author: fastah
-  version: "0.2.1"
+  version: "0.3.0"
 ---
 
 # Tune public geofeeds
@@ -37,8 +37,13 @@ reconstruct feed rows.
 - Do not write parser, validator, schema, renderer, or correction scripts.
   Invoke `scripts/geofeed_cli.py`; the typed models and committed schemas are
   the source of truth.
-- Do not start an unmanaged web server or tell the user to open localhost.
-  Return artifacts through the host's file or attachment mechanism.
+- Do not start a web server on your own, and never bind to a public interface.
+  First present results in chat. The HTML dashboard is the primary review
+  surface; offer to open it for the user. Only after the user explicitly asks
+  to view the dashboard in a browser, serve only the user's own generated
+  artifacts on `127.0.0.1` (never `0.0.0.0`), prefer the host's built-in
+  portal/preview mechanism in sandboxed environments, warn the user that the
+  dashboard contains their prefixes, and stop the server once the review ends.
 
 ## Available scripts
 
@@ -61,8 +66,22 @@ WORK="/absolute/path/to/user-selected-work-directory"
 mkdir -p "$WORK"
 ```
 
-Before the first run, follow [Python setup](references/setup.md). Use
-`"$PYTHON" "$RUN" --help` for the current command contract.
+Before the first run, verify the install: confirm both
+`scripts/geofeed_cli.py` and `package/pyproject.toml` exist under the skill
+root. If either is missing, do not debug the subdirectory — reinstall the
+complete skill from the bundle root and start over.
+
+Then set up Python. Offer `--bootstrap` first; it is one command and
+non-interactive (it automates the virtual environment only; obtaining Python
+3.14 remains a host/user step):
+
+```bash
+"$PYTHON" "$RUN" --bootstrap "$WORK"
+# prints PYTHON=... — use that interpreter for every later command
+```
+
+If bootstrap is unavailable, fall back to [Python setup](references/setup.md).
+Use `"$PYTHON" "$RUN" --help` for the current command contract.
 
 ## Default workflow
 
@@ -70,7 +89,7 @@ Track these gates and do not skip from analysis to export:
 
 - [ ] Local source acquired safely
 - [ ] Base Analysis JSON created and findings summarized
-- [ ] Optional RDAP and MCP stages explicitly chosen
+- [ ] Optional RDAP and MCP stages explicitly chosen by the user (silence means offline)
 - [ ] JSON, Markdown, HTML, and GeoJSON rendered from the final validated IR
 - [ ] Proposals reviewed
 - [ ] Exact decisions recorded only after user approval
@@ -87,6 +106,20 @@ working copy.
 Set `INPUT` to that absolute local path.
 Analysis records `source.sha256` for audits and for binding later approvals to
 the analyzed file. Most users do not need to calculate a separate digest.
+
+### 1a. Ask once about optional network evidence
+
+Before analysis, ask one consent question:
+
+> Recommended: run local RFC checks plus RDAP and Fastah place validation.
+> RDAP sends each canonical public prefix directly to its authoritative RIR.
+> Fastah receives only a generated row key and the declared country, region,
+> city, and search mode — never prefixes or the feed. Both provide evidence
+> only; your file is not changed. Choose: recommended RDAP + Fastah, RDAP only,
+> Fastah only, or offline only.
+
+An affirmative reply is consent; silence means offline. Ask the publisher
+profile question only after the user selects RDAP.
 
 ### 2. Analyze locally and present base findings
 
@@ -226,6 +259,9 @@ values, or existing output paths.
 ## Finish
 
 Report absolute artifact paths, source digest, row/finding counts, enrichment
-status, approved/rejected proposal IDs, and remaining findings. State clearly
-which claims are authored, advisory, or approved. Mention skipped or failed
-optional stages without fabricating results.
+status, approved/rejected proposal IDs, and remaining findings. Lead with the
+outcome in the user's terms — for example: "Your feed has 3 rows that will not
+geolocate correctly; here is what would fix each one." Then say which numbers
+are your declarations, which are advisory external evidence, and which changes
+were approved. Mention skipped or failed optional stages without fabricating
+results.

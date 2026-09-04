@@ -1,5 +1,13 @@
 # Output interpretation
 
+Explain results in the user's language first, then the precise terms. Say what
+a row state means for the user's feed ("this row will not geolocate correctly")
+before naming the state (`valid_unresolved`). When a term could be new to the
+user, define it once in plain words and then use it consistently. The dashboard
+glossary (row states and source format) and the GeoJSON `rowStateDefinitions`
+member carry these definitions; point users there instead of inventing new
+labels.
+
 Use these boundaries when explaining a validated Analysis IR or its renderers:
 
 - **Authored values** are retained source values. Normalized values do not

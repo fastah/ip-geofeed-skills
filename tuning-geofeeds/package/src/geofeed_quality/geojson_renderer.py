@@ -119,9 +119,21 @@ class GeoJsonFeature(Model):
     properties: GeoJsonProperties
 
 
+ROW_STATE_DEFINITIONS = {
+    "valid_unresolved": (
+        "Parsed successfully and carries a declared location; external geocode "
+        "checks are recorded separately when run."
+    ),
+    "valid_do_not_geolocate": ("The publisher declared that this prefix must not be geolocated."),
+    "invalid": "The row failed validation and is retained as authored.",
+    "not_applicable": "Comment or blank line.",
+}
+
+
 class GeoJsonFeatureCollection(Model):
     type: Literal["FeatureCollection"] = "FeatureCollection"
     features: list[GeoJsonFeature]
+    rowStateDefinitions: dict[str, str] = Field(default_factory=lambda: dict(ROW_STATE_DEFINITIONS))
     attribution: list[str] = Field(default_factory=lambda: [GEOJSON_ATTRIBUTION])
 
 

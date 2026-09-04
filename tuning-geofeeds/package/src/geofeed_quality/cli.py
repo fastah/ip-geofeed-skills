@@ -250,10 +250,18 @@ def main(argv: Sequence[str] | None = None) -> int:
         if args.command == "export-geojson":
             document = export_geojson_file(args.input)
             _write_atomic_new(args.output, (json.dumps(document, indent=2) + "\n").encode())
-            if not document["features"]:
+            features = document["features"]
+            if not features:
                 print(
                     "info: GeoJSON contains zero features because no rows with "
                     "canonical prefixes are present",
+                    file=sys.stderr,
+                )
+            elif all(feature["geometry"] is None for feature in features):
+                print(
+                    f"warning: GeoJSON contains {len(features)} features but no map "
+                    "geometry. Properties remain usable for tables; run Fastah place "
+                    "validation and re-export to add available points or bounds.",
                     file=sys.stderr,
                 )
             return 0
