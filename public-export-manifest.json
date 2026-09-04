@@ -4,12 +4,12 @@
     {
       "bytes": 725,
       "path": ".claude-plugin/plugin.json",
-      "sha256": "a6cf63780587e378d4b2be6dc4f9abb6214630bcff13bb65ef28bf77fd68ea32"
+      "sha256": "ea29390ab99120cc7a5702ffe3b48209c3683e63a9d4e6b62417baed14a584be"
     },
     {
       "bytes": 495,
       "path": ".github/plugin/plugin.json",
-      "sha256": "711f0acab84d83c69d42575cde9ecf80b0aef3af2c8fd9fd116ae2bdde55612d"
+      "sha256": "d934fa0f61151b057b46626964220668c893c929e9afe480069a71859f4673bc"
     },
     {
       "bytes": 118,
@@ -39,7 +39,7 @@
     {
       "bytes": 13119,
       "path": "README.md",
-      "sha256": "778a378e90880e970cdb4f0d5b12eaf0256b78386631901164db4cb45111f08e"
+      "sha256": "6936439be8a89f27ca67d7e048f575a3bffa2dd23971553d043acf4e920bfb1a"
     },
     {
       "bytes": 118,
@@ -49,7 +49,7 @@
     {
       "bytes": 10778,
       "path": "tuning-geofeeds/SKILL.md",
-      "sha256": "0622206370133eb63c6ae644df0d24c0649bcf69f80b11e64f4087a7879dd142"
+      "sha256": "7fb756381e0647ee2d0102e163d31a49e8fcfe2e1556cc2cfc057fa686fbbd95"
     },
     {
       "bytes": 1823,
