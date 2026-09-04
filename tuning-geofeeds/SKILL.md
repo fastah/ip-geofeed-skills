@@ -5,7 +5,7 @@ license: Apache-2.0
 compatibility: "Requires Python 3.14+. Runs locally by default; network access is optional and limited to managed public-HTTPS acquisition, direct authoritative RIR RDAP, and host-mediated Fastah MCP."
 metadata:
   author: fastah
-  version: "0.3.1"
+  version: "0.3.2"
 ---
 
 # Tune public geofeeds
@@ -199,8 +199,11 @@ or populate/apply location fields. Then import all captured responses:
 
 If the host can capture only some batches now, import those with `--partial`
 and repeat the import on its own output to add more batches; rows in
-uncaptured batches simply carry no MCP observations, and the import prints a
-warning stating how many batches remain.
+uncaptured batches simply carry no MCP observations. Each `--partial` run
+reports cumulative coverage ("N of M exported batches covered so far").
+Re-importing an identical response is a safe, idempotent no-op, so retrying
+after an interruption cannot corrupt the output; a conflicting response still
+fails closed.
 
 Set `CURRENT_IR` to the enriched output. Partial, no-match, invalid-input, or
 backend-unavailable statuses remain evidence and never erase base findings or
@@ -217,13 +220,17 @@ trigger a correction automatically. If MCP is unavailable, continue offline.
 The Analysis JSON itself is the JSON artifact. Renderers accept only validated
 IR and do not recompute findings. Explain output distinctions using
 [Interpretation guide](references/interpretation.md). Present the files through
-the host; the offline dashboard needs no server or Mapbox token. GeoJSON emits
+the host; the offline dashboard needs no server, no map tokens, and no map
+account — the map is vendored Leaflet with OpenStreetMap tiles. GeoJSON emits
 one feature per row with a canonical prefix, carrying the declared geography,
 declaration depth, finding summaries, ASN/organization/routing association
 evidence, and MCP H3 cells — use it to build tables and maps in any GeoJSON
 client. Geometry (MCP best-match bounding box, else center point) is null
 without usable MCP place evidence; features and their declared data remain
-present either way, and no geometry is ever invented.
+present either way, and no geometry is ever invented. The dashboard embeds the
+full GeoJSON inline, so very large enriched feeds produce large dashboard
+files — fine for review, but expect tens of megabytes for feeds with many
+thousands of enriched rows.
 
 ### 6. Propose, review, and explicitly approve corrections
 

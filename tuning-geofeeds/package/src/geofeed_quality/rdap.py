@@ -691,8 +691,9 @@ def _assessment(
         for item in public_ids
         if "org" in item.type or "handle" in item.type
     }
+    handle_names = {handle.casefold() for handle in handles}
     comparisons = {
-        "organization_name": (profile.organization_name, names),
+        "organization_name": (profile.organization_name, names | handle_names),
         "asn": (profile.asn, asns),
         "rdap_entity_handle": (profile.rdap_entity_handle, handles),
         "rir_organization_id": (profile.rir_organization_id, org_ids),
@@ -717,11 +718,25 @@ def _assessment(
             conflicting,
         )
     if matched:
-        return (
-            RdapAssessment.CONSISTENT,
+        handle_only_name = (
+            profile.organization_name is not None
+            and "organization_name" in matched
+            and _normal_name(profile.organization_name) not in names
+            and _normal_name(profile.organization_name) in handle_names
+        )
+        explanation = (
             "Authoritative RDAP identifiers are consistent for profile fields: "
             + ", ".join(matched)
-            + ". This does not prove legal ownership.",
+            + ". This does not prove legal ownership."
+        )
+        if handle_only_name:
+            explanation += (
+                " The organization_name comparison matched an RDAP handle rather than"
+                " an organization name."
+            )
+        return (
+            RdapAssessment.CONSISTENT,
+            explanation,
             matched,
             [],
         )

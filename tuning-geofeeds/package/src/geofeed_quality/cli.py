@@ -20,7 +20,7 @@ from .corrections import (
 )
 from .errors import AnalysisError
 from .geojson_renderer import export_geojson_file
-from .html_renderer import MapboxOptions, render_html_file
+from .html_renderer import render_html_file
 from .mcp_exchange import (
     DEFAULT_MCP_FALLBACK_BATCH_LIMIT,
     export_request_exchange,
@@ -92,15 +92,6 @@ Requested output files are created atomically and are never overwritten.""",
     )
     render_html.add_argument("input", type=Path)
     render_html.add_argument("--output", type=Path, required=True)
-    render_html.add_argument(
-        "--mapbox-token-file",
-        type=Path,
-        help="UTF-8 file containing a public pk.* token; token is embedded only in HTML",
-    )
-    render_html.add_argument(
-        "--mapbox-style",
-        help="mapbox://styles/<owner>/<style> or api.mapbox.com styles/v1 URL",
-    )
 
     geojson = subcommands.add_parser(
         "export-geojson", help="export privacy-allowlisted geographic evidence from validated IR"
@@ -250,15 +241,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             _write_atomic_new(args.output, render_markdown_file(args.input).encode())
             return 0
         if args.command == "render-html":
-            if bool(args.mapbox_token_file) != bool(args.mapbox_style):
-                raise ValueError("--mapbox-token-file and --mapbox-style must be supplied together")
-            options = None
-            if args.mapbox_token_file:
-                options = MapboxOptions(
-                    token=args.mapbox_token_file.read_text(encoding="utf-8").strip(),
-                    style=args.mapbox_style,
-                )
-            _write_atomic_new(args.output, render_html_file(args.input, options).encode())
+            _write_atomic_new(args.output, render_html_file(args.input).encode())
             return 0
         if args.command == "export-geojson":
             document = export_geojson_file(args.input)
@@ -370,11 +353,27 @@ def main(argv: Sequence[str] | None = None) -> int:
             enriched = import_response_batches(
                 analysis, responses, mapping, args.batch_limit, args.search_mode, args.partial
             )
-            if args.partial and len(responses) < mapping_batches:
+            if args.partial:
+                observed_ids = {
+                    observation.opaque_row_id
+                    for observation in enriched.enrichment.mcp_observations
+                }
+                covered = 0
+                for batch in mapping["batches"]:
+                    target_keys = [
+                        key for target in batch["targets"] for key in target["targetOpaqueRowKeys"]
+                    ]
+                    if target_keys and set(target_keys) <= observed_ids:
+                        covered += 1
+                state = (
+                    "all exported batches covered"
+                    if covered == mapping_batches
+                    else f"{mapping_batches - covered} batch(es) not yet captured"
+                )
                 print(
-                    f"warning: partial import: {len(responses)} of {mapping_batches} exported "
-                    "batches captured; rows in uncaptured batches have no MCP observations. "
-                    "Repeat mcp-import with --partial on this output to add more batches.",
+                    f"partial import: {len(responses)} response(s) captured this run; "
+                    f"{covered} of {mapping_batches} exported batches covered so far "
+                    f"({state}). Re-importing an identical response is a safe no-op.",
                     file=sys.stderr,
                 )
             output = enriched.model_dump(mode="json")
