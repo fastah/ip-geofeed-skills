@@ -51,14 +51,14 @@ def source_format_summary(analysis: Analysis) -> str:
             f"{count} rows with {fields} fields" for fields, count in sorted(field_counts.items())
         )
     ignored_text = (
-        f"{ignored_rows} rows carry extension fields that were ignored"
+        f"We skipped {ignored_rows} rows that carry extension fields"
         if ignored_rows
-        else "no extension fields were ignored"
+        else "We didn't skip any extension fields"
     )
     return (
-        f"Source format: {len(data_rows)} data rows; {ending_text}; {field_text} "
-        f"(the fifth field is the postal code; an empty postal code is valid, "
-        f"not an error); {ignored_text}."
+        f"Your feed: {len(data_rows):,} data rows, {ending_text}, {field_text}. "
+        f"The fifth field is the postal code — leaving it blank is totally fine, "
+        f"not an error. {ignored_text}."
     )
 
 
