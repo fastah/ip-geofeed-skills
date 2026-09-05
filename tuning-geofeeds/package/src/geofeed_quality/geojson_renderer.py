@@ -121,12 +121,16 @@ class GeoJsonFeature(Model):
 
 ROW_STATE_DEFINITIONS = {
     "valid_unresolved": (
-        "Parsed successfully and carries a declared location; external geocode "
-        "checks are recorded separately when run."
+        "Parsed fine and has a location you declared. If you run the external "
+        "checks, we note what they think separately."
     ),
-    "valid_do_not_geolocate": ("The publisher declared that this prefix must not be geolocated."),
-    "invalid": "The row failed validation and is retained as authored.",
-    "not_applicable": "Comment or blank line.",
+    "valid_do_not_geolocate": (
+        "You've flagged this prefix as \"don't geolocate me.\" We respect that and leave it alone."
+    ),
+    "invalid": (
+        "This row didn't parse. We keep it exactly as you wrote it, untouched, so nothing's lost."
+    ),
+    "not_applicable": "A comment or a blank line. Nothing to check here.",
 }
 
 

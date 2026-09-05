@@ -233,6 +233,16 @@ def main(argv: Sequence[str] | None = None) -> int:
                     profile,
                     report_rdap_progress,
                 )
+                observations = analysis.enrichment.observations
+                if observations and all(
+                    observation.assessment == "unavailable" for observation in observations
+                ):
+                    print(
+                        "note: no RDAP registry responded — is RDAP egress allowed "
+                        "on this host? Every prefix is recorded as unavailable and "
+                        "base findings stand; the run did not verify anything.",
+                        file=sys.stderr,
+                    )
             document = analysis.model_dump(mode="json")
             validate_document(document)
             _write_atomic_new(args.output, (json.dumps(document, indent=2) + "\n").encode())

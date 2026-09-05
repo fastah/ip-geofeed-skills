@@ -79,7 +79,10 @@ def main() -> int:
     if sys.version_info.releaselevel != "final":
         raise SystemExit(
             "error: tuning-geofeeds requires a final Python 3.14 or newer release; "
-            f"found prerelease {sys.version.split()[0]}"
+            f"found prerelease {sys.version.split()[0]}. Release candidates are "
+            "rejected on purpose. Fix: install a final release — for example "
+            "`uv python install 3.14` (upgrade uv first if it only offers rc "
+            "builds), then rerun with `--bootstrap`."
         )
     arguments = sys.argv[1:]
     if len(arguments) == 2 and arguments[0] == "--bootstrap":
