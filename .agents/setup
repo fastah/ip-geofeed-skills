@@ -42,7 +42,7 @@ if [[ ! -x "$venv/bin/python" ]] || [[ ! -f "$fingerprint_file" ]] || \
   rm -rf "$runtime_package"
   mkdir -p "$runtime_package"
   cp -a "$package_root/." "$runtime_package/"
-  "$uv_bin" venv --python 3.14 "$venv"
+  "$uv_bin" venv --clear --python 3.14 "$venv"
   "$uv_bin" pip install --python "$venv/bin/python" "$runtime_package"
   printf '%s\n' "$package_fingerprint" > "$fingerprint_file"
 else
